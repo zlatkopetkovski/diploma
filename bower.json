@@ -1,0 +1,21 @@
+{
+  "name": "diploma",
+  "homepage": "https://github.com/zlatkopetkovski/diploma",
+  "authors": [
+    "zlatkopetkovski <zlatko_petkovski@hotmail.com>"
+  ],
+  "description": "?",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^4.0.0",
+    "jquery": "^3.3.1"
+  }
+}

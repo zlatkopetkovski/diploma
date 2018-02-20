@@ -17,7 +17,6 @@
   "dependencies": {
     "bootstrap": "^4.0.0",
     "jquery": "^3.3.1",
-    "gulp": "^4.0.0",
-    "main-bower-files": "https://github.com/ck86/main-bower-files"
+    "gulp": "^4.0.0"
   }
 }

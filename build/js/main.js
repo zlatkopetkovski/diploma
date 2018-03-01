@@ -39508,6 +39508,61 @@ var Util = function ($) {
   return Util;
 }($);
 //# sourceMappingURL=util.js.map
+/* eslint-env node */
+/* eslint no-process-env: 0 */
+
+module.exports = (config) => {
+  const jqueryFile = process.env.USE_OLD_JQUERY ? 'js/tests/vendor/jquery-1.9.1.min.js' : 'assets/js/vendor/jquery-slim.min.js'
+
+  config.set({
+    basePath: '../..',
+    frameworks: ['qunit', 'detectBrowsers'],
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-qunit',
+      'karma-detect-browsers'
+    ],
+    // list of files / patterns to load in the browser
+    files: [
+      jqueryFile,
+      'assets/js/vendor/popper.min.js',
+      'js/dist/util.js',
+      'js/dist/tooltip.js',
+      'js/dist/!(util|index|tooltip).js', // include all of our js/dist files except util.js, index.js and tooltip.js
+      'js/tests/unit/*.js'
+    ],
+    reporters: ['dots'],
+    port: 9876,
+    colors: true,
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    logLevel: config.LOG_ERROR || config.LOG_WARN,
+    autoWatch: false,
+    customLaunchers: {
+      FirefoxHeadless: {
+        base: 'Firefox',
+        flags: ['-headless']
+      }
+    },
+    singleRun: true,
+    concurrency: Infinity,
+    detectBrowsers: {
+      usePhantomJS: false,
+      postDetection(availableBrowser) {
+        if (typeof process.env.TRAVIS_JOB_ID !== 'undefined' || availableBrowser.includes('Chrome')) {
+          return ['ChromeHeadless']
+        }
+
+        if (availableBrowser.includes('Firefox')) {
+          return ['FirefoxHeadless']
+        }
+
+        throw new Error('Please install Firefox or Chrome')
+      }
+    }
+  })
+}
+
 import $ from 'jquery'
 import Util from './util'
 
@@ -43557,61 +43612,6 @@ const Util = (($) => {
 
 export default Util
 
-/* eslint-env node */
-/* eslint no-process-env: 0 */
-
-module.exports = (config) => {
-  const jqueryFile = process.env.USE_OLD_JQUERY ? 'js/tests/vendor/jquery-1.9.1.min.js' : 'assets/js/vendor/jquery-slim.min.js'
-
-  config.set({
-    basePath: '../..',
-    frameworks: ['qunit', 'detectBrowsers'],
-    plugins: [
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-qunit',
-      'karma-detect-browsers'
-    ],
-    // list of files / patterns to load in the browser
-    files: [
-      jqueryFile,
-      'assets/js/vendor/popper.min.js',
-      'js/dist/util.js',
-      'js/dist/tooltip.js',
-      'js/dist/!(util|index|tooltip).js', // include all of our js/dist files except util.js, index.js and tooltip.js
-      'js/tests/unit/*.js'
-    ],
-    reporters: ['dots'],
-    port: 9876,
-    colors: true,
-    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR || config.LOG_WARN,
-    autoWatch: false,
-    customLaunchers: {
-      FirefoxHeadless: {
-        base: 'Firefox',
-        flags: ['-headless']
-      }
-    },
-    singleRun: true,
-    concurrency: Infinity,
-    detectBrowsers: {
-      usePhantomJS: false,
-      postDetection(availableBrowser) {
-        if (typeof process.env.TRAVIS_JOB_ID !== 'undefined' || availableBrowser.includes('Chrome')) {
-          return ['ChromeHeadless']
-        }
-
-        if (availableBrowser.includes('Firefox')) {
-          return ['FirefoxHeadless']
-        }
-
-        throw new Error('Please install Firefox or Chrome')
-      }
-    }
-  })
-}
-
 define( [
 	"../core",
 	"../var/isFunction",
@@ -47231,6 +47231,5073 @@ License:  MIT
  Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
  */(function(e,t){'object'==typeof exports&&'undefined'!=typeof module?module.exports=t():'function'==typeof define&&define.amd?define(t):e.Popper=t()})(this,function(){'use strict';function e(e){return e&&'[object Function]'==={}.toString.call(e)}function t(e,t){if(1!==e.nodeType)return[];var o=getComputedStyle(e,null);return t?o[t]:o}function o(e){return'HTML'===e.nodeName?e:e.parentNode||e.host}function n(e){if(!e)return document.body;switch(e.nodeName){case'HTML':case'BODY':return e.ownerDocument.body;case'#document':return e.body;}var i=t(e),r=i.overflow,p=i.overflowX,s=i.overflowY;return /(auto|scroll)/.test(r+s+p)?e:n(o(e))}function r(e){var o=e&&e.offsetParent,i=o&&o.nodeName;return i&&'BODY'!==i&&'HTML'!==i?-1!==['TD','TABLE'].indexOf(o.nodeName)&&'static'===t(o,'position')?r(o):o:e?e.ownerDocument.documentElement:document.documentElement}function p(e){var t=e.nodeName;return'BODY'!==t&&('HTML'===t||r(e.firstElementChild)===e)}function s(e){return null===e.parentNode?e:s(e.parentNode)}function d(e,t){if(!e||!e.nodeType||!t||!t.nodeType)return document.documentElement;var o=e.compareDocumentPosition(t)&Node.DOCUMENT_POSITION_FOLLOWING,i=o?e:t,n=o?t:e,a=document.createRange();a.setStart(i,0),a.setEnd(n,0);var l=a.commonAncestorContainer;if(e!==l&&t!==l||i.contains(n))return p(l)?l:r(l);var f=s(e);return f.host?d(f.host,t):d(e,s(t).host)}function a(e){var t=1<arguments.length&&void 0!==arguments[1]?arguments[1]:'top',o='top'===t?'scrollTop':'scrollLeft',i=e.nodeName;if('BODY'===i||'HTML'===i){var n=e.ownerDocument.documentElement,r=e.ownerDocument.scrollingElement||n;return r[o]}return e[o]}function l(e,t){var o=2<arguments.length&&void 0!==arguments[2]&&arguments[2],i=a(t,'top'),n=a(t,'left'),r=o?-1:1;return e.top+=i*r,e.bottom+=i*r,e.left+=n*r,e.right+=n*r,e}function f(e,t){var o='x'===t?'Left':'Top',i='Left'==o?'Right':'Bottom';return parseFloat(e['border'+o+'Width'],10)+parseFloat(e['border'+i+'Width'],10)}function m(e,t,o,i){return J(t['offset'+e],t['scroll'+e],o['client'+e],o['offset'+e],o['scroll'+e],ie()?o['offset'+e]+i['margin'+('Height'===e?'Top':'Left')]+i['margin'+('Height'===e?'Bottom':'Right')]:0)}function h(){var e=document.body,t=document.documentElement,o=ie()&&getComputedStyle(t);return{height:m('Height',e,t,o),width:m('Width',e,t,o)}}function c(e){return se({},e,{right:e.left+e.width,bottom:e.top+e.height})}function g(e){var o={};if(ie())try{o=e.getBoundingClientRect();var i=a(e,'top'),n=a(e,'left');o.top+=i,o.left+=n,o.bottom+=i,o.right+=n}catch(e){}else o=e.getBoundingClientRect();var r={left:o.left,top:o.top,width:o.right-o.left,height:o.bottom-o.top},p='HTML'===e.nodeName?h():{},s=p.width||e.clientWidth||r.right-r.left,d=p.height||e.clientHeight||r.bottom-r.top,l=e.offsetWidth-s,m=e.offsetHeight-d;if(l||m){var g=t(e);l-=f(g,'x'),m-=f(g,'y'),r.width-=l,r.height-=m}return c(r)}function u(e,o){var i=ie(),r='HTML'===o.nodeName,p=g(e),s=g(o),d=n(e),a=t(o),f=parseFloat(a.borderTopWidth,10),m=parseFloat(a.borderLeftWidth,10),h=c({top:p.top-s.top-f,left:p.left-s.left-m,width:p.width,height:p.height});if(h.marginTop=0,h.marginLeft=0,!i&&r){var u=parseFloat(a.marginTop,10),b=parseFloat(a.marginLeft,10);h.top-=f-u,h.bottom-=f-u,h.left-=m-b,h.right-=m-b,h.marginTop=u,h.marginLeft=b}return(i?o.contains(d):o===d&&'BODY'!==d.nodeName)&&(h=l(h,o)),h}function b(e){var t=e.ownerDocument.documentElement,o=u(e,t),i=J(t.clientWidth,window.innerWidth||0),n=J(t.clientHeight,window.innerHeight||0),r=a(t),p=a(t,'left'),s={top:r-o.top+o.marginTop,left:p-o.left+o.marginLeft,width:i,height:n};return c(s)}function w(e){var i=e.nodeName;return'BODY'===i||'HTML'===i?!1:'fixed'===t(e,'position')||w(o(e))}function y(e,t,i,r){var p={top:0,left:0},s=d(e,t);if('viewport'===r)p=b(s);else{var a;'scrollParent'===r?(a=n(o(t)),'BODY'===a.nodeName&&(a=e.ownerDocument.documentElement)):'window'===r?a=e.ownerDocument.documentElement:a=r;var l=u(a,s);if('HTML'===a.nodeName&&!w(s)){var f=h(),m=f.height,c=f.width;p.top+=l.top-l.marginTop,p.bottom=m+l.top,p.left+=l.left-l.marginLeft,p.right=c+l.left}else p=l}return p.left+=i,p.top+=i,p.right-=i,p.bottom-=i,p}function E(e){var t=e.width,o=e.height;return t*o}function v(e,t,o,i,n){var r=5<arguments.length&&void 0!==arguments[5]?arguments[5]:0;if(-1===e.indexOf('auto'))return e;var p=y(o,i,r,n),s={top:{width:p.width,height:t.top-p.top},right:{width:p.right-t.right,height:p.height},bottom:{width:p.width,height:p.bottom-t.bottom},left:{width:t.left-p.left,height:p.height}},d=Object.keys(s).map(function(e){return se({key:e},s[e],{area:E(s[e])})}).sort(function(e,t){return t.area-e.area}),a=d.filter(function(e){var t=e.width,i=e.height;return t>=o.clientWidth&&i>=o.clientHeight}),l=0<a.length?a[0].key:d[0].key,f=e.split('-')[1];return l+(f?'-'+f:'')}function O(e,t,o){var i=d(t,o);return u(o,i)}function L(e){var t=getComputedStyle(e),o=parseFloat(t.marginTop)+parseFloat(t.marginBottom),i=parseFloat(t.marginLeft)+parseFloat(t.marginRight),n={width:e.offsetWidth+i,height:e.offsetHeight+o};return n}function x(e){var t={left:'right',right:'left',bottom:'top',top:'bottom'};return e.replace(/left|right|bottom|top/g,function(e){return t[e]})}function S(e,t,o){o=o.split('-')[0];var i=L(e),n={width:i.width,height:i.height},r=-1!==['right','left'].indexOf(o),p=r?'top':'left',s=r?'left':'top',d=r?'height':'width',a=r?'width':'height';return n[p]=t[p]+t[d]/2-i[d]/2,n[s]=o===s?t[s]-i[a]:t[x(s)],n}function T(e,t){return Array.prototype.find?e.find(t):e.filter(t)[0]}function D(e,t,o){if(Array.prototype.findIndex)return e.findIndex(function(e){return e[t]===o});var i=T(e,function(e){return e[t]===o});return e.indexOf(i)}function C(t,o,i){var n=void 0===i?t:t.slice(0,D(t,'name',i));return n.forEach(function(t){t['function']&&console.warn('`modifier.function` is deprecated, use `modifier.fn`!');var i=t['function']||t.fn;t.enabled&&e(i)&&(o.offsets.popper=c(o.offsets.popper),o.offsets.reference=c(o.offsets.reference),o=i(o,t))}),o}function N(){if(!this.state.isDestroyed){var e={instance:this,styles:{},arrowStyles:{},attributes:{},flipped:!1,offsets:{}};e.offsets.reference=O(this.state,this.popper,this.reference),e.placement=v(this.options.placement,e.offsets.reference,this.popper,this.reference,this.options.modifiers.flip.boundariesElement,this.options.modifiers.flip.padding),e.originalPlacement=e.placement,e.offsets.popper=S(this.popper,e.offsets.reference,e.placement),e.offsets.popper.position='absolute',e=C(this.modifiers,e),this.state.isCreated?this.options.onUpdate(e):(this.state.isCreated=!0,this.options.onCreate(e))}}function k(e,t){return e.some(function(e){var o=e.name,i=e.enabled;return i&&o===t})}function W(e){for(var t=[!1,'ms','Webkit','Moz','O'],o=e.charAt(0).toUpperCase()+e.slice(1),n=0;n<t.length-1;n++){var i=t[n],r=i?''+i+o:e;if('undefined'!=typeof document.body.style[r])return r}return null}function P(){return this.state.isDestroyed=!0,k(this.modifiers,'applyStyle')&&(this.popper.removeAttribute('x-placement'),this.popper.style.left='',this.popper.style.position='',this.popper.style.top='',this.popper.style[W('transform')]=''),this.disableEventListeners(),this.options.removeOnDestroy&&this.popper.parentNode.removeChild(this.popper),this}function B(e){var t=e.ownerDocument;return t?t.defaultView:window}function H(e,t,o,i){var r='BODY'===e.nodeName,p=r?e.ownerDocument.defaultView:e;p.addEventListener(t,o,{passive:!0}),r||H(n(p.parentNode),t,o,i),i.push(p)}function A(e,t,o,i){o.updateBound=i,B(e).addEventListener('resize',o.updateBound,{passive:!0});var r=n(e);return H(r,'scroll',o.updateBound,o.scrollParents),o.scrollElement=r,o.eventsEnabled=!0,o}function I(){this.state.eventsEnabled||(this.state=A(this.reference,this.options,this.state,this.scheduleUpdate))}function M(e,t){return B(e).removeEventListener('resize',t.updateBound),t.scrollParents.forEach(function(e){e.removeEventListener('scroll',t.updateBound)}),t.updateBound=null,t.scrollParents=[],t.scrollElement=null,t.eventsEnabled=!1,t}function R(){this.state.eventsEnabled&&(cancelAnimationFrame(this.scheduleUpdate),this.state=M(this.reference,this.state))}function U(e){return''!==e&&!isNaN(parseFloat(e))&&isFinite(e)}function Y(e,t){Object.keys(t).forEach(function(o){var i='';-1!==['width','height','top','right','bottom','left'].indexOf(o)&&U(t[o])&&(i='px'),e.style[o]=t[o]+i})}function j(e,t){Object.keys(t).forEach(function(o){var i=t[o];!1===i?e.removeAttribute(o):e.setAttribute(o,t[o])})}function F(e,t,o){var i=T(e,function(e){var o=e.name;return o===t}),n=!!i&&e.some(function(e){return e.name===o&&e.enabled&&e.order<i.order});if(!n){var r='`'+t+'`';console.warn('`'+o+'`'+' modifier is required by '+r+' modifier in order to work, be sure to include it before '+r+'!')}return n}function K(e){return'end'===e?'start':'start'===e?'end':e}function q(e){var t=1<arguments.length&&void 0!==arguments[1]&&arguments[1],o=ae.indexOf(e),i=ae.slice(o+1).concat(ae.slice(0,o));return t?i.reverse():i}function V(e,t,o,i){var n=e.match(/((?:\-|\+)?\d*\.?\d*)(.*)/),r=+n[1],p=n[2];if(!r)return e;if(0===p.indexOf('%')){var s;switch(p){case'%p':s=o;break;case'%':case'%r':default:s=i;}var d=c(s);return d[t]/100*r}if('vh'===p||'vw'===p){var a;return a='vh'===p?J(document.documentElement.clientHeight,window.innerHeight||0):J(document.documentElement.clientWidth,window.innerWidth||0),a/100*r}return r}function z(e,t,o,i){var n=[0,0],r=-1!==['right','left'].indexOf(i),p=e.split(/(\+|\-)/).map(function(e){return e.trim()}),s=p.indexOf(T(p,function(e){return-1!==e.search(/,|\s/)}));p[s]&&-1===p[s].indexOf(',')&&console.warn('Offsets separated by white space(s) are deprecated, use a comma (,) instead.');var d=/\s*,\s*|\s+/,a=-1===s?[p]:[p.slice(0,s).concat([p[s].split(d)[0]]),[p[s].split(d)[1]].concat(p.slice(s+1))];return a=a.map(function(e,i){var n=(1===i?!r:r)?'height':'width',p=!1;return e.reduce(function(e,t){return''===e[e.length-1]&&-1!==['+','-'].indexOf(t)?(e[e.length-1]=t,p=!0,e):p?(e[e.length-1]+=t,p=!1,e):e.concat(t)},[]).map(function(e){return V(e,n,t,o)})}),a.forEach(function(e,t){e.forEach(function(o,i){U(o)&&(n[t]+=o*('-'===e[i-1]?-1:1))})}),n}function G(e,t){var o,i=t.offset,n=e.placement,r=e.offsets,p=r.popper,s=r.reference,d=n.split('-')[0];return o=U(+i)?[+i,0]:z(i,p,s,d),'left'===d?(p.top+=o[0],p.left-=o[1]):'right'===d?(p.top+=o[0],p.left+=o[1]):'top'===d?(p.left+=o[0],p.top-=o[1]):'bottom'===d&&(p.left+=o[0],p.top+=o[1]),e.popper=p,e}for(var _=Math.min,X=Math.floor,J=Math.max,Q='undefined'!=typeof window&&'undefined'!=typeof document,Z=['Edge','Trident','Firefox'],$=0,ee=0;ee<Z.length;ee+=1)if(Q&&0<=navigator.userAgent.indexOf(Z[ee])){$=1;break}var i,te=Q&&window.Promise,oe=te?function(e){var t=!1;return function(){t||(t=!0,window.Promise.resolve().then(function(){t=!1,e()}))}}:function(e){var t=!1;return function(){t||(t=!0,setTimeout(function(){t=!1,e()},$))}},ie=function(){return void 0==i&&(i=-1!==navigator.appVersion.indexOf('MSIE 10')),i},ne=function(e,t){if(!(e instanceof t))throw new TypeError('Cannot call a class as a function')},re=function(){function e(e,t){for(var o,n=0;n<t.length;n++)o=t[n],o.enumerable=o.enumerable||!1,o.configurable=!0,'value'in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}return function(t,o,i){return o&&e(t.prototype,o),i&&e(t,i),t}}(),pe=function(e,t,o){return t in e?Object.defineProperty(e,t,{value:o,enumerable:!0,configurable:!0,writable:!0}):e[t]=o,e},se=Object.assign||function(e){for(var t,o=1;o<arguments.length;o++)for(var i in t=arguments[o],t)Object.prototype.hasOwnProperty.call(t,i)&&(e[i]=t[i]);return e},de=['auto-start','auto','auto-end','top-start','top','top-end','right-start','right','right-end','bottom-end','bottom','bottom-start','left-end','left','left-start'],ae=de.slice(3),le={FLIP:'flip',CLOCKWISE:'clockwise',COUNTERCLOCKWISE:'counterclockwise'},fe=function(){function t(o,i){var n=this,r=2<arguments.length&&void 0!==arguments[2]?arguments[2]:{};ne(this,t),this.scheduleUpdate=function(){return requestAnimationFrame(n.update)},this.update=oe(this.update.bind(this)),this.options=se({},t.Defaults,r),this.state={isDestroyed:!1,isCreated:!1,scrollParents:[]},this.reference=o&&o.jquery?o[0]:o,this.popper=i&&i.jquery?i[0]:i,this.options.modifiers={},Object.keys(se({},t.Defaults.modifiers,r.modifiers)).forEach(function(e){n.options.modifiers[e]=se({},t.Defaults.modifiers[e]||{},r.modifiers?r.modifiers[e]:{})}),this.modifiers=Object.keys(this.options.modifiers).map(function(e){return se({name:e},n.options.modifiers[e])}).sort(function(e,t){return e.order-t.order}),this.modifiers.forEach(function(t){t.enabled&&e(t.onLoad)&&t.onLoad(n.reference,n.popper,n.options,t,n.state)}),this.update();var p=this.options.eventsEnabled;p&&this.enableEventListeners(),this.state.eventsEnabled=p}return re(t,[{key:'update',value:function(){return N.call(this)}},{key:'destroy',value:function(){return P.call(this)}},{key:'enableEventListeners',value:function(){return I.call(this)}},{key:'disableEventListeners',value:function(){return R.call(this)}}]),t}();return fe.Utils=('undefined'==typeof window?global:window).PopperUtils,fe.placements=de,fe.Defaults={placement:'bottom',eventsEnabled:!0,removeOnDestroy:!1,onCreate:function(){},onUpdate:function(){},modifiers:{shift:{order:100,enabled:!0,fn:function(e){var t=e.placement,o=t.split('-')[0],i=t.split('-')[1];if(i){var n=e.offsets,r=n.reference,p=n.popper,s=-1!==['bottom','top'].indexOf(o),d=s?'left':'top',a=s?'width':'height',l={start:pe({},d,r[d]),end:pe({},d,r[d]+r[a]-p[a])};e.offsets.popper=se({},p,l[i])}return e}},offset:{order:200,enabled:!0,fn:G,offset:0},preventOverflow:{order:300,enabled:!0,fn:function(e,t){var o=t.boundariesElement||r(e.instance.popper);e.instance.reference===o&&(o=r(o));var i=y(e.instance.popper,e.instance.reference,t.padding,o);t.boundaries=i;var n=t.priority,p=e.offsets.popper,s={primary:function(e){var o=p[e];return p[e]<i[e]&&!t.escapeWithReference&&(o=J(p[e],i[e])),pe({},e,o)},secondary:function(e){var o='right'===e?'left':'top',n=p[o];return p[e]>i[e]&&!t.escapeWithReference&&(n=_(p[o],i[e]-('right'===e?p.width:p.height))),pe({},o,n)}};return n.forEach(function(e){var t=-1===['left','top'].indexOf(e)?'secondary':'primary';p=se({},p,s[t](e))}),e.offsets.popper=p,e},priority:['left','right','top','bottom'],padding:5,boundariesElement:'scrollParent'},keepTogether:{order:400,enabled:!0,fn:function(e){var t=e.offsets,o=t.popper,i=t.reference,n=e.placement.split('-')[0],r=X,p=-1!==['top','bottom'].indexOf(n),s=p?'right':'bottom',d=p?'left':'top',a=p?'width':'height';return o[s]<r(i[d])&&(e.offsets.popper[d]=r(i[d])-o[a]),o[d]>r(i[s])&&(e.offsets.popper[d]=r(i[s])),e}},arrow:{order:500,enabled:!0,fn:function(e,o){var i;if(!F(e.instance.modifiers,'arrow','keepTogether'))return e;var n=o.element;if('string'==typeof n){if(n=e.instance.popper.querySelector(n),!n)return e;}else if(!e.instance.popper.contains(n))return console.warn('WARNING: `arrow.element` must be child of its popper element!'),e;var r=e.placement.split('-')[0],p=e.offsets,s=p.popper,d=p.reference,a=-1!==['left','right'].indexOf(r),l=a?'height':'width',f=a?'Top':'Left',m=f.toLowerCase(),h=a?'left':'top',g=a?'bottom':'right',u=L(n)[l];d[g]-u<s[m]&&(e.offsets.popper[m]-=s[m]-(d[g]-u)),d[m]+u>s[g]&&(e.offsets.popper[m]+=d[m]+u-s[g]),e.offsets.popper=c(e.offsets.popper);var b=d[m]+d[l]/2-u/2,w=t(e.instance.popper),y=parseFloat(w['margin'+f],10),E=parseFloat(w['border'+f+'Width'],10),v=b-e.offsets.popper[m]-y-E;return v=J(_(s[l]-u,v),0),e.arrowElement=n,e.offsets.arrow=(i={},pe(i,m,Math.round(v)),pe(i,h,''),i),e},element:'[x-arrow]'},flip:{order:600,enabled:!0,fn:function(e,t){if(k(e.instance.modifiers,'inner'))return e;if(e.flipped&&e.placement===e.originalPlacement)return e;var o=y(e.instance.popper,e.instance.reference,t.padding,t.boundariesElement),i=e.placement.split('-')[0],n=x(i),r=e.placement.split('-')[1]||'',p=[];switch(t.behavior){case le.FLIP:p=[i,n];break;case le.CLOCKWISE:p=q(i);break;case le.COUNTERCLOCKWISE:p=q(i,!0);break;default:p=t.behavior;}return p.forEach(function(s,d){if(i!==s||p.length===d+1)return e;i=e.placement.split('-')[0],n=x(i);var a=e.offsets.popper,l=e.offsets.reference,f=X,m='left'===i&&f(a.right)>f(l.left)||'right'===i&&f(a.left)<f(l.right)||'top'===i&&f(a.bottom)>f(l.top)||'bottom'===i&&f(a.top)<f(l.bottom),h=f(a.left)<f(o.left),c=f(a.right)>f(o.right),g=f(a.top)<f(o.top),u=f(a.bottom)>f(o.bottom),b='left'===i&&h||'right'===i&&c||'top'===i&&g||'bottom'===i&&u,w=-1!==['top','bottom'].indexOf(i),y=!!t.flipVariations&&(w&&'start'===r&&h||w&&'end'===r&&c||!w&&'start'===r&&g||!w&&'end'===r&&u);(m||b||y)&&(e.flipped=!0,(m||b)&&(i=p[d+1]),y&&(r=K(r)),e.placement=i+(r?'-'+r:''),e.offsets.popper=se({},e.offsets.popper,S(e.instance.popper,e.offsets.reference,e.placement)),e=C(e.instance.modifiers,e,'flip'))}),e},behavior:'flip',padding:5,boundariesElement:'viewport'},inner:{order:700,enabled:!1,fn:function(e){var t=e.placement,o=t.split('-')[0],i=e.offsets,n=i.popper,r=i.reference,p=-1!==['left','right'].indexOf(o),s=-1===['top','left'].indexOf(o);return n[p?'left':'top']=r[o]-(s?n[p?'width':'height']:0),e.placement=x(t),e.offsets.popper=c(n),e}},hide:{order:800,enabled:!0,fn:function(e){if(!F(e.instance.modifiers,'hide','preventOverflow'))return e;var t=e.offsets.reference,o=T(e.instance.modifiers,function(e){return'preventOverflow'===e.name}).boundaries;if(t.bottom<o.top||t.left>o.right||t.top>o.bottom||t.right<o.left){if(!0===e.hide)return e;e.hide=!0,e.attributes['x-out-of-boundaries']=''}else{if(!1===e.hide)return e;e.hide=!1,e.attributes['x-out-of-boundaries']=!1}return e}},computeStyle:{order:850,enabled:!0,fn:function(e,t){var o=t.x,i=t.y,n=e.offsets.popper,p=T(e.instance.modifiers,function(e){return'applyStyle'===e.name}).gpuAcceleration;void 0!==p&&console.warn('WARNING: `gpuAcceleration` option moved to `computeStyle` modifier and will not be supported in future versions of Popper.js!');var s,d,a=void 0===p?t.gpuAcceleration:p,l=r(e.instance.popper),f=g(l),m={position:n.position},h={left:X(n.left),top:X(n.top),bottom:X(n.bottom),right:X(n.right)},c='bottom'===o?'top':'bottom',u='right'===i?'left':'right',b=W('transform');if(d='bottom'==c?-f.height+h.bottom:h.top,s='right'==u?-f.width+h.right:h.left,a&&b)m[b]='translate3d('+s+'px, '+d+'px, 0)',m[c]=0,m[u]=0,m.willChange='transform';else{var w='bottom'==c?-1:1,y='right'==u?-1:1;m[c]=d*w,m[u]=s*y,m.willChange=c+', '+u}var E={"x-placement":e.placement};return e.attributes=se({},E,e.attributes),e.styles=se({},m,e.styles),e.arrowStyles=se({},e.offsets.arrow,e.arrowStyles),e},gpuAcceleration:!0,x:'bottom',y:'right'},applyStyle:{order:900,enabled:!0,fn:function(e){return Y(e.instance.popper,e.styles),j(e.instance.popper,e.attributes),e.arrowElement&&Object.keys(e.arrowStyles).length&&Y(e.arrowElement,e.arrowStyles),e},onLoad:function(e,t,o,i,n){var r=O(n,t,e),p=v(o.placement,r,t,e,o.modifiers.flip.boundariesElement,o.modifiers.flip.padding);return t.setAttribute('x-placement',p),Y(t,{position:'absolute'}),o},gpuAcceleration:void 0}}},fe});
 //# sourceMappingURL=popper.min.js.map
+
+/*! jQuery v1.9.1 | (c) 2005, 2012 jQuery Foundation, Inc. | jquery.org/license
+//@ sourceMappingURL=jquery.min.map
+*/(function(e,t){var n,r,i=typeof t,o=e.document,a=e.location,s=e.jQuery,u=e.$,l={},c=[],p="1.9.1",f=c.concat,d=c.push,h=c.slice,g=c.indexOf,m=l.toString,y=l.hasOwnProperty,v=p.trim,b=function(e,t){return new b.fn.init(e,t,r)},x=/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,w=/\S+/g,T=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,N=/^(?:(<[\w\W]+>)[^>]*|#([\w-]*))$/,C=/^<(\w+)\s*\/?>(?:<\/\1>|)$/,k=/^[\],:{}\s]*$/,E=/(?:^|:|,)(?:\s*\[)+/g,S=/\\(?:["\\\/bfnrt]|u[\da-fA-F]{4})/g,A=/"[^"\\\r\n]*"|true|false|null|-?(?:\d+\.|)\d+(?:[eE][+-]?\d+|)/g,j=/^-ms-/,D=/-([\da-z])/gi,L=function(e,t){return t.toUpperCase()},H=function(e){(o.addEventListener||"load"===e.type||"complete"===o.readyState)&&(q(),b.ready())},q=function(){o.addEventListener?(o.removeEventListener("DOMContentLoaded",H,!1),e.removeEventListener("load",H,!1)):(o.detachEvent("onreadystatechange",H),e.detachEvent("onload",H))};b.fn=b.prototype={jquery:p,constructor:b,init:function(e,n,r){var i,a;if(!e)return this;if("string"==typeof e){if(i="<"===e.charAt(0)&&">"===e.charAt(e.length-1)&&e.length>=3?[null,e,null]:N.exec(e),!i||!i[1]&&n)return!n||n.jquery?(n||r).find(e):this.constructor(n).find(e);if(i[1]){if(n=n instanceof b?n[0]:n,b.merge(this,b.parseHTML(i[1],n&&n.nodeType?n.ownerDocument||n:o,!0)),C.test(i[1])&&b.isPlainObject(n))for(i in n)b.isFunction(this[i])?this[i](n[i]):this.attr(i,n[i]);return this}if(a=o.getElementById(i[2]),a&&a.parentNode){if(a.id!==i[2])return r.find(e);this.length=1,this[0]=a}return this.context=o,this.selector=e,this}return e.nodeType?(this.context=this[0]=e,this.length=1,this):b.isFunction(e)?r.ready(e):(e.selector!==t&&(this.selector=e.selector,this.context=e.context),b.makeArray(e,this))},selector:"",length:0,size:function(){return this.length},toArray:function(){return h.call(this)},get:function(e){return null==e?this.toArray():0>e?this[this.length+e]:this[e]},pushStack:function(e){var t=b.merge(this.constructor(),e);return t.prevObject=this,t.context=this.context,t},each:function(e,t){return b.each(this,e,t)},ready:function(e){return b.ready.promise().done(e),this},slice:function(){return this.pushStack(h.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(e){var t=this.length,n=+e+(0>e?t:0);return this.pushStack(n>=0&&t>n?[this[n]]:[])},map:function(e){return this.pushStack(b.map(this,function(t,n){return e.call(t,n,t)}))},end:function(){return this.prevObject||this.constructor(null)},push:d,sort:[].sort,splice:[].splice},b.fn.init.prototype=b.fn,b.extend=b.fn.extend=function(){var e,n,r,i,o,a,s=arguments[0]||{},u=1,l=arguments.length,c=!1;for("boolean"==typeof s&&(c=s,s=arguments[1]||{},u=2),"object"==typeof s||b.isFunction(s)||(s={}),l===u&&(s=this,--u);l>u;u++)if(null!=(o=arguments[u]))for(i in o)e=s[i],r=o[i],s!==r&&(c&&r&&(b.isPlainObject(r)||(n=b.isArray(r)))?(n?(n=!1,a=e&&b.isArray(e)?e:[]):a=e&&b.isPlainObject(e)?e:{},s[i]=b.extend(c,a,r)):r!==t&&(s[i]=r));return s},b.extend({noConflict:function(t){return e.$===b&&(e.$=u),t&&e.jQuery===b&&(e.jQuery=s),b},isReady:!1,readyWait:1,holdReady:function(e){e?b.readyWait++:b.ready(!0)},ready:function(e){if(e===!0?!--b.readyWait:!b.isReady){if(!o.body)return setTimeout(b.ready);b.isReady=!0,e!==!0&&--b.readyWait>0||(n.resolveWith(o,[b]),b.fn.trigger&&b(o).trigger("ready").off("ready"))}},isFunction:function(e){return"function"===b.type(e)},isArray:Array.isArray||function(e){return"array"===b.type(e)},isWindow:function(e){return null!=e&&e==e.window},isNumeric:function(e){return!isNaN(parseFloat(e))&&isFinite(e)},type:function(e){return null==e?e+"":"object"==typeof e||"function"==typeof e?l[m.call(e)]||"object":typeof e},isPlainObject:function(e){if(!e||"object"!==b.type(e)||e.nodeType||b.isWindow(e))return!1;try{if(e.constructor&&!y.call(e,"constructor")&&!y.call(e.constructor.prototype,"isPrototypeOf"))return!1}catch(n){return!1}var r;for(r in e);return r===t||y.call(e,r)},isEmptyObject:function(e){var t;for(t in e)return!1;return!0},error:function(e){throw Error(e)},parseHTML:function(e,t,n){if(!e||"string"!=typeof e)return null;"boolean"==typeof t&&(n=t,t=!1),t=t||o;var r=C.exec(e),i=!n&&[];return r?[t.createElement(r[1])]:(r=b.buildFragment([e],t,i),i&&b(i).remove(),b.merge([],r.childNodes))},parseJSON:function(n){return e.JSON&&e.JSON.parse?e.JSON.parse(n):null===n?n:"string"==typeof n&&(n=b.trim(n),n&&k.test(n.replace(S,"@").replace(A,"]").replace(E,"")))?Function("return "+n)():(b.error("Invalid JSON: "+n),t)},parseXML:function(n){var r,i;if(!n||"string"!=typeof n)return null;try{e.DOMParser?(i=new DOMParser,r=i.parseFromString(n,"text/xml")):(r=new ActiveXObject("Microsoft.XMLDOM"),r.async="false",r.loadXML(n))}catch(o){r=t}return r&&r.documentElement&&!r.getElementsByTagName("parsererror").length||b.error("Invalid XML: "+n),r},noop:function(){},globalEval:function(t){t&&b.trim(t)&&(e.execScript||function(t){e.eval.call(e,t)})(t)},camelCase:function(e){return e.replace(j,"ms-").replace(D,L)},nodeName:function(e,t){return e.nodeName&&e.nodeName.toLowerCase()===t.toLowerCase()},each:function(e,t,n){var r,i=0,o=e.length,a=M(e);if(n){if(a){for(;o>i;i++)if(r=t.apply(e[i],n),r===!1)break}else for(i in e)if(r=t.apply(e[i],n),r===!1)break}else if(a){for(;o>i;i++)if(r=t.call(e[i],i,e[i]),r===!1)break}else for(i in e)if(r=t.call(e[i],i,e[i]),r===!1)break;return e},trim:v&&!v.call("\ufeff\u00a0")?function(e){return null==e?"":v.call(e)}:function(e){return null==e?"":(e+"").replace(T,"")},makeArray:function(e,t){var n=t||[];return null!=e&&(M(Object(e))?b.merge(n,"string"==typeof e?[e]:e):d.call(n,e)),n},inArray:function(e,t,n){var r;if(t){if(g)return g.call(t,e,n);for(r=t.length,n=n?0>n?Math.max(0,r+n):n:0;r>n;n++)if(n in t&&t[n]===e)return n}return-1},merge:function(e,n){var r=n.length,i=e.length,o=0;if("number"==typeof r)for(;r>o;o++)e[i++]=n[o];else while(n[o]!==t)e[i++]=n[o++];return e.length=i,e},grep:function(e,t,n){var r,i=[],o=0,a=e.length;for(n=!!n;a>o;o++)r=!!t(e[o],o),n!==r&&i.push(e[o]);return i},map:function(e,t,n){var r,i=0,o=e.length,a=M(e),s=[];if(a)for(;o>i;i++)r=t(e[i],i,n),null!=r&&(s[s.length]=r);else for(i in e)r=t(e[i],i,n),null!=r&&(s[s.length]=r);return f.apply([],s)},guid:1,proxy:function(e,n){var r,i,o;return"string"==typeof n&&(o=e[n],n=e,e=o),b.isFunction(e)?(r=h.call(arguments,2),i=function(){return e.apply(n||this,r.concat(h.call(arguments)))},i.guid=e.guid=e.guid||b.guid++,i):t},access:function(e,n,r,i,o,a,s){var u=0,l=e.length,c=null==r;if("object"===b.type(r)){o=!0;for(u in r)b.access(e,n,u,r[u],!0,a,s)}else if(i!==t&&(o=!0,b.isFunction(i)||(s=!0),c&&(s?(n.call(e,i),n=null):(c=n,n=function(e,t,n){return c.call(b(e),n)})),n))for(;l>u;u++)n(e[u],r,s?i:i.call(e[u],u,n(e[u],r)));return o?e:c?n.call(e):l?n(e[0],r):a},now:function(){return(new Date).getTime()}}),b.ready.promise=function(t){if(!n)if(n=b.Deferred(),"complete"===o.readyState)setTimeout(b.ready);else if(o.addEventListener)o.addEventListener("DOMContentLoaded",H,!1),e.addEventListener("load",H,!1);else{o.attachEvent("onreadystatechange",H),e.attachEvent("onload",H);var r=!1;try{r=null==e.frameElement&&o.documentElement}catch(i){}r&&r.doScroll&&function a(){if(!b.isReady){try{r.doScroll("left")}catch(e){return setTimeout(a,50)}q(),b.ready()}}()}return n.promise(t)},b.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),function(e,t){l["[object "+t+"]"]=t.toLowerCase()});function M(e){var t=e.length,n=b.type(e);return b.isWindow(e)?!1:1===e.nodeType&&t?!0:"array"===n||"function"!==n&&(0===t||"number"==typeof t&&t>0&&t-1 in e)}r=b(o);var _={};function F(e){var t=_[e]={};return b.each(e.match(w)||[],function(e,n){t[n]=!0}),t}b.Callbacks=function(e){e="string"==typeof e?_[e]||F(e):b.extend({},e);var n,r,i,o,a,s,u=[],l=!e.once&&[],c=function(t){for(r=e.memory&&t,i=!0,a=s||0,s=0,o=u.length,n=!0;u&&o>a;a++)if(u[a].apply(t[0],t[1])===!1&&e.stopOnFalse){r=!1;break}n=!1,u&&(l?l.length&&c(l.shift()):r?u=[]:p.disable())},p={add:function(){if(u){var t=u.length;(function i(t){b.each(t,function(t,n){var r=b.type(n);"function"===r?e.unique&&p.has(n)||u.push(n):n&&n.length&&"string"!==r&&i(n)})})(arguments),n?o=u.length:r&&(s=t,c(r))}return this},remove:function(){return u&&b.each(arguments,function(e,t){var r;while((r=b.inArray(t,u,r))>-1)u.splice(r,1),n&&(o>=r&&o--,a>=r&&a--)}),this},has:function(e){return e?b.inArray(e,u)>-1:!(!u||!u.length)},empty:function(){return u=[],this},disable:function(){return u=l=r=t,this},disabled:function(){return!u},lock:function(){return l=t,r||p.disable(),this},locked:function(){return!l},fireWith:function(e,t){return t=t||[],t=[e,t.slice?t.slice():t],!u||i&&!l||(n?l.push(t):c(t)),this},fire:function(){return p.fireWith(this,arguments),this},fired:function(){return!!i}};return p},b.extend({Deferred:function(e){var t=[["resolve","done",b.Callbacks("once memory"),"resolved"],["reject","fail",b.Callbacks("once memory"),"rejected"],["notify","progress",b.Callbacks("memory")]],n="pending",r={state:function(){return n},always:function(){return i.done(arguments).fail(arguments),this},then:function(){var e=arguments;return b.Deferred(function(n){b.each(t,function(t,o){var a=o[0],s=b.isFunction(e[t])&&e[t];i[o[1]](function(){var e=s&&s.apply(this,arguments);e&&b.isFunction(e.promise)?e.promise().done(n.resolve).fail(n.reject).progress(n.notify):n[a+"With"](this===r?n.promise():this,s?[e]:arguments)})}),e=null}).promise()},promise:function(e){return null!=e?b.extend(e,r):r}},i={};return r.pipe=r.then,b.each(t,function(e,o){var a=o[2],s=o[3];r[o[1]]=a.add,s&&a.add(function(){n=s},t[1^e][2].disable,t[2][2].lock),i[o[0]]=function(){return i[o[0]+"With"](this===i?r:this,arguments),this},i[o[0]+"With"]=a.fireWith}),r.promise(i),e&&e.call(i,i),i},when:function(e){var t=0,n=h.call(arguments),r=n.length,i=1!==r||e&&b.isFunction(e.promise)?r:0,o=1===i?e:b.Deferred(),a=function(e,t,n){return function(r){t[e]=this,n[e]=arguments.length>1?h.call(arguments):r,n===s?o.notifyWith(t,n):--i||o.resolveWith(t,n)}},s,u,l;if(r>1)for(s=Array(r),u=Array(r),l=Array(r);r>t;t++)n[t]&&b.isFunction(n[t].promise)?n[t].promise().done(a(t,l,n)).fail(o.reject).progress(a(t,u,s)):--i;return i||o.resolveWith(l,n),o.promise()}}),b.support=function(){var t,n,r,a,s,u,l,c,p,f,d=o.createElement("div");if(d.setAttribute("className","t"),d.innerHTML="  <link/><table></table><a href='/a'>a</a><input type='checkbox'/>",n=d.getElementsByTagName("*"),r=d.getElementsByTagName("a")[0],!n||!r||!n.length)return{};s=o.createElement("select"),l=s.appendChild(o.createElement("option")),a=d.getElementsByTagName("input")[0],r.style.cssText="top:1px;float:left;opacity:.5",t={getSetAttribute:"t"!==d.className,leadingWhitespace:3===d.firstChild.nodeType,tbody:!d.getElementsByTagName("tbody").length,htmlSerialize:!!d.getElementsByTagName("link").length,style:/top/.test(r.getAttribute("style")),hrefNormalized:"/a"===r.getAttribute("href"),opacity:/^0.5/.test(r.style.opacity),cssFloat:!!r.style.cssFloat,checkOn:!!a.value,optSelected:l.selected,enctype:!!o.createElement("form").enctype,html5Clone:"<:nav></:nav>"!==o.createElement("nav").cloneNode(!0).outerHTML,boxModel:"CSS1Compat"===o.compatMode,deleteExpando:!0,noCloneEvent:!0,inlineBlockNeedsLayout:!1,shrinkWrapBlocks:!1,reliableMarginRight:!0,boxSizingReliable:!0,pixelPosition:!1},a.checked=!0,t.noCloneChecked=a.cloneNode(!0).checked,s.disabled=!0,t.optDisabled=!l.disabled;try{delete d.test}catch(h){t.deleteExpando=!1}a=o.createElement("input"),a.setAttribute("value",""),t.input=""===a.getAttribute("value"),a.value="t",a.setAttribute("type","radio"),t.radioValue="t"===a.value,a.setAttribute("checked","t"),a.setAttribute("name","t"),u=o.createDocumentFragment(),u.appendChild(a),t.appendChecked=a.checked,t.checkClone=u.cloneNode(!0).cloneNode(!0).lastChild.checked,d.attachEvent&&(d.attachEvent("onclick",function(){t.noCloneEvent=!1}),d.cloneNode(!0).click());for(f in{submit:!0,change:!0,focusin:!0})d.setAttribute(c="on"+f,"t"),t[f+"Bubbles"]=c in e||d.attributes[c].expando===!1;return d.style.backgroundClip="content-box",d.cloneNode(!0).style.backgroundClip="",t.clearCloneStyle="content-box"===d.style.backgroundClip,b(function(){var n,r,a,s="padding:0;margin:0;border:0;display:block;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;",u=o.getElementsByTagName("body")[0];u&&(n=o.createElement("div"),n.style.cssText="border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px",u.appendChild(n).appendChild(d),d.innerHTML="<table><tr><td></td><td>t</td></tr></table>",a=d.getElementsByTagName("td"),a[0].style.cssText="padding:0;margin:0;border:0;display:none",p=0===a[0].offsetHeight,a[0].style.display="",a[1].style.display="none",t.reliableHiddenOffsets=p&&0===a[0].offsetHeight,d.innerHTML="",d.style.cssText="box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;position:absolute;top:1%;",t.boxSizing=4===d.offsetWidth,t.doesNotIncludeMarginInBodyOffset=1!==u.offsetTop,e.getComputedStyle&&(t.pixelPosition="1%"!==(e.getComputedStyle(d,null)||{}).top,t.boxSizingReliable="4px"===(e.getComputedStyle(d,null)||{width:"4px"}).width,r=d.appendChild(o.createElement("div")),r.style.cssText=d.style.cssText=s,r.style.marginRight=r.style.width="0",d.style.width="1px",t.reliableMarginRight=!parseFloat((e.getComputedStyle(r,null)||{}).marginRight)),typeof d.style.zoom!==i&&(d.innerHTML="",d.style.cssText=s+"width:1px;padding:1px;display:inline;zoom:1",t.inlineBlockNeedsLayout=3===d.offsetWidth,d.style.display="block",d.innerHTML="<div></div>",d.firstChild.style.width="5px",t.shrinkWrapBlocks=3!==d.offsetWidth,t.inlineBlockNeedsLayout&&(u.style.zoom=1)),u.removeChild(n),n=d=a=r=null)}),n=s=u=l=r=a=null,t}();var O=/(?:\{[\s\S]*\}|\[[\s\S]*\])$/,B=/([A-Z])/g;function P(e,n,r,i){if(b.acceptData(e)){var o,a,s=b.expando,u="string"==typeof n,l=e.nodeType,p=l?b.cache:e,f=l?e[s]:e[s]&&s;if(f&&p[f]&&(i||p[f].data)||!u||r!==t)return f||(l?e[s]=f=c.pop()||b.guid++:f=s),p[f]||(p[f]={},l||(p[f].toJSON=b.noop)),("object"==typeof n||"function"==typeof n)&&(i?p[f]=b.extend(p[f],n):p[f].data=b.extend(p[f].data,n)),o=p[f],i||(o.data||(o.data={}),o=o.data),r!==t&&(o[b.camelCase(n)]=r),u?(a=o[n],null==a&&(a=o[b.camelCase(n)])):a=o,a}}function R(e,t,n){if(b.acceptData(e)){var r,i,o,a=e.nodeType,s=a?b.cache:e,u=a?e[b.expando]:b.expando;if(s[u]){if(t&&(o=n?s[u]:s[u].data)){b.isArray(t)?t=t.concat(b.map(t,b.camelCase)):t in o?t=[t]:(t=b.camelCase(t),t=t in o?[t]:t.split(" "));for(r=0,i=t.length;i>r;r++)delete o[t[r]];if(!(n?$:b.isEmptyObject)(o))return}(n||(delete s[u].data,$(s[u])))&&(a?b.cleanData([e],!0):b.support.deleteExpando||s!=s.window?delete s[u]:s[u]=null)}}}b.extend({cache:{},expando:"jQuery"+(p+Math.random()).replace(/\D/g,""),noData:{embed:!0,object:"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000",applet:!0},hasData:function(e){return e=e.nodeType?b.cache[e[b.expando]]:e[b.expando],!!e&&!$(e)},data:function(e,t,n){return P(e,t,n)},removeData:function(e,t){return R(e,t)},_data:function(e,t,n){return P(e,t,n,!0)},_removeData:function(e,t){return R(e,t,!0)},acceptData:function(e){if(e.nodeType&&1!==e.nodeType&&9!==e.nodeType)return!1;var t=e.nodeName&&b.noData[e.nodeName.toLowerCase()];return!t||t!==!0&&e.getAttribute("classid")===t}}),b.fn.extend({data:function(e,n){var r,i,o=this[0],a=0,s=null;if(e===t){if(this.length&&(s=b.data(o),1===o.nodeType&&!b._data(o,"parsedAttrs"))){for(r=o.attributes;r.length>a;a++)i=r[a].name,i.indexOf("data-")||(i=b.camelCase(i.slice(5)),W(o,i,s[i]));b._data(o,"parsedAttrs",!0)}return s}return"object"==typeof e?this.each(function(){b.data(this,e)}):b.access(this,function(n){return n===t?o?W(o,e,b.data(o,e)):null:(this.each(function(){b.data(this,e,n)}),t)},null,n,arguments.length>1,null,!0)},removeData:function(e){return this.each(function(){b.removeData(this,e)})}});function W(e,n,r){if(r===t&&1===e.nodeType){var i="data-"+n.replace(B,"-$1").toLowerCase();if(r=e.getAttribute(i),"string"==typeof r){try{r="true"===r?!0:"false"===r?!1:"null"===r?null:+r+""===r?+r:O.test(r)?b.parseJSON(r):r}catch(o){}b.data(e,n,r)}else r=t}return r}function $(e){var t;for(t in e)if(("data"!==t||!b.isEmptyObject(e[t]))&&"toJSON"!==t)return!1;return!0}b.extend({queue:function(e,n,r){var i;return e?(n=(n||"fx")+"queue",i=b._data(e,n),r&&(!i||b.isArray(r)?i=b._data(e,n,b.makeArray(r)):i.push(r)),i||[]):t},dequeue:function(e,t){t=t||"fx";var n=b.queue(e,t),r=n.length,i=n.shift(),o=b._queueHooks(e,t),a=function(){b.dequeue(e,t)};"inprogress"===i&&(i=n.shift(),r--),o.cur=i,i&&("fx"===t&&n.unshift("inprogress"),delete o.stop,i.call(e,a,o)),!r&&o&&o.empty.fire()},_queueHooks:function(e,t){var n=t+"queueHooks";return b._data(e,n)||b._data(e,n,{empty:b.Callbacks("once memory").add(function(){b._removeData(e,t+"queue"),b._removeData(e,n)})})}}),b.fn.extend({queue:function(e,n){var r=2;return"string"!=typeof e&&(n=e,e="fx",r--),r>arguments.length?b.queue(this[0],e):n===t?this:this.each(function(){var t=b.queue(this,e,n);b._queueHooks(this,e),"fx"===e&&"inprogress"!==t[0]&&b.dequeue(this,e)})},dequeue:function(e){return this.each(function(){b.dequeue(this,e)})},delay:function(e,t){return e=b.fx?b.fx.speeds[e]||e:e,t=t||"fx",this.queue(t,function(t,n){var r=setTimeout(t,e);n.stop=function(){clearTimeout(r)}})},clearQueue:function(e){return this.queue(e||"fx",[])},promise:function(e,n){var r,i=1,o=b.Deferred(),a=this,s=this.length,u=function(){--i||o.resolveWith(a,[a])};"string"!=typeof e&&(n=e,e=t),e=e||"fx";while(s--)r=b._data(a[s],e+"queueHooks"),r&&r.empty&&(i++,r.empty.add(u));return u(),o.promise(n)}});var I,z,X=/[\t\r\n]/g,U=/\r/g,V=/^(?:input|select|textarea|button|object)$/i,Y=/^(?:a|area)$/i,J=/^(?:checked|selected|autofocus|autoplay|async|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped)$/i,G=/^(?:checked|selected)$/i,Q=b.support.getSetAttribute,K=b.support.input;b.fn.extend({attr:function(e,t){return b.access(this,b.attr,e,t,arguments.length>1)},removeAttr:function(e){return this.each(function(){b.removeAttr(this,e)})},prop:function(e,t){return b.access(this,b.prop,e,t,arguments.length>1)},removeProp:function(e){return e=b.propFix[e]||e,this.each(function(){try{this[e]=t,delete this[e]}catch(n){}})},addClass:function(e){var t,n,r,i,o,a=0,s=this.length,u="string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).addClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):" ")){o=0;while(i=t[o++])0>r.indexOf(" "+i+" ")&&(r+=i+" ");n.className=b.trim(r)}return this},removeClass:function(e){var t,n,r,i,o,a=0,s=this.length,u=0===arguments.length||"string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).removeClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):"")){o=0;while(i=t[o++])while(r.indexOf(" "+i+" ")>=0)r=r.replace(" "+i+" "," ");n.className=e?b.trim(r):""}return this},toggleClass:function(e,t){var n=typeof e,r="boolean"==typeof t;return b.isFunction(e)?this.each(function(n){b(this).toggleClass(e.call(this,n,this.className,t),t)}):this.each(function(){if("string"===n){var o,a=0,s=b(this),u=t,l=e.match(w)||[];while(o=l[a++])u=r?u:!s.hasClass(o),s[u?"addClass":"removeClass"](o)}else(n===i||"boolean"===n)&&(this.className&&b._data(this,"__className__",this.className),this.className=this.className||e===!1?"":b._data(this,"__className__")||"")})},hasClass:function(e){var t=" "+e+" ",n=0,r=this.length;for(;r>n;n++)if(1===this[n].nodeType&&(" "+this[n].className+" ").replace(X," ").indexOf(t)>=0)return!0;return!1},val:function(e){var n,r,i,o=this[0];{if(arguments.length)return i=b.isFunction(e),this.each(function(n){var o,a=b(this);1===this.nodeType&&(o=i?e.call(this,n,a.val()):e,null==o?o="":"number"==typeof o?o+="":b.isArray(o)&&(o=b.map(o,function(e){return null==e?"":e+""})),r=b.valHooks[this.type]||b.valHooks[this.nodeName.toLowerCase()],r&&"set"in r&&r.set(this,o,"value")!==t||(this.value=o))});if(o)return r=b.valHooks[o.type]||b.valHooks[o.nodeName.toLowerCase()],r&&"get"in r&&(n=r.get(o,"value"))!==t?n:(n=o.value,"string"==typeof n?n.replace(U,""):null==n?"":n)}}}),b.extend({valHooks:{option:{get:function(e){var t=e.attributes.value;return!t||t.specified?e.value:e.text}},select:{get:function(e){var t,n,r=e.options,i=e.selectedIndex,o="select-one"===e.type||0>i,a=o?null:[],s=o?i+1:r.length,u=0>i?s:o?i:0;for(;s>u;u++)if(n=r[u],!(!n.selected&&u!==i||(b.support.optDisabled?n.disabled:null!==n.getAttribute("disabled"))||n.parentNode.disabled&&b.nodeName(n.parentNode,"optgroup"))){if(t=b(n).val(),o)return t;a.push(t)}return a},set:function(e,t){var n=b.makeArray(t);return b(e).find("option").each(function(){this.selected=b.inArray(b(this).val(),n)>=0}),n.length||(e.selectedIndex=-1),n}}},attr:function(e,n,r){var o,a,s,u=e.nodeType;if(e&&3!==u&&8!==u&&2!==u)return typeof e.getAttribute===i?b.prop(e,n,r):(a=1!==u||!b.isXMLDoc(e),a&&(n=n.toLowerCase(),o=b.attrHooks[n]||(J.test(n)?z:I)),r===t?o&&a&&"get"in o&&null!==(s=o.get(e,n))?s:(typeof e.getAttribute!==i&&(s=e.getAttribute(n)),null==s?t:s):null!==r?o&&a&&"set"in o&&(s=o.set(e,r,n))!==t?s:(e.setAttribute(n,r+""),r):(b.removeAttr(e,n),t))},removeAttr:function(e,t){var n,r,i=0,o=t&&t.match(w);if(o&&1===e.nodeType)while(n=o[i++])r=b.propFix[n]||n,J.test(n)?!Q&&G.test(n)?e[b.camelCase("default-"+n)]=e[r]=!1:e[r]=!1:b.attr(e,n,""),e.removeAttribute(Q?n:r)},attrHooks:{type:{set:function(e,t){if(!b.support.radioValue&&"radio"===t&&b.nodeName(e,"input")){var n=e.value;return e.setAttribute("type",t),n&&(e.value=n),t}}}},propFix:{tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor","class":"className",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder",contenteditable:"contentEditable"},prop:function(e,n,r){var i,o,a,s=e.nodeType;if(e&&3!==s&&8!==s&&2!==s)return a=1!==s||!b.isXMLDoc(e),a&&(n=b.propFix[n]||n,o=b.propHooks[n]),r!==t?o&&"set"in o&&(i=o.set(e,r,n))!==t?i:e[n]=r:o&&"get"in o&&null!==(i=o.get(e,n))?i:e[n]},propHooks:{tabIndex:{get:function(e){var n=e.getAttributeNode("tabindex");return n&&n.specified?parseInt(n.value,10):V.test(e.nodeName)||Y.test(e.nodeName)&&e.href?0:t}}}}),z={get:function(e,n){var r=b.prop(e,n),i="boolean"==typeof r&&e.getAttribute(n),o="boolean"==typeof r?K&&Q?null!=i:G.test(n)?e[b.camelCase("default-"+n)]:!!i:e.getAttributeNode(n);return o&&o.value!==!1?n.toLowerCase():t},set:function(e,t,n){return t===!1?b.removeAttr(e,n):K&&Q||!G.test(n)?e.setAttribute(!Q&&b.propFix[n]||n,n):e[b.camelCase("default-"+n)]=e[n]=!0,n}},K&&Q||(b.attrHooks.value={get:function(e,n){var r=e.getAttributeNode(n);return b.nodeName(e,"input")?e.defaultValue:r&&r.specified?r.value:t},set:function(e,n,r){return b.nodeName(e,"input")?(e.defaultValue=n,t):I&&I.set(e,n,r)}}),Q||(I=b.valHooks.button={get:function(e,n){var r=e.getAttributeNode(n);return r&&("id"===n||"name"===n||"coords"===n?""!==r.value:r.specified)?r.value:t},set:function(e,n,r){var i=e.getAttributeNode(r);return i||e.setAttributeNode(i=e.ownerDocument.createAttribute(r)),i.value=n+="","value"===r||n===e.getAttribute(r)?n:t}},b.attrHooks.contenteditable={get:I.get,set:function(e,t,n){I.set(e,""===t?!1:t,n)}},b.each(["width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{set:function(e,r){return""===r?(e.setAttribute(n,"auto"),r):t}})})),b.support.hrefNormalized||(b.each(["href","src","width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{get:function(e){var r=e.getAttribute(n,2);return null==r?t:r}})}),b.each(["href","src"],function(e,t){b.propHooks[t]={get:function(e){return e.getAttribute(t,4)}}})),b.support.style||(b.attrHooks.style={get:function(e){return e.style.cssText||t},set:function(e,t){return e.style.cssText=t+""}}),b.support.optSelected||(b.propHooks.selected=b.extend(b.propHooks.selected,{get:function(e){var t=e.parentNode;return t&&(t.selectedIndex,t.parentNode&&t.parentNode.selectedIndex),null}})),b.support.enctype||(b.propFix.enctype="encoding"),b.support.checkOn||b.each(["radio","checkbox"],function(){b.valHooks[this]={get:function(e){return null===e.getAttribute("value")?"on":e.value}}}),b.each(["radio","checkbox"],function(){b.valHooks[this]=b.extend(b.valHooks[this],{set:function(e,n){return b.isArray(n)?e.checked=b.inArray(b(e).val(),n)>=0:t}})});var Z=/^(?:input|select|textarea)$/i,et=/^key/,tt=/^(?:mouse|contextmenu)|click/,nt=/^(?:focusinfocus|focusoutblur)$/,rt=/^([^.]*)(?:\.(.+)|)$/;function it(){return!0}function ot(){return!1}b.event={global:{},add:function(e,n,r,o,a){var s,u,l,c,p,f,d,h,g,m,y,v=b._data(e);if(v){r.handler&&(c=r,r=c.handler,a=c.selector),r.guid||(r.guid=b.guid++),(u=v.events)||(u=v.events={}),(f=v.handle)||(f=v.handle=function(e){return typeof b===i||e&&b.event.triggered===e.type?t:b.event.dispatch.apply(f.elem,arguments)},f.elem=e),n=(n||"").match(w)||[""],l=n.length;while(l--)s=rt.exec(n[l])||[],g=y=s[1],m=(s[2]||"").split(".").sort(),p=b.event.special[g]||{},g=(a?p.delegateType:p.bindType)||g,p=b.event.special[g]||{},d=b.extend({type:g,origType:y,data:o,handler:r,guid:r.guid,selector:a,needsContext:a&&b.expr.match.needsContext.test(a),namespace:m.join(".")},c),(h=u[g])||(h=u[g]=[],h.delegateCount=0,p.setup&&p.setup.call(e,o,m,f)!==!1||(e.addEventListener?e.addEventListener(g,f,!1):e.attachEvent&&e.attachEvent("on"+g,f))),p.add&&(p.add.call(e,d),d.handler.guid||(d.handler.guid=r.guid)),a?h.splice(h.delegateCount++,0,d):h.push(d),b.event.global[g]=!0;e=null}},remove:function(e,t,n,r,i){var o,a,s,u,l,c,p,f,d,h,g,m=b.hasData(e)&&b._data(e);if(m&&(c=m.events)){t=(t||"").match(w)||[""],l=t.length;while(l--)if(s=rt.exec(t[l])||[],d=g=s[1],h=(s[2]||"").split(".").sort(),d){p=b.event.special[d]||{},d=(r?p.delegateType:p.bindType)||d,f=c[d]||[],s=s[2]&&RegExp("(^|\\.)"+h.join("\\.(?:.*\\.|)")+"(\\.|$)"),u=o=f.length;while(o--)a=f[o],!i&&g!==a.origType||n&&n.guid!==a.guid||s&&!s.test(a.namespace)||r&&r!==a.selector&&("**"!==r||!a.selector)||(f.splice(o,1),a.selector&&f.delegateCount--,p.remove&&p.remove.call(e,a));u&&!f.length&&(p.teardown&&p.teardown.call(e,h,m.handle)!==!1||b.removeEvent(e,d,m.handle),delete c[d])}else for(d in c)b.event.remove(e,d+t[l],n,r,!0);b.isEmptyObject(c)&&(delete m.handle,b._removeData(e,"events"))}},trigger:function(n,r,i,a){var s,u,l,c,p,f,d,h=[i||o],g=y.call(n,"type")?n.type:n,m=y.call(n,"namespace")?n.namespace.split("."):[];if(l=f=i=i||o,3!==i.nodeType&&8!==i.nodeType&&!nt.test(g+b.event.triggered)&&(g.indexOf(".")>=0&&(m=g.split("."),g=m.shift(),m.sort()),u=0>g.indexOf(":")&&"on"+g,n=n[b.expando]?n:new b.Event(g,"object"==typeof n&&n),n.isTrigger=!0,n.namespace=m.join("."),n.namespace_re=n.namespace?RegExp("(^|\\.)"+m.join("\\.(?:.*\\.|)")+"(\\.|$)"):null,n.result=t,n.target||(n.target=i),r=null==r?[n]:b.makeArray(r,[n]),p=b.event.special[g]||{},a||!p.trigger||p.trigger.apply(i,r)!==!1)){if(!a&&!p.noBubble&&!b.isWindow(i)){for(c=p.delegateType||g,nt.test(c+g)||(l=l.parentNode);l;l=l.parentNode)h.push(l),f=l;f===(i.ownerDocument||o)&&h.push(f.defaultView||f.parentWindow||e)}d=0;while((l=h[d++])&&!n.isPropagationStopped())n.type=d>1?c:p.bindType||g,s=(b._data(l,"events")||{})[n.type]&&b._data(l,"handle"),s&&s.apply(l,r),s=u&&l[u],s&&b.acceptData(l)&&s.apply&&s.apply(l,r)===!1&&n.preventDefault();if(n.type=g,!(a||n.isDefaultPrevented()||p._default&&p._default.apply(i.ownerDocument,r)!==!1||"click"===g&&b.nodeName(i,"a")||!b.acceptData(i)||!u||!i[g]||b.isWindow(i))){f=i[u],f&&(i[u]=null),b.event.triggered=g;try{i[g]()}catch(v){}b.event.triggered=t,f&&(i[u]=f)}return n.result}},dispatch:function(e){e=b.event.fix(e);var n,r,i,o,a,s=[],u=h.call(arguments),l=(b._data(this,"events")||{})[e.type]||[],c=b.event.special[e.type]||{};if(u[0]=e,e.delegateTarget=this,!c.preDispatch||c.preDispatch.call(this,e)!==!1){s=b.event.handlers.call(this,e,l),n=0;while((o=s[n++])&&!e.isPropagationStopped()){e.currentTarget=o.elem,a=0;while((i=o.handlers[a++])&&!e.isImmediatePropagationStopped())(!e.namespace_re||e.namespace_re.test(i.namespace))&&(e.handleObj=i,e.data=i.data,r=((b.event.special[i.origType]||{}).handle||i.handler).apply(o.elem,u),r!==t&&(e.result=r)===!1&&(e.preventDefault(),e.stopPropagation()))}return c.postDispatch&&c.postDispatch.call(this,e),e.result}},handlers:function(e,n){var r,i,o,a,s=[],u=n.delegateCount,l=e.target;if(u&&l.nodeType&&(!e.button||"click"!==e.type))for(;l!=this;l=l.parentNode||this)if(1===l.nodeType&&(l.disabled!==!0||"click"!==e.type)){for(o=[],a=0;u>a;a++)i=n[a],r=i.selector+" ",o[r]===t&&(o[r]=i.needsContext?b(r,this).index(l)>=0:b.find(r,this,null,[l]).length),o[r]&&o.push(i);o.length&&s.push({elem:l,handlers:o})}return n.length>u&&s.push({elem:this,handlers:n.slice(u)}),s},fix:function(e){if(e[b.expando])return e;var t,n,r,i=e.type,a=e,s=this.fixHooks[i];s||(this.fixHooks[i]=s=tt.test(i)?this.mouseHooks:et.test(i)?this.keyHooks:{}),r=s.props?this.props.concat(s.props):this.props,e=new b.Event(a),t=r.length;while(t--)n=r[t],e[n]=a[n];return e.target||(e.target=a.srcElement||o),3===e.target.nodeType&&(e.target=e.target.parentNode),e.metaKey=!!e.metaKey,s.filter?s.filter(e,a):e},props:"altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "),fixHooks:{},keyHooks:{props:"char charCode key keyCode".split(" "),filter:function(e,t){return null==e.which&&(e.which=null!=t.charCode?t.charCode:t.keyCode),e}},mouseHooks:{props:"button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement".split(" "),filter:function(e,n){var r,i,a,s=n.button,u=n.fromElement;return null==e.pageX&&null!=n.clientX&&(i=e.target.ownerDocument||o,a=i.documentElement,r=i.body,e.pageX=n.clientX+(a&&a.scrollLeft||r&&r.scrollLeft||0)-(a&&a.clientLeft||r&&r.clientLeft||0),e.pageY=n.clientY+(a&&a.scrollTop||r&&r.scrollTop||0)-(a&&a.clientTop||r&&r.clientTop||0)),!e.relatedTarget&&u&&(e.relatedTarget=u===e.target?n.toElement:u),e.which||s===t||(e.which=1&s?1:2&s?3:4&s?2:0),e}},special:{load:{noBubble:!0},click:{trigger:function(){return b.nodeName(this,"input")&&"checkbox"===this.type&&this.click?(this.click(),!1):t}},focus:{trigger:function(){if(this!==o.activeElement&&this.focus)try{return this.focus(),!1}catch(e){}},delegateType:"focusin"},blur:{trigger:function(){return this===o.activeElement&&this.blur?(this.blur(),!1):t},delegateType:"focusout"},beforeunload:{postDispatch:function(e){e.result!==t&&(e.originalEvent.returnValue=e.result)}}},simulate:function(e,t,n,r){var i=b.extend(new b.Event,n,{type:e,isSimulated:!0,originalEvent:{}});r?b.event.trigger(i,null,t):b.event.dispatch.call(t,i),i.isDefaultPrevented()&&n.preventDefault()}},b.removeEvent=o.removeEventListener?function(e,t,n){e.removeEventListener&&e.removeEventListener(t,n,!1)}:function(e,t,n){var r="on"+t;e.detachEvent&&(typeof e[r]===i&&(e[r]=null),e.detachEvent(r,n))},b.Event=function(e,n){return this instanceof b.Event?(e&&e.type?(this.originalEvent=e,this.type=e.type,this.isDefaultPrevented=e.defaultPrevented||e.returnValue===!1||e.getPreventDefault&&e.getPreventDefault()?it:ot):this.type=e,n&&b.extend(this,n),this.timeStamp=e&&e.timeStamp||b.now(),this[b.expando]=!0,t):new b.Event(e,n)},b.Event.prototype={isDefaultPrevented:ot,isPropagationStopped:ot,isImmediatePropagationStopped:ot,preventDefault:function(){var e=this.originalEvent;this.isDefaultPrevented=it,e&&(e.preventDefault?e.preventDefault():e.returnValue=!1)},stopPropagation:function(){var e=this.originalEvent;this.isPropagationStopped=it,e&&(e.stopPropagation&&e.stopPropagation(),e.cancelBubble=!0)},stopImmediatePropagation:function(){this.isImmediatePropagationStopped=it,this.stopPropagation()}},b.each({mouseenter:"mouseover",mouseleave:"mouseout"},function(e,t){b.event.special[e]={delegateType:t,bindType:t,handle:function(e){var n,r=this,i=e.relatedTarget,o=e.handleObj;
+return(!i||i!==r&&!b.contains(r,i))&&(e.type=o.origType,n=o.handler.apply(this,arguments),e.type=t),n}}}),b.support.submitBubbles||(b.event.special.submit={setup:function(){return b.nodeName(this,"form")?!1:(b.event.add(this,"click._submit keypress._submit",function(e){var n=e.target,r=b.nodeName(n,"input")||b.nodeName(n,"button")?n.form:t;r&&!b._data(r,"submitBubbles")&&(b.event.add(r,"submit._submit",function(e){e._submit_bubble=!0}),b._data(r,"submitBubbles",!0))}),t)},postDispatch:function(e){e._submit_bubble&&(delete e._submit_bubble,this.parentNode&&!e.isTrigger&&b.event.simulate("submit",this.parentNode,e,!0))},teardown:function(){return b.nodeName(this,"form")?!1:(b.event.remove(this,"._submit"),t)}}),b.support.changeBubbles||(b.event.special.change={setup:function(){return Z.test(this.nodeName)?(("checkbox"===this.type||"radio"===this.type)&&(b.event.add(this,"propertychange._change",function(e){"checked"===e.originalEvent.propertyName&&(this._just_changed=!0)}),b.event.add(this,"click._change",function(e){this._just_changed&&!e.isTrigger&&(this._just_changed=!1),b.event.simulate("change",this,e,!0)})),!1):(b.event.add(this,"beforeactivate._change",function(e){var t=e.target;Z.test(t.nodeName)&&!b._data(t,"changeBubbles")&&(b.event.add(t,"change._change",function(e){!this.parentNode||e.isSimulated||e.isTrigger||b.event.simulate("change",this.parentNode,e,!0)}),b._data(t,"changeBubbles",!0))}),t)},handle:function(e){var n=e.target;return this!==n||e.isSimulated||e.isTrigger||"radio"!==n.type&&"checkbox"!==n.type?e.handleObj.handler.apply(this,arguments):t},teardown:function(){return b.event.remove(this,"._change"),!Z.test(this.nodeName)}}),b.support.focusinBubbles||b.each({focus:"focusin",blur:"focusout"},function(e,t){var n=0,r=function(e){b.event.simulate(t,e.target,b.event.fix(e),!0)};b.event.special[t]={setup:function(){0===n++&&o.addEventListener(e,r,!0)},teardown:function(){0===--n&&o.removeEventListener(e,r,!0)}}}),b.fn.extend({on:function(e,n,r,i,o){var a,s;if("object"==typeof e){"string"!=typeof n&&(r=r||n,n=t);for(a in e)this.on(a,n,r,e[a],o);return this}if(null==r&&null==i?(i=n,r=n=t):null==i&&("string"==typeof n?(i=r,r=t):(i=r,r=n,n=t)),i===!1)i=ot;else if(!i)return this;return 1===o&&(s=i,i=function(e){return b().off(e),s.apply(this,arguments)},i.guid=s.guid||(s.guid=b.guid++)),this.each(function(){b.event.add(this,e,i,r,n)})},one:function(e,t,n,r){return this.on(e,t,n,r,1)},off:function(e,n,r){var i,o;if(e&&e.preventDefault&&e.handleObj)return i=e.handleObj,b(e.delegateTarget).off(i.namespace?i.origType+"."+i.namespace:i.origType,i.selector,i.handler),this;if("object"==typeof e){for(o in e)this.off(o,n,e[o]);return this}return(n===!1||"function"==typeof n)&&(r=n,n=t),r===!1&&(r=ot),this.each(function(){b.event.remove(this,e,r,n)})},bind:function(e,t,n){return this.on(e,null,t,n)},unbind:function(e,t){return this.off(e,null,t)},delegate:function(e,t,n,r){return this.on(t,e,n,r)},undelegate:function(e,t,n){return 1===arguments.length?this.off(e,"**"):this.off(t,e||"**",n)},trigger:function(e,t){return this.each(function(){b.event.trigger(e,t,this)})},triggerHandler:function(e,n){var r=this[0];return r?b.event.trigger(e,n,r,!0):t}}),function(e,t){var n,r,i,o,a,s,u,l,c,p,f,d,h,g,m,y,v,x="sizzle"+-new Date,w=e.document,T={},N=0,C=0,k=it(),E=it(),S=it(),A=typeof t,j=1<<31,D=[],L=D.pop,H=D.push,q=D.slice,M=D.indexOf||function(e){var t=0,n=this.length;for(;n>t;t++)if(this[t]===e)return t;return-1},_="[\\x20\\t\\r\\n\\f]",F="(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",O=F.replace("w","w#"),B="([*^$|!~]?=)",P="\\["+_+"*("+F+")"+_+"*(?:"+B+_+"*(?:(['\"])((?:\\\\.|[^\\\\])*?)\\3|("+O+")|)|)"+_+"*\\]",R=":("+F+")(?:\\(((['\"])((?:\\\\.|[^\\\\])*?)\\3|((?:\\\\.|[^\\\\()[\\]]|"+P.replace(3,8)+")*)|.*)\\)|)",W=RegExp("^"+_+"+|((?:^|[^\\\\])(?:\\\\.)*)"+_+"+$","g"),$=RegExp("^"+_+"*,"+_+"*"),I=RegExp("^"+_+"*([\\x20\\t\\r\\n\\f>+~])"+_+"*"),z=RegExp(R),X=RegExp("^"+O+"$"),U={ID:RegExp("^#("+F+")"),CLASS:RegExp("^\\.("+F+")"),NAME:RegExp("^\\[name=['\"]?("+F+")['\"]?\\]"),TAG:RegExp("^("+F.replace("w","w*")+")"),ATTR:RegExp("^"+P),PSEUDO:RegExp("^"+R),CHILD:RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+_+"*(even|odd|(([+-]|)(\\d*)n|)"+_+"*(?:([+-]|)"+_+"*(\\d+)|))"+_+"*\\)|)","i"),needsContext:RegExp("^"+_+"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\("+_+"*((?:-\\d)?\\d*)"+_+"*\\)|)(?=[^-]|$)","i")},V=/[\x20\t\r\n\f]*[+~]/,Y=/^[^{]+\{\s*\[native code/,J=/^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,G=/^(?:input|select|textarea|button)$/i,Q=/^h\d$/i,K=/'|\\/g,Z=/\=[\x20\t\r\n\f]*([^'"\]]*)[\x20\t\r\n\f]*\]/g,et=/\\([\da-fA-F]{1,6}[\x20\t\r\n\f]?|.)/g,tt=function(e,t){var n="0x"+t-65536;return n!==n?t:0>n?String.fromCharCode(n+65536):String.fromCharCode(55296|n>>10,56320|1023&n)};try{q.call(w.documentElement.childNodes,0)[0].nodeType}catch(nt){q=function(e){var t,n=[];while(t=this[e++])n.push(t);return n}}function rt(e){return Y.test(e+"")}function it(){var e,t=[];return e=function(n,r){return t.push(n+=" ")>i.cacheLength&&delete e[t.shift()],e[n]=r}}function ot(e){return e[x]=!0,e}function at(e){var t=p.createElement("div");try{return e(t)}catch(n){return!1}finally{t=null}}function st(e,t,n,r){var i,o,a,s,u,l,f,g,m,v;if((t?t.ownerDocument||t:w)!==p&&c(t),t=t||p,n=n||[],!e||"string"!=typeof e)return n;if(1!==(s=t.nodeType)&&9!==s)return[];if(!d&&!r){if(i=J.exec(e))if(a=i[1]){if(9===s){if(o=t.getElementById(a),!o||!o.parentNode)return n;if(o.id===a)return n.push(o),n}else if(t.ownerDocument&&(o=t.ownerDocument.getElementById(a))&&y(t,o)&&o.id===a)return n.push(o),n}else{if(i[2])return H.apply(n,q.call(t.getElementsByTagName(e),0)),n;if((a=i[3])&&T.getByClassName&&t.getElementsByClassName)return H.apply(n,q.call(t.getElementsByClassName(a),0)),n}if(T.qsa&&!h.test(e)){if(f=!0,g=x,m=t,v=9===s&&e,1===s&&"object"!==t.nodeName.toLowerCase()){l=ft(e),(f=t.getAttribute("id"))?g=f.replace(K,"\\$&"):t.setAttribute("id",g),g="[id='"+g+"'] ",u=l.length;while(u--)l[u]=g+dt(l[u]);m=V.test(e)&&t.parentNode||t,v=l.join(",")}if(v)try{return H.apply(n,q.call(m.querySelectorAll(v),0)),n}catch(b){}finally{f||t.removeAttribute("id")}}}return wt(e.replace(W,"$1"),t,n,r)}a=st.isXML=function(e){var t=e&&(e.ownerDocument||e).documentElement;return t?"HTML"!==t.nodeName:!1},c=st.setDocument=function(e){var n=e?e.ownerDocument||e:w;return n!==p&&9===n.nodeType&&n.documentElement?(p=n,f=n.documentElement,d=a(n),T.tagNameNoComments=at(function(e){return e.appendChild(n.createComment("")),!e.getElementsByTagName("*").length}),T.attributes=at(function(e){e.innerHTML="<select></select>";var t=typeof e.lastChild.getAttribute("multiple");return"boolean"!==t&&"string"!==t}),T.getByClassName=at(function(e){return e.innerHTML="<div class='hidden e'></div><div class='hidden'></div>",e.getElementsByClassName&&e.getElementsByClassName("e").length?(e.lastChild.className="e",2===e.getElementsByClassName("e").length):!1}),T.getByName=at(function(e){e.id=x+0,e.innerHTML="<a name='"+x+"'></a><div name='"+x+"'></div>",f.insertBefore(e,f.firstChild);var t=n.getElementsByName&&n.getElementsByName(x).length===2+n.getElementsByName(x+0).length;return T.getIdNotName=!n.getElementById(x),f.removeChild(e),t}),i.attrHandle=at(function(e){return e.innerHTML="<a href='#'></a>",e.firstChild&&typeof e.firstChild.getAttribute!==A&&"#"===e.firstChild.getAttribute("href")})?{}:{href:function(e){return e.getAttribute("href",2)},type:function(e){return e.getAttribute("type")}},T.getIdNotName?(i.find.ID=function(e,t){if(typeof t.getElementById!==A&&!d){var n=t.getElementById(e);return n&&n.parentNode?[n]:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){return e.getAttribute("id")===t}}):(i.find.ID=function(e,n){if(typeof n.getElementById!==A&&!d){var r=n.getElementById(e);return r?r.id===e||typeof r.getAttributeNode!==A&&r.getAttributeNode("id").value===e?[r]:t:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){var n=typeof e.getAttributeNode!==A&&e.getAttributeNode("id");return n&&n.value===t}}),i.find.TAG=T.tagNameNoComments?function(e,n){return typeof n.getElementsByTagName!==A?n.getElementsByTagName(e):t}:function(e,t){var n,r=[],i=0,o=t.getElementsByTagName(e);if("*"===e){while(n=o[i++])1===n.nodeType&&r.push(n);return r}return o},i.find.NAME=T.getByName&&function(e,n){return typeof n.getElementsByName!==A?n.getElementsByName(name):t},i.find.CLASS=T.getByClassName&&function(e,n){return typeof n.getElementsByClassName===A||d?t:n.getElementsByClassName(e)},g=[],h=[":focus"],(T.qsa=rt(n.querySelectorAll))&&(at(function(e){e.innerHTML="<select><option selected=''></option></select>",e.querySelectorAll("[selected]").length||h.push("\\["+_+"*(?:checked|disabled|ismap|multiple|readonly|selected|value)"),e.querySelectorAll(":checked").length||h.push(":checked")}),at(function(e){e.innerHTML="<input type='hidden' i=''/>",e.querySelectorAll("[i^='']").length&&h.push("[*^$]="+_+"*(?:\"\"|'')"),e.querySelectorAll(":enabled").length||h.push(":enabled",":disabled"),e.querySelectorAll("*,:x"),h.push(",.*:")})),(T.matchesSelector=rt(m=f.matchesSelector||f.mozMatchesSelector||f.webkitMatchesSelector||f.oMatchesSelector||f.msMatchesSelector))&&at(function(e){T.disconnectedMatch=m.call(e,"div"),m.call(e,"[s!='']:x"),g.push("!=",R)}),h=RegExp(h.join("|")),g=RegExp(g.join("|")),y=rt(f.contains)||f.compareDocumentPosition?function(e,t){var n=9===e.nodeType?e.documentElement:e,r=t&&t.parentNode;return e===r||!(!r||1!==r.nodeType||!(n.contains?n.contains(r):e.compareDocumentPosition&&16&e.compareDocumentPosition(r)))}:function(e,t){if(t)while(t=t.parentNode)if(t===e)return!0;return!1},v=f.compareDocumentPosition?function(e,t){var r;return e===t?(u=!0,0):(r=t.compareDocumentPosition&&e.compareDocumentPosition&&e.compareDocumentPosition(t))?1&r||e.parentNode&&11===e.parentNode.nodeType?e===n||y(w,e)?-1:t===n||y(w,t)?1:0:4&r?-1:1:e.compareDocumentPosition?-1:1}:function(e,t){var r,i=0,o=e.parentNode,a=t.parentNode,s=[e],l=[t];if(e===t)return u=!0,0;if(!o||!a)return e===n?-1:t===n?1:o?-1:a?1:0;if(o===a)return ut(e,t);r=e;while(r=r.parentNode)s.unshift(r);r=t;while(r=r.parentNode)l.unshift(r);while(s[i]===l[i])i++;return i?ut(s[i],l[i]):s[i]===w?-1:l[i]===w?1:0},u=!1,[0,0].sort(v),T.detectDuplicates=u,p):p},st.matches=function(e,t){return st(e,null,null,t)},st.matchesSelector=function(e,t){if((e.ownerDocument||e)!==p&&c(e),t=t.replace(Z,"='$1']"),!(!T.matchesSelector||d||g&&g.test(t)||h.test(t)))try{var n=m.call(e,t);if(n||T.disconnectedMatch||e.document&&11!==e.document.nodeType)return n}catch(r){}return st(t,p,null,[e]).length>0},st.contains=function(e,t){return(e.ownerDocument||e)!==p&&c(e),y(e,t)},st.attr=function(e,t){var n;return(e.ownerDocument||e)!==p&&c(e),d||(t=t.toLowerCase()),(n=i.attrHandle[t])?n(e):d||T.attributes?e.getAttribute(t):((n=e.getAttributeNode(t))||e.getAttribute(t))&&e[t]===!0?t:n&&n.specified?n.value:null},st.error=function(e){throw Error("Syntax error, unrecognized expression: "+e)},st.uniqueSort=function(e){var t,n=[],r=1,i=0;if(u=!T.detectDuplicates,e.sort(v),u){for(;t=e[r];r++)t===e[r-1]&&(i=n.push(r));while(i--)e.splice(n[i],1)}return e};function ut(e,t){var n=t&&e,r=n&&(~t.sourceIndex||j)-(~e.sourceIndex||j);if(r)return r;if(n)while(n=n.nextSibling)if(n===t)return-1;return e?1:-1}function lt(e){return function(t){var n=t.nodeName.toLowerCase();return"input"===n&&t.type===e}}function ct(e){return function(t){var n=t.nodeName.toLowerCase();return("input"===n||"button"===n)&&t.type===e}}function pt(e){return ot(function(t){return t=+t,ot(function(n,r){var i,o=e([],n.length,t),a=o.length;while(a--)n[i=o[a]]&&(n[i]=!(r[i]=n[i]))})})}o=st.getText=function(e){var t,n="",r=0,i=e.nodeType;if(i){if(1===i||9===i||11===i){if("string"==typeof e.textContent)return e.textContent;for(e=e.firstChild;e;e=e.nextSibling)n+=o(e)}else if(3===i||4===i)return e.nodeValue}else for(;t=e[r];r++)n+=o(t);return n},i=st.selectors={cacheLength:50,createPseudo:ot,match:U,find:{},relative:{">":{dir:"parentNode",first:!0}," ":{dir:"parentNode"},"+":{dir:"previousSibling",first:!0},"~":{dir:"previousSibling"}},preFilter:{ATTR:function(e){return e[1]=e[1].replace(et,tt),e[3]=(e[4]||e[5]||"").replace(et,tt),"~="===e[2]&&(e[3]=" "+e[3]+" "),e.slice(0,4)},CHILD:function(e){return e[1]=e[1].toLowerCase(),"nth"===e[1].slice(0,3)?(e[3]||st.error(e[0]),e[4]=+(e[4]?e[5]+(e[6]||1):2*("even"===e[3]||"odd"===e[3])),e[5]=+(e[7]+e[8]||"odd"===e[3])):e[3]&&st.error(e[0]),e},PSEUDO:function(e){var t,n=!e[5]&&e[2];return U.CHILD.test(e[0])?null:(e[4]?e[2]=e[4]:n&&z.test(n)&&(t=ft(n,!0))&&(t=n.indexOf(")",n.length-t)-n.length)&&(e[0]=e[0].slice(0,t),e[2]=n.slice(0,t)),e.slice(0,3))}},filter:{TAG:function(e){return"*"===e?function(){return!0}:(e=e.replace(et,tt).toLowerCase(),function(t){return t.nodeName&&t.nodeName.toLowerCase()===e})},CLASS:function(e){var t=k[e+" "];return t||(t=RegExp("(^|"+_+")"+e+"("+_+"|$)"))&&k(e,function(e){return t.test(e.className||typeof e.getAttribute!==A&&e.getAttribute("class")||"")})},ATTR:function(e,t,n){return function(r){var i=st.attr(r,e);return null==i?"!="===t:t?(i+="","="===t?i===n:"!="===t?i!==n:"^="===t?n&&0===i.indexOf(n):"*="===t?n&&i.indexOf(n)>-1:"$="===t?n&&i.slice(-n.length)===n:"~="===t?(" "+i+" ").indexOf(n)>-1:"|="===t?i===n||i.slice(0,n.length+1)===n+"-":!1):!0}},CHILD:function(e,t,n,r,i){var o="nth"!==e.slice(0,3),a="last"!==e.slice(-4),s="of-type"===t;return 1===r&&0===i?function(e){return!!e.parentNode}:function(t,n,u){var l,c,p,f,d,h,g=o!==a?"nextSibling":"previousSibling",m=t.parentNode,y=s&&t.nodeName.toLowerCase(),v=!u&&!s;if(m){if(o){while(g){p=t;while(p=p[g])if(s?p.nodeName.toLowerCase()===y:1===p.nodeType)return!1;h=g="only"===e&&!h&&"nextSibling"}return!0}if(h=[a?m.firstChild:m.lastChild],a&&v){c=m[x]||(m[x]={}),l=c[e]||[],d=l[0]===N&&l[1],f=l[0]===N&&l[2],p=d&&m.childNodes[d];while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if(1===p.nodeType&&++f&&p===t){c[e]=[N,d,f];break}}else if(v&&(l=(t[x]||(t[x]={}))[e])&&l[0]===N)f=l[1];else while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if((s?p.nodeName.toLowerCase()===y:1===p.nodeType)&&++f&&(v&&((p[x]||(p[x]={}))[e]=[N,f]),p===t))break;return f-=i,f===r||0===f%r&&f/r>=0}}},PSEUDO:function(e,t){var n,r=i.pseudos[e]||i.setFilters[e.toLowerCase()]||st.error("unsupported pseudo: "+e);return r[x]?r(t):r.length>1?(n=[e,e,"",t],i.setFilters.hasOwnProperty(e.toLowerCase())?ot(function(e,n){var i,o=r(e,t),a=o.length;while(a--)i=M.call(e,o[a]),e[i]=!(n[i]=o[a])}):function(e){return r(e,0,n)}):r}},pseudos:{not:ot(function(e){var t=[],n=[],r=s(e.replace(W,"$1"));return r[x]?ot(function(e,t,n,i){var o,a=r(e,null,i,[]),s=e.length;while(s--)(o=a[s])&&(e[s]=!(t[s]=o))}):function(e,i,o){return t[0]=e,r(t,null,o,n),!n.pop()}}),has:ot(function(e){return function(t){return st(e,t).length>0}}),contains:ot(function(e){return function(t){return(t.textContent||t.innerText||o(t)).indexOf(e)>-1}}),lang:ot(function(e){return X.test(e||"")||st.error("unsupported lang: "+e),e=e.replace(et,tt).toLowerCase(),function(t){var n;do if(n=d?t.getAttribute("xml:lang")||t.getAttribute("lang"):t.lang)return n=n.toLowerCase(),n===e||0===n.indexOf(e+"-");while((t=t.parentNode)&&1===t.nodeType);return!1}}),target:function(t){var n=e.location&&e.location.hash;return n&&n.slice(1)===t.id},root:function(e){return e===f},focus:function(e){return e===p.activeElement&&(!p.hasFocus||p.hasFocus())&&!!(e.type||e.href||~e.tabIndex)},enabled:function(e){return e.disabled===!1},disabled:function(e){return e.disabled===!0},checked:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&!!e.checked||"option"===t&&!!e.selected},selected:function(e){return e.parentNode&&e.parentNode.selectedIndex,e.selected===!0},empty:function(e){for(e=e.firstChild;e;e=e.nextSibling)if(e.nodeName>"@"||3===e.nodeType||4===e.nodeType)return!1;return!0},parent:function(e){return!i.pseudos.empty(e)},header:function(e){return Q.test(e.nodeName)},input:function(e){return G.test(e.nodeName)},button:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&"button"===e.type||"button"===t},text:function(e){var t;return"input"===e.nodeName.toLowerCase()&&"text"===e.type&&(null==(t=e.getAttribute("type"))||t.toLowerCase()===e.type)},first:pt(function(){return[0]}),last:pt(function(e,t){return[t-1]}),eq:pt(function(e,t,n){return[0>n?n+t:n]}),even:pt(function(e,t){var n=0;for(;t>n;n+=2)e.push(n);return e}),odd:pt(function(e,t){var n=1;for(;t>n;n+=2)e.push(n);return e}),lt:pt(function(e,t,n){var r=0>n?n+t:n;for(;--r>=0;)e.push(r);return e}),gt:pt(function(e,t,n){var r=0>n?n+t:n;for(;t>++r;)e.push(r);return e})}};for(n in{radio:!0,checkbox:!0,file:!0,password:!0,image:!0})i.pseudos[n]=lt(n);for(n in{submit:!0,reset:!0})i.pseudos[n]=ct(n);function ft(e,t){var n,r,o,a,s,u,l,c=E[e+" "];if(c)return t?0:c.slice(0);s=e,u=[],l=i.preFilter;while(s){(!n||(r=$.exec(s)))&&(r&&(s=s.slice(r[0].length)||s),u.push(o=[])),n=!1,(r=I.exec(s))&&(n=r.shift(),o.push({value:n,type:r[0].replace(W," ")}),s=s.slice(n.length));for(a in i.filter)!(r=U[a].exec(s))||l[a]&&!(r=l[a](r))||(n=r.shift(),o.push({value:n,type:a,matches:r}),s=s.slice(n.length));if(!n)break}return t?s.length:s?st.error(e):E(e,u).slice(0)}function dt(e){var t=0,n=e.length,r="";for(;n>t;t++)r+=e[t].value;return r}function ht(e,t,n){var i=t.dir,o=n&&"parentNode"===i,a=C++;return t.first?function(t,n,r){while(t=t[i])if(1===t.nodeType||o)return e(t,n,r)}:function(t,n,s){var u,l,c,p=N+" "+a;if(s){while(t=t[i])if((1===t.nodeType||o)&&e(t,n,s))return!0}else while(t=t[i])if(1===t.nodeType||o)if(c=t[x]||(t[x]={}),(l=c[i])&&l[0]===p){if((u=l[1])===!0||u===r)return u===!0}else if(l=c[i]=[p],l[1]=e(t,n,s)||r,l[1]===!0)return!0}}function gt(e){return e.length>1?function(t,n,r){var i=e.length;while(i--)if(!e[i](t,n,r))return!1;return!0}:e[0]}function mt(e,t,n,r,i){var o,a=[],s=0,u=e.length,l=null!=t;for(;u>s;s++)(o=e[s])&&(!n||n(o,r,i))&&(a.push(o),l&&t.push(s));return a}function yt(e,t,n,r,i,o){return r&&!r[x]&&(r=yt(r)),i&&!i[x]&&(i=yt(i,o)),ot(function(o,a,s,u){var l,c,p,f=[],d=[],h=a.length,g=o||xt(t||"*",s.nodeType?[s]:s,[]),m=!e||!o&&t?g:mt(g,f,e,s,u),y=n?i||(o?e:h||r)?[]:a:m;if(n&&n(m,y,s,u),r){l=mt(y,d),r(l,[],s,u),c=l.length;while(c--)(p=l[c])&&(y[d[c]]=!(m[d[c]]=p))}if(o){if(i||e){if(i){l=[],c=y.length;while(c--)(p=y[c])&&l.push(m[c]=p);i(null,y=[],l,u)}c=y.length;while(c--)(p=y[c])&&(l=i?M.call(o,p):f[c])>-1&&(o[l]=!(a[l]=p))}}else y=mt(y===a?y.splice(h,y.length):y),i?i(null,a,y,u):H.apply(a,y)})}function vt(e){var t,n,r,o=e.length,a=i.relative[e[0].type],s=a||i.relative[" "],u=a?1:0,c=ht(function(e){return e===t},s,!0),p=ht(function(e){return M.call(t,e)>-1},s,!0),f=[function(e,n,r){return!a&&(r||n!==l)||((t=n).nodeType?c(e,n,r):p(e,n,r))}];for(;o>u;u++)if(n=i.relative[e[u].type])f=[ht(gt(f),n)];else{if(n=i.filter[e[u].type].apply(null,e[u].matches),n[x]){for(r=++u;o>r;r++)if(i.relative[e[r].type])break;return yt(u>1&&gt(f),u>1&&dt(e.slice(0,u-1)).replace(W,"$1"),n,r>u&&vt(e.slice(u,r)),o>r&&vt(e=e.slice(r)),o>r&&dt(e))}f.push(n)}return gt(f)}function bt(e,t){var n=0,o=t.length>0,a=e.length>0,s=function(s,u,c,f,d){var h,g,m,y=[],v=0,b="0",x=s&&[],w=null!=d,T=l,C=s||a&&i.find.TAG("*",d&&u.parentNode||u),k=N+=null==T?1:Math.random()||.1;for(w&&(l=u!==p&&u,r=n);null!=(h=C[b]);b++){if(a&&h){g=0;while(m=e[g++])if(m(h,u,c)){f.push(h);break}w&&(N=k,r=++n)}o&&((h=!m&&h)&&v--,s&&x.push(h))}if(v+=b,o&&b!==v){g=0;while(m=t[g++])m(x,y,u,c);if(s){if(v>0)while(b--)x[b]||y[b]||(y[b]=L.call(f));y=mt(y)}H.apply(f,y),w&&!s&&y.length>0&&v+t.length>1&&st.uniqueSort(f)}return w&&(N=k,l=T),x};return o?ot(s):s}s=st.compile=function(e,t){var n,r=[],i=[],o=S[e+" "];if(!o){t||(t=ft(e)),n=t.length;while(n--)o=vt(t[n]),o[x]?r.push(o):i.push(o);o=S(e,bt(i,r))}return o};function xt(e,t,n){var r=0,i=t.length;for(;i>r;r++)st(e,t[r],n);return n}function wt(e,t,n,r){var o,a,u,l,c,p=ft(e);if(!r&&1===p.length){if(a=p[0]=p[0].slice(0),a.length>2&&"ID"===(u=a[0]).type&&9===t.nodeType&&!d&&i.relative[a[1].type]){if(t=i.find.ID(u.matches[0].replace(et,tt),t)[0],!t)return n;e=e.slice(a.shift().value.length)}o=U.needsContext.test(e)?0:a.length;while(o--){if(u=a[o],i.relative[l=u.type])break;if((c=i.find[l])&&(r=c(u.matches[0].replace(et,tt),V.test(a[0].type)&&t.parentNode||t))){if(a.splice(o,1),e=r.length&&dt(a),!e)return H.apply(n,q.call(r,0)),n;break}}}return s(e,p)(r,t,d,n,V.test(e)),n}i.pseudos.nth=i.pseudos.eq;function Tt(){}i.filters=Tt.prototype=i.pseudos,i.setFilters=new Tt,c(),st.attr=b.attr,b.find=st,b.expr=st.selectors,b.expr[":"]=b.expr.pseudos,b.unique=st.uniqueSort,b.text=st.getText,b.isXMLDoc=st.isXML,b.contains=st.contains}(e);var at=/Until$/,st=/^(?:parents|prev(?:Until|All))/,ut=/^.[^:#\[\.,]*$/,lt=b.expr.match.needsContext,ct={children:!0,contents:!0,next:!0,prev:!0};b.fn.extend({find:function(e){var t,n,r,i=this.length;if("string"!=typeof e)return r=this,this.pushStack(b(e).filter(function(){for(t=0;i>t;t++)if(b.contains(r[t],this))return!0}));for(n=[],t=0;i>t;t++)b.find(e,this[t],n);return n=this.pushStack(i>1?b.unique(n):n),n.selector=(this.selector?this.selector+" ":"")+e,n},has:function(e){var t,n=b(e,this),r=n.length;return this.filter(function(){for(t=0;r>t;t++)if(b.contains(this,n[t]))return!0})},not:function(e){return this.pushStack(ft(this,e,!1))},filter:function(e){return this.pushStack(ft(this,e,!0))},is:function(e){return!!e&&("string"==typeof e?lt.test(e)?b(e,this.context).index(this[0])>=0:b.filter(e,this).length>0:this.filter(e).length>0)},closest:function(e,t){var n,r=0,i=this.length,o=[],a=lt.test(e)||"string"!=typeof e?b(e,t||this.context):0;for(;i>r;r++){n=this[r];while(n&&n.ownerDocument&&n!==t&&11!==n.nodeType){if(a?a.index(n)>-1:b.find.matchesSelector(n,e)){o.push(n);break}n=n.parentNode}}return this.pushStack(o.length>1?b.unique(o):o)},index:function(e){return e?"string"==typeof e?b.inArray(this[0],b(e)):b.inArray(e.jquery?e[0]:e,this):this[0]&&this[0].parentNode?this.first().prevAll().length:-1},add:function(e,t){var n="string"==typeof e?b(e,t):b.makeArray(e&&e.nodeType?[e]:e),r=b.merge(this.get(),n);return this.pushStack(b.unique(r))},addBack:function(e){return this.add(null==e?this.prevObject:this.prevObject.filter(e))}}),b.fn.andSelf=b.fn.addBack;function pt(e,t){do e=e[t];while(e&&1!==e.nodeType);return e}b.each({parent:function(e){var t=e.parentNode;return t&&11!==t.nodeType?t:null},parents:function(e){return b.dir(e,"parentNode")},parentsUntil:function(e,t,n){return b.dir(e,"parentNode",n)},next:function(e){return pt(e,"nextSibling")},prev:function(e){return pt(e,"previousSibling")},nextAll:function(e){return b.dir(e,"nextSibling")},prevAll:function(e){return b.dir(e,"previousSibling")},nextUntil:function(e,t,n){return b.dir(e,"nextSibling",n)},prevUntil:function(e,t,n){return b.dir(e,"previousSibling",n)},siblings:function(e){return b.sibling((e.parentNode||{}).firstChild,e)},children:function(e){return b.sibling(e.firstChild)},contents:function(e){return b.nodeName(e,"iframe")?e.contentDocument||e.contentWindow.document:b.merge([],e.childNodes)}},function(e,t){b.fn[e]=function(n,r){var i=b.map(this,t,n);return at.test(e)||(r=n),r&&"string"==typeof r&&(i=b.filter(r,i)),i=this.length>1&&!ct[e]?b.unique(i):i,this.length>1&&st.test(e)&&(i=i.reverse()),this.pushStack(i)}}),b.extend({filter:function(e,t,n){return n&&(e=":not("+e+")"),1===t.length?b.find.matchesSelector(t[0],e)?[t[0]]:[]:b.find.matches(e,t)},dir:function(e,n,r){var i=[],o=e[n];while(o&&9!==o.nodeType&&(r===t||1!==o.nodeType||!b(o).is(r)))1===o.nodeType&&i.push(o),o=o[n];return i},sibling:function(e,t){var n=[];for(;e;e=e.nextSibling)1===e.nodeType&&e!==t&&n.push(e);return n}});function ft(e,t,n){if(t=t||0,b.isFunction(t))return b.grep(e,function(e,r){var i=!!t.call(e,r,e);return i===n});if(t.nodeType)return b.grep(e,function(e){return e===t===n});if("string"==typeof t){var r=b.grep(e,function(e){return 1===e.nodeType});if(ut.test(t))return b.filter(t,r,!n);t=b.filter(t,r)}return b.grep(e,function(e){return b.inArray(e,t)>=0===n})}function dt(e){var t=ht.split("|"),n=e.createDocumentFragment();if(n.createElement)while(t.length)n.createElement(t.pop());return n}var ht="abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",gt=/ jQuery\d+="(?:null|\d+)"/g,mt=RegExp("<(?:"+ht+")[\\s/>]","i"),yt=/^\s+/,vt=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,bt=/<([\w:]+)/,xt=/<tbody/i,wt=/<|&#?\w+;/,Tt=/<(?:script|style|link)/i,Nt=/^(?:checkbox|radio)$/i,Ct=/checked\s*(?:[^=]|=\s*.checked.)/i,kt=/^$|\/(?:java|ecma)script/i,Et=/^true\/(.*)/,St=/^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g,At={option:[1,"<select multiple='multiple'>","</select>"],legend:[1,"<fieldset>","</fieldset>"],area:[1,"<map>","</map>"],param:[1,"<object>","</object>"],thead:[1,"<table>","</table>"],tr:[2,"<table><tbody>","</tbody></table>"],col:[2,"<table><tbody></tbody><colgroup>","</colgroup></table>"],td:[3,"<table><tbody><tr>","</tr></tbody></table>"],_default:b.support.htmlSerialize?[0,"",""]:[1,"X<div>","</div>"]},jt=dt(o),Dt=jt.appendChild(o.createElement("div"));At.optgroup=At.option,At.tbody=At.tfoot=At.colgroup=At.caption=At.thead,At.th=At.td,b.fn.extend({text:function(e){return b.access(this,function(e){return e===t?b.text(this):this.empty().append((this[0]&&this[0].ownerDocument||o).createTextNode(e))},null,e,arguments.length)},wrapAll:function(e){if(b.isFunction(e))return this.each(function(t){b(this).wrapAll(e.call(this,t))});if(this[0]){var t=b(e,this[0].ownerDocument).eq(0).clone(!0);this[0].parentNode&&t.insertBefore(this[0]),t.map(function(){var e=this;while(e.firstChild&&1===e.firstChild.nodeType)e=e.firstChild;return e}).append(this)}return this},wrapInner:function(e){return b.isFunction(e)?this.each(function(t){b(this).wrapInner(e.call(this,t))}):this.each(function(){var t=b(this),n=t.contents();n.length?n.wrapAll(e):t.append(e)})},wrap:function(e){var t=b.isFunction(e);return this.each(function(n){b(this).wrapAll(t?e.call(this,n):e)})},unwrap:function(){return this.parent().each(function(){b.nodeName(this,"body")||b(this).replaceWith(this.childNodes)}).end()},append:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.appendChild(e)})},prepend:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.insertBefore(e,this.firstChild)})},before:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this)})},after:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this.nextSibling)})},remove:function(e,t){var n,r=0;for(;null!=(n=this[r]);r++)(!e||b.filter(e,[n]).length>0)&&(t||1!==n.nodeType||b.cleanData(Ot(n)),n.parentNode&&(t&&b.contains(n.ownerDocument,n)&&Mt(Ot(n,"script")),n.parentNode.removeChild(n)));return this},empty:function(){var e,t=0;for(;null!=(e=this[t]);t++){1===e.nodeType&&b.cleanData(Ot(e,!1));while(e.firstChild)e.removeChild(e.firstChild);e.options&&b.nodeName(e,"select")&&(e.options.length=0)}return this},clone:function(e,t){return e=null==e?!1:e,t=null==t?e:t,this.map(function(){return b.clone(this,e,t)})},html:function(e){return b.access(this,function(e){var n=this[0]||{},r=0,i=this.length;if(e===t)return 1===n.nodeType?n.innerHTML.replace(gt,""):t;if(!("string"!=typeof e||Tt.test(e)||!b.support.htmlSerialize&&mt.test(e)||!b.support.leadingWhitespace&&yt.test(e)||At[(bt.exec(e)||["",""])[1].toLowerCase()])){e=e.replace(vt,"<$1></$2>");try{for(;i>r;r++)n=this[r]||{},1===n.nodeType&&(b.cleanData(Ot(n,!1)),n.innerHTML=e);n=0}catch(o){}}n&&this.empty().append(e)},null,e,arguments.length)},replaceWith:function(e){var t=b.isFunction(e);return t||"string"==typeof e||(e=b(e).not(this).detach()),this.domManip([e],!0,function(e){var t=this.nextSibling,n=this.parentNode;n&&(b(this).remove(),n.insertBefore(e,t))})},detach:function(e){return this.remove(e,!0)},domManip:function(e,n,r){e=f.apply([],e);var i,o,a,s,u,l,c=0,p=this.length,d=this,h=p-1,g=e[0],m=b.isFunction(g);if(m||!(1>=p||"string"!=typeof g||b.support.checkClone)&&Ct.test(g))return this.each(function(i){var o=d.eq(i);m&&(e[0]=g.call(this,i,n?o.html():t)),o.domManip(e,n,r)});if(p&&(l=b.buildFragment(e,this[0].ownerDocument,!1,this),i=l.firstChild,1===l.childNodes.length&&(l=i),i)){for(n=n&&b.nodeName(i,"tr"),s=b.map(Ot(l,"script"),Ht),a=s.length;p>c;c++)o=l,c!==h&&(o=b.clone(o,!0,!0),a&&b.merge(s,Ot(o,"script"))),r.call(n&&b.nodeName(this[c],"table")?Lt(this[c],"tbody"):this[c],o,c);if(a)for(u=s[s.length-1].ownerDocument,b.map(s,qt),c=0;a>c;c++)o=s[c],kt.test(o.type||"")&&!b._data(o,"globalEval")&&b.contains(u,o)&&(o.src?b.ajax({url:o.src,type:"GET",dataType:"script",async:!1,global:!1,"throws":!0}):b.globalEval((o.text||o.textContent||o.innerHTML||"").replace(St,"")));l=i=null}return this}});function Lt(e,t){return e.getElementsByTagName(t)[0]||e.appendChild(e.ownerDocument.createElement(t))}function Ht(e){var t=e.getAttributeNode("type");return e.type=(t&&t.specified)+"/"+e.type,e}function qt(e){var t=Et.exec(e.type);return t?e.type=t[1]:e.removeAttribute("type"),e}function Mt(e,t){var n,r=0;for(;null!=(n=e[r]);r++)b._data(n,"globalEval",!t||b._data(t[r],"globalEval"))}function _t(e,t){if(1===t.nodeType&&b.hasData(e)){var n,r,i,o=b._data(e),a=b._data(t,o),s=o.events;if(s){delete a.handle,a.events={};for(n in s)for(r=0,i=s[n].length;i>r;r++)b.event.add(t,n,s[n][r])}a.data&&(a.data=b.extend({},a.data))}}function Ft(e,t){var n,r,i;if(1===t.nodeType){if(n=t.nodeName.toLowerCase(),!b.support.noCloneEvent&&t[b.expando]){i=b._data(t);for(r in i.events)b.removeEvent(t,r,i.handle);t.removeAttribute(b.expando)}"script"===n&&t.text!==e.text?(Ht(t).text=e.text,qt(t)):"object"===n?(t.parentNode&&(t.outerHTML=e.outerHTML),b.support.html5Clone&&e.innerHTML&&!b.trim(t.innerHTML)&&(t.innerHTML=e.innerHTML)):"input"===n&&Nt.test(e.type)?(t.defaultChecked=t.checked=e.checked,t.value!==e.value&&(t.value=e.value)):"option"===n?t.defaultSelected=t.selected=e.defaultSelected:("input"===n||"textarea"===n)&&(t.defaultValue=e.defaultValue)}}b.each({appendTo:"append",prependTo:"prepend",insertBefore:"before",insertAfter:"after",replaceAll:"replaceWith"},function(e,t){b.fn[e]=function(e){var n,r=0,i=[],o=b(e),a=o.length-1;for(;a>=r;r++)n=r===a?this:this.clone(!0),b(o[r])[t](n),d.apply(i,n.get());return this.pushStack(i)}});function Ot(e,n){var r,o,a=0,s=typeof e.getElementsByTagName!==i?e.getElementsByTagName(n||"*"):typeof e.querySelectorAll!==i?e.querySelectorAll(n||"*"):t;if(!s)for(s=[],r=e.childNodes||e;null!=(o=r[a]);a++)!n||b.nodeName(o,n)?s.push(o):b.merge(s,Ot(o,n));return n===t||n&&b.nodeName(e,n)?b.merge([e],s):s}function Bt(e){Nt.test(e.type)&&(e.defaultChecked=e.checked)}b.extend({clone:function(e,t,n){var r,i,o,a,s,u=b.contains(e.ownerDocument,e);if(b.support.html5Clone||b.isXMLDoc(e)||!mt.test("<"+e.nodeName+">")?o=e.cloneNode(!0):(Dt.innerHTML=e.outerHTML,Dt.removeChild(o=Dt.firstChild)),!(b.support.noCloneEvent&&b.support.noCloneChecked||1!==e.nodeType&&11!==e.nodeType||b.isXMLDoc(e)))for(r=Ot(o),s=Ot(e),a=0;null!=(i=s[a]);++a)r[a]&&Ft(i,r[a]);if(t)if(n)for(s=s||Ot(e),r=r||Ot(o),a=0;null!=(i=s[a]);a++)_t(i,r[a]);else _t(e,o);return r=Ot(o,"script"),r.length>0&&Mt(r,!u&&Ot(e,"script")),r=s=i=null,o},buildFragment:function(e,t,n,r){var i,o,a,s,u,l,c,p=e.length,f=dt(t),d=[],h=0;for(;p>h;h++)if(o=e[h],o||0===o)if("object"===b.type(o))b.merge(d,o.nodeType?[o]:o);else if(wt.test(o)){s=s||f.appendChild(t.createElement("div")),u=(bt.exec(o)||["",""])[1].toLowerCase(),c=At[u]||At._default,s.innerHTML=c[1]+o.replace(vt,"<$1></$2>")+c[2],i=c[0];while(i--)s=s.lastChild;if(!b.support.leadingWhitespace&&yt.test(o)&&d.push(t.createTextNode(yt.exec(o)[0])),!b.support.tbody){o="table"!==u||xt.test(o)?"<table>"!==c[1]||xt.test(o)?0:s:s.firstChild,i=o&&o.childNodes.length;while(i--)b.nodeName(l=o.childNodes[i],"tbody")&&!l.childNodes.length&&o.removeChild(l)
+}b.merge(d,s.childNodes),s.textContent="";while(s.firstChild)s.removeChild(s.firstChild);s=f.lastChild}else d.push(t.createTextNode(o));s&&f.removeChild(s),b.support.appendChecked||b.grep(Ot(d,"input"),Bt),h=0;while(o=d[h++])if((!r||-1===b.inArray(o,r))&&(a=b.contains(o.ownerDocument,o),s=Ot(f.appendChild(o),"script"),a&&Mt(s),n)){i=0;while(o=s[i++])kt.test(o.type||"")&&n.push(o)}return s=null,f},cleanData:function(e,t){var n,r,o,a,s=0,u=b.expando,l=b.cache,p=b.support.deleteExpando,f=b.event.special;for(;null!=(n=e[s]);s++)if((t||b.acceptData(n))&&(o=n[u],a=o&&l[o])){if(a.events)for(r in a.events)f[r]?b.event.remove(n,r):b.removeEvent(n,r,a.handle);l[o]&&(delete l[o],p?delete n[u]:typeof n.removeAttribute!==i?n.removeAttribute(u):n[u]=null,c.push(o))}}});var Pt,Rt,Wt,$t=/alpha\([^)]*\)/i,It=/opacity\s*=\s*([^)]*)/,zt=/^(top|right|bottom|left)$/,Xt=/^(none|table(?!-c[ea]).+)/,Ut=/^margin/,Vt=RegExp("^("+x+")(.*)$","i"),Yt=RegExp("^("+x+")(?!px)[a-z%]+$","i"),Jt=RegExp("^([+-])=("+x+")","i"),Gt={BODY:"block"},Qt={position:"absolute",visibility:"hidden",display:"block"},Kt={letterSpacing:0,fontWeight:400},Zt=["Top","Right","Bottom","Left"],en=["Webkit","O","Moz","ms"];function tn(e,t){if(t in e)return t;var n=t.charAt(0).toUpperCase()+t.slice(1),r=t,i=en.length;while(i--)if(t=en[i]+n,t in e)return t;return r}function nn(e,t){return e=t||e,"none"===b.css(e,"display")||!b.contains(e.ownerDocument,e)}function rn(e,t){var n,r,i,o=[],a=0,s=e.length;for(;s>a;a++)r=e[a],r.style&&(o[a]=b._data(r,"olddisplay"),n=r.style.display,t?(o[a]||"none"!==n||(r.style.display=""),""===r.style.display&&nn(r)&&(o[a]=b._data(r,"olddisplay",un(r.nodeName)))):o[a]||(i=nn(r),(n&&"none"!==n||!i)&&b._data(r,"olddisplay",i?n:b.css(r,"display"))));for(a=0;s>a;a++)r=e[a],r.style&&(t&&"none"!==r.style.display&&""!==r.style.display||(r.style.display=t?o[a]||"":"none"));return e}b.fn.extend({css:function(e,n){return b.access(this,function(e,n,r){var i,o,a={},s=0;if(b.isArray(n)){for(o=Rt(e),i=n.length;i>s;s++)a[n[s]]=b.css(e,n[s],!1,o);return a}return r!==t?b.style(e,n,r):b.css(e,n)},e,n,arguments.length>1)},show:function(){return rn(this,!0)},hide:function(){return rn(this)},toggle:function(e){var t="boolean"==typeof e;return this.each(function(){(t?e:nn(this))?b(this).show():b(this).hide()})}}),b.extend({cssHooks:{opacity:{get:function(e,t){if(t){var n=Wt(e,"opacity");return""===n?"1":n}}}},cssNumber:{columnCount:!0,fillOpacity:!0,fontWeight:!0,lineHeight:!0,opacity:!0,orphans:!0,widows:!0,zIndex:!0,zoom:!0},cssProps:{"float":b.support.cssFloat?"cssFloat":"styleFloat"},style:function(e,n,r,i){if(e&&3!==e.nodeType&&8!==e.nodeType&&e.style){var o,a,s,u=b.camelCase(n),l=e.style;if(n=b.cssProps[u]||(b.cssProps[u]=tn(l,u)),s=b.cssHooks[n]||b.cssHooks[u],r===t)return s&&"get"in s&&(o=s.get(e,!1,i))!==t?o:l[n];if(a=typeof r,"string"===a&&(o=Jt.exec(r))&&(r=(o[1]+1)*o[2]+parseFloat(b.css(e,n)),a="number"),!(null==r||"number"===a&&isNaN(r)||("number"!==a||b.cssNumber[u]||(r+="px"),b.support.clearCloneStyle||""!==r||0!==n.indexOf("background")||(l[n]="inherit"),s&&"set"in s&&(r=s.set(e,r,i))===t)))try{l[n]=r}catch(c){}}},css:function(e,n,r,i){var o,a,s,u=b.camelCase(n);return n=b.cssProps[u]||(b.cssProps[u]=tn(e.style,u)),s=b.cssHooks[n]||b.cssHooks[u],s&&"get"in s&&(a=s.get(e,!0,r)),a===t&&(a=Wt(e,n,i)),"normal"===a&&n in Kt&&(a=Kt[n]),""===r||r?(o=parseFloat(a),r===!0||b.isNumeric(o)?o||0:a):a},swap:function(e,t,n,r){var i,o,a={};for(o in t)a[o]=e.style[o],e.style[o]=t[o];i=n.apply(e,r||[]);for(o in t)e.style[o]=a[o];return i}}),e.getComputedStyle?(Rt=function(t){return e.getComputedStyle(t,null)},Wt=function(e,n,r){var i,o,a,s=r||Rt(e),u=s?s.getPropertyValue(n)||s[n]:t,l=e.style;return s&&(""!==u||b.contains(e.ownerDocument,e)||(u=b.style(e,n)),Yt.test(u)&&Ut.test(n)&&(i=l.width,o=l.minWidth,a=l.maxWidth,l.minWidth=l.maxWidth=l.width=u,u=s.width,l.width=i,l.minWidth=o,l.maxWidth=a)),u}):o.documentElement.currentStyle&&(Rt=function(e){return e.currentStyle},Wt=function(e,n,r){var i,o,a,s=r||Rt(e),u=s?s[n]:t,l=e.style;return null==u&&l&&l[n]&&(u=l[n]),Yt.test(u)&&!zt.test(n)&&(i=l.left,o=e.runtimeStyle,a=o&&o.left,a&&(o.left=e.currentStyle.left),l.left="fontSize"===n?"1em":u,u=l.pixelLeft+"px",l.left=i,a&&(o.left=a)),""===u?"auto":u});function on(e,t,n){var r=Vt.exec(t);return r?Math.max(0,r[1]-(n||0))+(r[2]||"px"):t}function an(e,t,n,r,i){var o=n===(r?"border":"content")?4:"width"===t?1:0,a=0;for(;4>o;o+=2)"margin"===n&&(a+=b.css(e,n+Zt[o],!0,i)),r?("content"===n&&(a-=b.css(e,"padding"+Zt[o],!0,i)),"margin"!==n&&(a-=b.css(e,"border"+Zt[o]+"Width",!0,i))):(a+=b.css(e,"padding"+Zt[o],!0,i),"padding"!==n&&(a+=b.css(e,"border"+Zt[o]+"Width",!0,i)));return a}function sn(e,t,n){var r=!0,i="width"===t?e.offsetWidth:e.offsetHeight,o=Rt(e),a=b.support.boxSizing&&"border-box"===b.css(e,"boxSizing",!1,o);if(0>=i||null==i){if(i=Wt(e,t,o),(0>i||null==i)&&(i=e.style[t]),Yt.test(i))return i;r=a&&(b.support.boxSizingReliable||i===e.style[t]),i=parseFloat(i)||0}return i+an(e,t,n||(a?"border":"content"),r,o)+"px"}function un(e){var t=o,n=Gt[e];return n||(n=ln(e,t),"none"!==n&&n||(Pt=(Pt||b("<iframe frameborder='0' width='0' height='0'/>").css("cssText","display:block !important")).appendTo(t.documentElement),t=(Pt[0].contentWindow||Pt[0].contentDocument).document,t.write("<!doctype html><html><body>"),t.close(),n=ln(e,t),Pt.detach()),Gt[e]=n),n}function ln(e,t){var n=b(t.createElement(e)).appendTo(t.body),r=b.css(n[0],"display");return n.remove(),r}b.each(["height","width"],function(e,n){b.cssHooks[n]={get:function(e,r,i){return r?0===e.offsetWidth&&Xt.test(b.css(e,"display"))?b.swap(e,Qt,function(){return sn(e,n,i)}):sn(e,n,i):t},set:function(e,t,r){var i=r&&Rt(e);return on(e,t,r?an(e,n,r,b.support.boxSizing&&"border-box"===b.css(e,"boxSizing",!1,i),i):0)}}}),b.support.opacity||(b.cssHooks.opacity={get:function(e,t){return It.test((t&&e.currentStyle?e.currentStyle.filter:e.style.filter)||"")?.01*parseFloat(RegExp.$1)+"":t?"1":""},set:function(e,t){var n=e.style,r=e.currentStyle,i=b.isNumeric(t)?"alpha(opacity="+100*t+")":"",o=r&&r.filter||n.filter||"";n.zoom=1,(t>=1||""===t)&&""===b.trim(o.replace($t,""))&&n.removeAttribute&&(n.removeAttribute("filter"),""===t||r&&!r.filter)||(n.filter=$t.test(o)?o.replace($t,i):o+" "+i)}}),b(function(){b.support.reliableMarginRight||(b.cssHooks.marginRight={get:function(e,n){return n?b.swap(e,{display:"inline-block"},Wt,[e,"marginRight"]):t}}),!b.support.pixelPosition&&b.fn.position&&b.each(["top","left"],function(e,n){b.cssHooks[n]={get:function(e,r){return r?(r=Wt(e,n),Yt.test(r)?b(e).position()[n]+"px":r):t}}})}),b.expr&&b.expr.filters&&(b.expr.filters.hidden=function(e){return 0>=e.offsetWidth&&0>=e.offsetHeight||!b.support.reliableHiddenOffsets&&"none"===(e.style&&e.style.display||b.css(e,"display"))},b.expr.filters.visible=function(e){return!b.expr.filters.hidden(e)}),b.each({margin:"",padding:"",border:"Width"},function(e,t){b.cssHooks[e+t]={expand:function(n){var r=0,i={},o="string"==typeof n?n.split(" "):[n];for(;4>r;r++)i[e+Zt[r]+t]=o[r]||o[r-2]||o[0];return i}},Ut.test(e)||(b.cssHooks[e+t].set=on)});var cn=/%20/g,pn=/\[\]$/,fn=/\r?\n/g,dn=/^(?:submit|button|image|reset|file)$/i,hn=/^(?:input|select|textarea|keygen)/i;b.fn.extend({serialize:function(){return b.param(this.serializeArray())},serializeArray:function(){return this.map(function(){var e=b.prop(this,"elements");return e?b.makeArray(e):this}).filter(function(){var e=this.type;return this.name&&!b(this).is(":disabled")&&hn.test(this.nodeName)&&!dn.test(e)&&(this.checked||!Nt.test(e))}).map(function(e,t){var n=b(this).val();return null==n?null:b.isArray(n)?b.map(n,function(e){return{name:t.name,value:e.replace(fn,"\r\n")}}):{name:t.name,value:n.replace(fn,"\r\n")}}).get()}}),b.param=function(e,n){var r,i=[],o=function(e,t){t=b.isFunction(t)?t():null==t?"":t,i[i.length]=encodeURIComponent(e)+"="+encodeURIComponent(t)};if(n===t&&(n=b.ajaxSettings&&b.ajaxSettings.traditional),b.isArray(e)||e.jquery&&!b.isPlainObject(e))b.each(e,function(){o(this.name,this.value)});else for(r in e)gn(r,e[r],n,o);return i.join("&").replace(cn,"+")};function gn(e,t,n,r){var i;if(b.isArray(t))b.each(t,function(t,i){n||pn.test(e)?r(e,i):gn(e+"["+("object"==typeof i?t:"")+"]",i,n,r)});else if(n||"object"!==b.type(t))r(e,t);else for(i in t)gn(e+"["+i+"]",t[i],n,r)}b.each("blur focus focusin focusout load resize scroll unload click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup error contextmenu".split(" "),function(e,t){b.fn[t]=function(e,n){return arguments.length>0?this.on(t,null,e,n):this.trigger(t)}}),b.fn.hover=function(e,t){return this.mouseenter(e).mouseleave(t||e)};var mn,yn,vn=b.now(),bn=/\?/,xn=/#.*$/,wn=/([?&])_=[^&]*/,Tn=/^(.*?):[ \t]*([^\r\n]*)\r?$/gm,Nn=/^(?:about|app|app-storage|.+-extension|file|res|widget):$/,Cn=/^(?:GET|HEAD)$/,kn=/^\/\//,En=/^([\w.+-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,Sn=b.fn.load,An={},jn={},Dn="*/".concat("*");try{yn=a.href}catch(Ln){yn=o.createElement("a"),yn.href="",yn=yn.href}mn=En.exec(yn.toLowerCase())||[];function Hn(e){return function(t,n){"string"!=typeof t&&(n=t,t="*");var r,i=0,o=t.toLowerCase().match(w)||[];if(b.isFunction(n))while(r=o[i++])"+"===r[0]?(r=r.slice(1)||"*",(e[r]=e[r]||[]).unshift(n)):(e[r]=e[r]||[]).push(n)}}function qn(e,n,r,i){var o={},a=e===jn;function s(u){var l;return o[u]=!0,b.each(e[u]||[],function(e,u){var c=u(n,r,i);return"string"!=typeof c||a||o[c]?a?!(l=c):t:(n.dataTypes.unshift(c),s(c),!1)}),l}return s(n.dataTypes[0])||!o["*"]&&s("*")}function Mn(e,n){var r,i,o=b.ajaxSettings.flatOptions||{};for(i in n)n[i]!==t&&((o[i]?e:r||(r={}))[i]=n[i]);return r&&b.extend(!0,e,r),e}b.fn.load=function(e,n,r){if("string"!=typeof e&&Sn)return Sn.apply(this,arguments);var i,o,a,s=this,u=e.indexOf(" ");return u>=0&&(i=e.slice(u,e.length),e=e.slice(0,u)),b.isFunction(n)?(r=n,n=t):n&&"object"==typeof n&&(a="POST"),s.length>0&&b.ajax({url:e,type:a,dataType:"html",data:n}).done(function(e){o=arguments,s.html(i?b("<div>").append(b.parseHTML(e)).find(i):e)}).complete(r&&function(e,t){s.each(r,o||[e.responseText,t,e])}),this},b.each(["ajaxStart","ajaxStop","ajaxComplete","ajaxError","ajaxSuccess","ajaxSend"],function(e,t){b.fn[t]=function(e){return this.on(t,e)}}),b.each(["get","post"],function(e,n){b[n]=function(e,r,i,o){return b.isFunction(r)&&(o=o||i,i=r,r=t),b.ajax({url:e,type:n,dataType:o,data:r,success:i})}}),b.extend({active:0,lastModified:{},etag:{},ajaxSettings:{url:yn,type:"GET",isLocal:Nn.test(mn[1]),global:!0,processData:!0,async:!0,contentType:"application/x-www-form-urlencoded; charset=UTF-8",accepts:{"*":Dn,text:"text/plain",html:"text/html",xml:"application/xml, text/xml",json:"application/json, text/javascript"},contents:{xml:/xml/,html:/html/,json:/json/},responseFields:{xml:"responseXML",text:"responseText"},converters:{"* text":e.String,"text html":!0,"text json":b.parseJSON,"text xml":b.parseXML},flatOptions:{url:!0,context:!0}},ajaxSetup:function(e,t){return t?Mn(Mn(e,b.ajaxSettings),t):Mn(b.ajaxSettings,e)},ajaxPrefilter:Hn(An),ajaxTransport:Hn(jn),ajax:function(e,n){"object"==typeof e&&(n=e,e=t),n=n||{};var r,i,o,a,s,u,l,c,p=b.ajaxSetup({},n),f=p.context||p,d=p.context&&(f.nodeType||f.jquery)?b(f):b.event,h=b.Deferred(),g=b.Callbacks("once memory"),m=p.statusCode||{},y={},v={},x=0,T="canceled",N={readyState:0,getResponseHeader:function(e){var t;if(2===x){if(!c){c={};while(t=Tn.exec(a))c[t[1].toLowerCase()]=t[2]}t=c[e.toLowerCase()]}return null==t?null:t},getAllResponseHeaders:function(){return 2===x?a:null},setRequestHeader:function(e,t){var n=e.toLowerCase();return x||(e=v[n]=v[n]||e,y[e]=t),this},overrideMimeType:function(e){return x||(p.mimeType=e),this},statusCode:function(e){var t;if(e)if(2>x)for(t in e)m[t]=[m[t],e[t]];else N.always(e[N.status]);return this},abort:function(e){var t=e||T;return l&&l.abort(t),k(0,t),this}};if(h.promise(N).complete=g.add,N.success=N.done,N.error=N.fail,p.url=((e||p.url||yn)+"").replace(xn,"").replace(kn,mn[1]+"//"),p.type=n.method||n.type||p.method||p.type,p.dataTypes=b.trim(p.dataType||"*").toLowerCase().match(w)||[""],null==p.crossDomain&&(r=En.exec(p.url.toLowerCase()),p.crossDomain=!(!r||r[1]===mn[1]&&r[2]===mn[2]&&(r[3]||("http:"===r[1]?80:443))==(mn[3]||("http:"===mn[1]?80:443)))),p.data&&p.processData&&"string"!=typeof p.data&&(p.data=b.param(p.data,p.traditional)),qn(An,p,n,N),2===x)return N;u=p.global,u&&0===b.active++&&b.event.trigger("ajaxStart"),p.type=p.type.toUpperCase(),p.hasContent=!Cn.test(p.type),o=p.url,p.hasContent||(p.data&&(o=p.url+=(bn.test(o)?"&":"?")+p.data,delete p.data),p.cache===!1&&(p.url=wn.test(o)?o.replace(wn,"$1_="+vn++):o+(bn.test(o)?"&":"?")+"_="+vn++)),p.ifModified&&(b.lastModified[o]&&N.setRequestHeader("If-Modified-Since",b.lastModified[o]),b.etag[o]&&N.setRequestHeader("If-None-Match",b.etag[o])),(p.data&&p.hasContent&&p.contentType!==!1||n.contentType)&&N.setRequestHeader("Content-Type",p.contentType),N.setRequestHeader("Accept",p.dataTypes[0]&&p.accepts[p.dataTypes[0]]?p.accepts[p.dataTypes[0]]+("*"!==p.dataTypes[0]?", "+Dn+"; q=0.01":""):p.accepts["*"]);for(i in p.headers)N.setRequestHeader(i,p.headers[i]);if(p.beforeSend&&(p.beforeSend.call(f,N,p)===!1||2===x))return N.abort();T="abort";for(i in{success:1,error:1,complete:1})N[i](p[i]);if(l=qn(jn,p,n,N)){N.readyState=1,u&&d.trigger("ajaxSend",[N,p]),p.async&&p.timeout>0&&(s=setTimeout(function(){N.abort("timeout")},p.timeout));try{x=1,l.send(y,k)}catch(C){if(!(2>x))throw C;k(-1,C)}}else k(-1,"No Transport");function k(e,n,r,i){var c,y,v,w,T,C=n;2!==x&&(x=2,s&&clearTimeout(s),l=t,a=i||"",N.readyState=e>0?4:0,r&&(w=_n(p,N,r)),e>=200&&300>e||304===e?(p.ifModified&&(T=N.getResponseHeader("Last-Modified"),T&&(b.lastModified[o]=T),T=N.getResponseHeader("etag"),T&&(b.etag[o]=T)),204===e?(c=!0,C="nocontent"):304===e?(c=!0,C="notmodified"):(c=Fn(p,w),C=c.state,y=c.data,v=c.error,c=!v)):(v=C,(e||!C)&&(C="error",0>e&&(e=0))),N.status=e,N.statusText=(n||C)+"",c?h.resolveWith(f,[y,C,N]):h.rejectWith(f,[N,C,v]),N.statusCode(m),m=t,u&&d.trigger(c?"ajaxSuccess":"ajaxError",[N,p,c?y:v]),g.fireWith(f,[N,C]),u&&(d.trigger("ajaxComplete",[N,p]),--b.active||b.event.trigger("ajaxStop")))}return N},getScript:function(e,n){return b.get(e,t,n,"script")},getJSON:function(e,t,n){return b.get(e,t,n,"json")}});function _n(e,n,r){var i,o,a,s,u=e.contents,l=e.dataTypes,c=e.responseFields;for(s in c)s in r&&(n[c[s]]=r[s]);while("*"===l[0])l.shift(),o===t&&(o=e.mimeType||n.getResponseHeader("Content-Type"));if(o)for(s in u)if(u[s]&&u[s].test(o)){l.unshift(s);break}if(l[0]in r)a=l[0];else{for(s in r){if(!l[0]||e.converters[s+" "+l[0]]){a=s;break}i||(i=s)}a=a||i}return a?(a!==l[0]&&l.unshift(a),r[a]):t}function Fn(e,t){var n,r,i,o,a={},s=0,u=e.dataTypes.slice(),l=u[0];if(e.dataFilter&&(t=e.dataFilter(t,e.dataType)),u[1])for(i in e.converters)a[i.toLowerCase()]=e.converters[i];for(;r=u[++s];)if("*"!==r){if("*"!==l&&l!==r){if(i=a[l+" "+r]||a["* "+r],!i)for(n in a)if(o=n.split(" "),o[1]===r&&(i=a[l+" "+o[0]]||a["* "+o[0]])){i===!0?i=a[n]:a[n]!==!0&&(r=o[0],u.splice(s--,0,r));break}if(i!==!0)if(i&&e["throws"])t=i(t);else try{t=i(t)}catch(c){return{state:"parsererror",error:i?c:"No conversion from "+l+" to "+r}}}l=r}return{state:"success",data:t}}b.ajaxSetup({accepts:{script:"text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"},contents:{script:/(?:java|ecma)script/},converters:{"text script":function(e){return b.globalEval(e),e}}}),b.ajaxPrefilter("script",function(e){e.cache===t&&(e.cache=!1),e.crossDomain&&(e.type="GET",e.global=!1)}),b.ajaxTransport("script",function(e){if(e.crossDomain){var n,r=o.head||b("head")[0]||o.documentElement;return{send:function(t,i){n=o.createElement("script"),n.async=!0,e.scriptCharset&&(n.charset=e.scriptCharset),n.src=e.url,n.onload=n.onreadystatechange=function(e,t){(t||!n.readyState||/loaded|complete/.test(n.readyState))&&(n.onload=n.onreadystatechange=null,n.parentNode&&n.parentNode.removeChild(n),n=null,t||i(200,"success"))},r.insertBefore(n,r.firstChild)},abort:function(){n&&n.onload(t,!0)}}}});var On=[],Bn=/(=)\?(?=&|$)|\?\?/;b.ajaxSetup({jsonp:"callback",jsonpCallback:function(){var e=On.pop()||b.expando+"_"+vn++;return this[e]=!0,e}}),b.ajaxPrefilter("json jsonp",function(n,r,i){var o,a,s,u=n.jsonp!==!1&&(Bn.test(n.url)?"url":"string"==typeof n.data&&!(n.contentType||"").indexOf("application/x-www-form-urlencoded")&&Bn.test(n.data)&&"data");return u||"jsonp"===n.dataTypes[0]?(o=n.jsonpCallback=b.isFunction(n.jsonpCallback)?n.jsonpCallback():n.jsonpCallback,u?n[u]=n[u].replace(Bn,"$1"+o):n.jsonp!==!1&&(n.url+=(bn.test(n.url)?"&":"?")+n.jsonp+"="+o),n.converters["script json"]=function(){return s||b.error(o+" was not called"),s[0]},n.dataTypes[0]="json",a=e[o],e[o]=function(){s=arguments},i.always(function(){e[o]=a,n[o]&&(n.jsonpCallback=r.jsonpCallback,On.push(o)),s&&b.isFunction(a)&&a(s[0]),s=a=t}),"script"):t});var Pn,Rn,Wn=0,$n=e.ActiveXObject&&function(){var e;for(e in Pn)Pn[e](t,!0)};function In(){try{return new e.XMLHttpRequest}catch(t){}}function zn(){try{return new e.ActiveXObject("Microsoft.XMLHTTP")}catch(t){}}b.ajaxSettings.xhr=e.ActiveXObject?function(){return!this.isLocal&&In()||zn()}:In,Rn=b.ajaxSettings.xhr(),b.support.cors=!!Rn&&"withCredentials"in Rn,Rn=b.support.ajax=!!Rn,Rn&&b.ajaxTransport(function(n){if(!n.crossDomain||b.support.cors){var r;return{send:function(i,o){var a,s,u=n.xhr();if(n.username?u.open(n.type,n.url,n.async,n.username,n.password):u.open(n.type,n.url,n.async),n.xhrFields)for(s in n.xhrFields)u[s]=n.xhrFields[s];n.mimeType&&u.overrideMimeType&&u.overrideMimeType(n.mimeType),n.crossDomain||i["X-Requested-With"]||(i["X-Requested-With"]="XMLHttpRequest");try{for(s in i)u.setRequestHeader(s,i[s])}catch(l){}u.send(n.hasContent&&n.data||null),r=function(e,i){var s,l,c,p;try{if(r&&(i||4===u.readyState))if(r=t,a&&(u.onreadystatechange=b.noop,$n&&delete Pn[a]),i)4!==u.readyState&&u.abort();else{p={},s=u.status,l=u.getAllResponseHeaders(),"string"==typeof u.responseText&&(p.text=u.responseText);try{c=u.statusText}catch(f){c=""}s||!n.isLocal||n.crossDomain?1223===s&&(s=204):s=p.text?200:404}}catch(d){i||o(-1,d)}p&&o(s,c,p,l)},n.async?4===u.readyState?setTimeout(r):(a=++Wn,$n&&(Pn||(Pn={},b(e).unload($n)),Pn[a]=r),u.onreadystatechange=r):r()},abort:function(){r&&r(t,!0)}}}});var Xn,Un,Vn=/^(?:toggle|show|hide)$/,Yn=RegExp("^(?:([+-])=|)("+x+")([a-z%]*)$","i"),Jn=/queueHooks$/,Gn=[nr],Qn={"*":[function(e,t){var n,r,i=this.createTween(e,t),o=Yn.exec(t),a=i.cur(),s=+a||0,u=1,l=20;if(o){if(n=+o[2],r=o[3]||(b.cssNumber[e]?"":"px"),"px"!==r&&s){s=b.css(i.elem,e,!0)||n||1;do u=u||".5",s/=u,b.style(i.elem,e,s+r);while(u!==(u=i.cur()/a)&&1!==u&&--l)}i.unit=r,i.start=s,i.end=o[1]?s+(o[1]+1)*n:n}return i}]};function Kn(){return setTimeout(function(){Xn=t}),Xn=b.now()}function Zn(e,t){b.each(t,function(t,n){var r=(Qn[t]||[]).concat(Qn["*"]),i=0,o=r.length;for(;o>i;i++)if(r[i].call(e,t,n))return})}function er(e,t,n){var r,i,o=0,a=Gn.length,s=b.Deferred().always(function(){delete u.elem}),u=function(){if(i)return!1;var t=Xn||Kn(),n=Math.max(0,l.startTime+l.duration-t),r=n/l.duration||0,o=1-r,a=0,u=l.tweens.length;for(;u>a;a++)l.tweens[a].run(o);return s.notifyWith(e,[l,o,n]),1>o&&u?n:(s.resolveWith(e,[l]),!1)},l=s.promise({elem:e,props:b.extend({},t),opts:b.extend(!0,{specialEasing:{}},n),originalProperties:t,originalOptions:n,startTime:Xn||Kn(),duration:n.duration,tweens:[],createTween:function(t,n){var r=b.Tween(e,l.opts,t,n,l.opts.specialEasing[t]||l.opts.easing);return l.tweens.push(r),r},stop:function(t){var n=0,r=t?l.tweens.length:0;if(i)return this;for(i=!0;r>n;n++)l.tweens[n].run(1);return t?s.resolveWith(e,[l,t]):s.rejectWith(e,[l,t]),this}}),c=l.props;for(tr(c,l.opts.specialEasing);a>o;o++)if(r=Gn[o].call(l,e,c,l.opts))return r;return Zn(l,c),b.isFunction(l.opts.start)&&l.opts.start.call(e,l),b.fx.timer(b.extend(u,{elem:e,anim:l,queue:l.opts.queue})),l.progress(l.opts.progress).done(l.opts.done,l.opts.complete).fail(l.opts.fail).always(l.opts.always)}function tr(e,t){var n,r,i,o,a;for(i in e)if(r=b.camelCase(i),o=t[r],n=e[i],b.isArray(n)&&(o=n[1],n=e[i]=n[0]),i!==r&&(e[r]=n,delete e[i]),a=b.cssHooks[r],a&&"expand"in a){n=a.expand(n),delete e[r];for(i in n)i in e||(e[i]=n[i],t[i]=o)}else t[r]=o}b.Animation=b.extend(er,{tweener:function(e,t){b.isFunction(e)?(t=e,e=["*"]):e=e.split(" ");var n,r=0,i=e.length;for(;i>r;r++)n=e[r],Qn[n]=Qn[n]||[],Qn[n].unshift(t)},prefilter:function(e,t){t?Gn.unshift(e):Gn.push(e)}});function nr(e,t,n){var r,i,o,a,s,u,l,c,p,f=this,d=e.style,h={},g=[],m=e.nodeType&&nn(e);n.queue||(c=b._queueHooks(e,"fx"),null==c.unqueued&&(c.unqueued=0,p=c.empty.fire,c.empty.fire=function(){c.unqueued||p()}),c.unqueued++,f.always(function(){f.always(function(){c.unqueued--,b.queue(e,"fx").length||c.empty.fire()})})),1===e.nodeType&&("height"in t||"width"in t)&&(n.overflow=[d.overflow,d.overflowX,d.overflowY],"inline"===b.css(e,"display")&&"none"===b.css(e,"float")&&(b.support.inlineBlockNeedsLayout&&"inline"!==un(e.nodeName)?d.zoom=1:d.display="inline-block")),n.overflow&&(d.overflow="hidden",b.support.shrinkWrapBlocks||f.always(function(){d.overflow=n.overflow[0],d.overflowX=n.overflow[1],d.overflowY=n.overflow[2]}));for(i in t)if(a=t[i],Vn.exec(a)){if(delete t[i],u=u||"toggle"===a,a===(m?"hide":"show"))continue;g.push(i)}if(o=g.length){s=b._data(e,"fxshow")||b._data(e,"fxshow",{}),"hidden"in s&&(m=s.hidden),u&&(s.hidden=!m),m?b(e).show():f.done(function(){b(e).hide()}),f.done(function(){var t;b._removeData(e,"fxshow");for(t in h)b.style(e,t,h[t])});for(i=0;o>i;i++)r=g[i],l=f.createTween(r,m?s[r]:0),h[r]=s[r]||b.style(e,r),r in s||(s[r]=l.start,m&&(l.end=l.start,l.start="width"===r||"height"===r?1:0))}}function rr(e,t,n,r,i){return new rr.prototype.init(e,t,n,r,i)}b.Tween=rr,rr.prototype={constructor:rr,init:function(e,t,n,r,i,o){this.elem=e,this.prop=n,this.easing=i||"swing",this.options=t,this.start=this.now=this.cur(),this.end=r,this.unit=o||(b.cssNumber[n]?"":"px")},cur:function(){var e=rr.propHooks[this.prop];return e&&e.get?e.get(this):rr.propHooks._default.get(this)},run:function(e){var t,n=rr.propHooks[this.prop];return this.pos=t=this.options.duration?b.easing[this.easing](e,this.options.duration*e,0,1,this.options.duration):e,this.now=(this.end-this.start)*t+this.start,this.options.step&&this.options.step.call(this.elem,this.now,this),n&&n.set?n.set(this):rr.propHooks._default.set(this),this}},rr.prototype.init.prototype=rr.prototype,rr.propHooks={_default:{get:function(e){var t;return null==e.elem[e.prop]||e.elem.style&&null!=e.elem.style[e.prop]?(t=b.css(e.elem,e.prop,""),t&&"auto"!==t?t:0):e.elem[e.prop]},set:function(e){b.fx.step[e.prop]?b.fx.step[e.prop](e):e.elem.style&&(null!=e.elem.style[b.cssProps[e.prop]]||b.cssHooks[e.prop])?b.style(e.elem,e.prop,e.now+e.unit):e.elem[e.prop]=e.now}}},rr.propHooks.scrollTop=rr.propHooks.scrollLeft={set:function(e){e.elem.nodeType&&e.elem.parentNode&&(e.elem[e.prop]=e.now)}},b.each(["toggle","show","hide"],function(e,t){var n=b.fn[t];b.fn[t]=function(e,r,i){return null==e||"boolean"==typeof e?n.apply(this,arguments):this.animate(ir(t,!0),e,r,i)}}),b.fn.extend({fadeTo:function(e,t,n,r){return this.filter(nn).css("opacity",0).show().end().animate({opacity:t},e,n,r)},animate:function(e,t,n,r){var i=b.isEmptyObject(e),o=b.speed(t,n,r),a=function(){var t=er(this,b.extend({},e),o);a.finish=function(){t.stop(!0)},(i||b._data(this,"finish"))&&t.stop(!0)};return a.finish=a,i||o.queue===!1?this.each(a):this.queue(o.queue,a)},stop:function(e,n,r){var i=function(e){var t=e.stop;delete e.stop,t(r)};return"string"!=typeof e&&(r=n,n=e,e=t),n&&e!==!1&&this.queue(e||"fx",[]),this.each(function(){var t=!0,n=null!=e&&e+"queueHooks",o=b.timers,a=b._data(this);if(n)a[n]&&a[n].stop&&i(a[n]);else for(n in a)a[n]&&a[n].stop&&Jn.test(n)&&i(a[n]);for(n=o.length;n--;)o[n].elem!==this||null!=e&&o[n].queue!==e||(o[n].anim.stop(r),t=!1,o.splice(n,1));(t||!r)&&b.dequeue(this,e)})},finish:function(e){return e!==!1&&(e=e||"fx"),this.each(function(){var t,n=b._data(this),r=n[e+"queue"],i=n[e+"queueHooks"],o=b.timers,a=r?r.length:0;for(n.finish=!0,b.queue(this,e,[]),i&&i.cur&&i.cur.finish&&i.cur.finish.call(this),t=o.length;t--;)o[t].elem===this&&o[t].queue===e&&(o[t].anim.stop(!0),o.splice(t,1));for(t=0;a>t;t++)r[t]&&r[t].finish&&r[t].finish.call(this);delete n.finish})}});function ir(e,t){var n,r={height:e},i=0;for(t=t?1:0;4>i;i+=2-t)n=Zt[i],r["margin"+n]=r["padding"+n]=e;return t&&(r.opacity=r.width=e),r}b.each({slideDown:ir("show"),slideUp:ir("hide"),slideToggle:ir("toggle"),fadeIn:{opacity:"show"},fadeOut:{opacity:"hide"},fadeToggle:{opacity:"toggle"}},function(e,t){b.fn[e]=function(e,n,r){return this.animate(t,e,n,r)}}),b.speed=function(e,t,n){var r=e&&"object"==typeof e?b.extend({},e):{complete:n||!n&&t||b.isFunction(e)&&e,duration:e,easing:n&&t||t&&!b.isFunction(t)&&t};return r.duration=b.fx.off?0:"number"==typeof r.duration?r.duration:r.duration in b.fx.speeds?b.fx.speeds[r.duration]:b.fx.speeds._default,(null==r.queue||r.queue===!0)&&(r.queue="fx"),r.old=r.complete,r.complete=function(){b.isFunction(r.old)&&r.old.call(this),r.queue&&b.dequeue(this,r.queue)},r},b.easing={linear:function(e){return e},swing:function(e){return.5-Math.cos(e*Math.PI)/2}},b.timers=[],b.fx=rr.prototype.init,b.fx.tick=function(){var e,n=b.timers,r=0;for(Xn=b.now();n.length>r;r++)e=n[r],e()||n[r]!==e||n.splice(r--,1);n.length||b.fx.stop(),Xn=t},b.fx.timer=function(e){e()&&b.timers.push(e)&&b.fx.start()},b.fx.interval=13,b.fx.start=function(){Un||(Un=setInterval(b.fx.tick,b.fx.interval))},b.fx.stop=function(){clearInterval(Un),Un=null},b.fx.speeds={slow:600,fast:200,_default:400},b.fx.step={},b.expr&&b.expr.filters&&(b.expr.filters.animated=function(e){return b.grep(b.timers,function(t){return e===t.elem}).length}),b.fn.offset=function(e){if(arguments.length)return e===t?this:this.each(function(t){b.offset.setOffset(this,e,t)});var n,r,o={top:0,left:0},a=this[0],s=a&&a.ownerDocument;if(s)return n=s.documentElement,b.contains(n,a)?(typeof a.getBoundingClientRect!==i&&(o=a.getBoundingClientRect()),r=or(s),{top:o.top+(r.pageYOffset||n.scrollTop)-(n.clientTop||0),left:o.left+(r.pageXOffset||n.scrollLeft)-(n.clientLeft||0)}):o},b.offset={setOffset:function(e,t,n){var r=b.css(e,"position");"static"===r&&(e.style.position="relative");var i=b(e),o=i.offset(),a=b.css(e,"top"),s=b.css(e,"left"),u=("absolute"===r||"fixed"===r)&&b.inArray("auto",[a,s])>-1,l={},c={},p,f;u?(c=i.position(),p=c.top,f=c.left):(p=parseFloat(a)||0,f=parseFloat(s)||0),b.isFunction(t)&&(t=t.call(e,n,o)),null!=t.top&&(l.top=t.top-o.top+p),null!=t.left&&(l.left=t.left-o.left+f),"using"in t?t.using.call(e,l):i.css(l)}},b.fn.extend({position:function(){if(this[0]){var e,t,n={top:0,left:0},r=this[0];return"fixed"===b.css(r,"position")?t=r.getBoundingClientRect():(e=this.offsetParent(),t=this.offset(),b.nodeName(e[0],"html")||(n=e.offset()),n.top+=b.css(e[0],"borderTopWidth",!0),n.left+=b.css(e[0],"borderLeftWidth",!0)),{top:t.top-n.top-b.css(r,"marginTop",!0),left:t.left-n.left-b.css(r,"marginLeft",!0)}}},offsetParent:function(){return this.map(function(){var e=this.offsetParent||o.documentElement;while(e&&!b.nodeName(e,"html")&&"static"===b.css(e,"position"))e=e.offsetParent;return e||o.documentElement})}}),b.each({scrollLeft:"pageXOffset",scrollTop:"pageYOffset"},function(e,n){var r=/Y/.test(n);b.fn[e]=function(i){return b.access(this,function(e,i,o){var a=or(e);return o===t?a?n in a?a[n]:a.document.documentElement[i]:e[i]:(a?a.scrollTo(r?b(a).scrollLeft():o,r?o:b(a).scrollTop()):e[i]=o,t)},e,i,arguments.length,null)}});function or(e){return b.isWindow(e)?e:9===e.nodeType?e.defaultView||e.parentWindow:!1}b.each({Height:"height",Width:"width"},function(e,n){b.each({padding:"inner"+e,content:n,"":"outer"+e},function(r,i){b.fn[i]=function(i,o){var a=arguments.length&&(r||"boolean"!=typeof i),s=r||(i===!0||o===!0?"margin":"border");return b.access(this,function(n,r,i){var o;return b.isWindow(n)?n.document.documentElement["client"+e]:9===n.nodeType?(o=n.documentElement,Math.max(n.body["scroll"+e],o["scroll"+e],n.body["offset"+e],o["offset"+e],o["client"+e])):i===t?b.css(n,r,s):b.style(n,r,i,s)},n,a?i:t,a,null)}})}),e.jQuery=e.$=b,"function"==typeof define&&define.amd&&define.amd.jQuery&&define("jquery",[],function(){return b})})(window);
+/*!
+ * QUnit 2.4.1
+ * https://qunitjs.com/
+ *
+ * Copyright jQuery Foundation and other contributors
+ * Released under the MIT license
+ * https://jquery.org/license
+ *
+ * Date: 2017-10-22T05:12Z
+ */
+(function (global$1) {
+  'use strict';
+
+  global$1 = 'default' in global$1 ? global$1['default'] : global$1;
+
+  var window = global$1.window;
+  var self$1 = global$1.self;
+  var console = global$1.console;
+  var setTimeout = global$1.setTimeout;
+  var clearTimeout = global$1.clearTimeout;
+
+  var document = window && window.document;
+  var navigator = window && window.navigator;
+
+  var localSessionStorage = function () {
+  	var x = "qunit-test-string";
+  	try {
+  		global$1.sessionStorage.setItem(x, x);
+  		global$1.sessionStorage.removeItem(x);
+  		return global$1.sessionStorage;
+  	} catch (e) {
+  		return undefined;
+  	}
+  }();
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  };
+
+
+
+
+
+
+
+
+
+
+
+  var classCallCheck = function (instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  };
+
+  var createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var toConsumableArray = function (arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  };
+
+  var toString = Object.prototype.toString;
+  var hasOwn = Object.prototype.hasOwnProperty;
+  var now = Date.now || function () {
+  	return new Date().getTime();
+  };
+
+  var defined = {
+  	document: window && window.document !== undefined,
+  	setTimeout: setTimeout !== undefined
+  };
+
+  // Returns a new Array with the elements that are in a but not in b
+  function diff(a, b) {
+  	var i,
+  	    j,
+  	    result = a.slice();
+
+  	for (i = 0; i < result.length; i++) {
+  		for (j = 0; j < b.length; j++) {
+  			if (result[i] === b[j]) {
+  				result.splice(i, 1);
+  				i--;
+  				break;
+  			}
+  		}
+  	}
+  	return result;
+  }
+
+  /**
+   * Determines whether an element exists in a given array or not.
+   *
+   * @method inArray
+   * @param {Any} elem
+   * @param {Array} array
+   * @return {Boolean}
+   */
+  function inArray(elem, array) {
+  	return array.indexOf(elem) !== -1;
+  }
+
+  /**
+   * Makes a clone of an object using only Array or Object as base,
+   * and copies over the own enumerable properties.
+   *
+   * @param {Object} obj
+   * @return {Object} New object with only the own properties (recursively).
+   */
+  function objectValues(obj) {
+  	var key,
+  	    val,
+  	    vals = is("array", obj) ? [] : {};
+  	for (key in obj) {
+  		if (hasOwn.call(obj, key)) {
+  			val = obj[key];
+  			vals[key] = val === Object(val) ? objectValues(val) : val;
+  		}
+  	}
+  	return vals;
+  }
+
+  function extend(a, b, undefOnly) {
+  	for (var prop in b) {
+  		if (hasOwn.call(b, prop)) {
+  			if (b[prop] === undefined) {
+  				delete a[prop];
+  			} else if (!(undefOnly && typeof a[prop] !== "undefined")) {
+  				a[prop] = b[prop];
+  			}
+  		}
+  	}
+
+  	return a;
+  }
+
+  function objectType(obj) {
+  	if (typeof obj === "undefined") {
+  		return "undefined";
+  	}
+
+  	// Consider: typeof null === object
+  	if (obj === null) {
+  		return "null";
+  	}
+
+  	var match = toString.call(obj).match(/^\[object\s(.*)\]$/),
+  	    type = match && match[1];
+
+  	switch (type) {
+  		case "Number":
+  			if (isNaN(obj)) {
+  				return "nan";
+  			}
+  			return "number";
+  		case "String":
+  		case "Boolean":
+  		case "Array":
+  		case "Set":
+  		case "Map":
+  		case "Date":
+  		case "RegExp":
+  		case "Function":
+  		case "Symbol":
+  			return type.toLowerCase();
+  		default:
+  			return typeof obj === "undefined" ? "undefined" : _typeof(obj);
+  	}
+  }
+
+  // Safe object type checking
+  function is(type, obj) {
+  	return objectType(obj) === type;
+  }
+
+  // Based on Java's String.hashCode, a simple but not
+  // rigorously collision resistant hashing function
+  function generateHash(module, testName) {
+  	var str = module + "\x1C" + testName;
+  	var hash = 0;
+
+  	for (var i = 0; i < str.length; i++) {
+  		hash = (hash << 5) - hash + str.charCodeAt(i);
+  		hash |= 0;
+  	}
+
+  	// Convert the possibly negative integer hash code into an 8 character hex string, which isn't
+  	// strictly necessary but increases user understanding that the id is a SHA-like hash
+  	var hex = (0x100000000 + hash).toString(16);
+  	if (hex.length < 8) {
+  		hex = "0000000" + hex;
+  	}
+
+  	return hex.slice(-8);
+  }
+
+  // Test for equality any JavaScript type.
+  // Authors: Philippe Rathé <prathe@gmail.com>, David Chan <david@troi.org>
+  var equiv = (function () {
+
+  	// Value pairs queued for comparison. Used for breadth-first processing order, recursion
+  	// detection and avoiding repeated comparison (see below for details).
+  	// Elements are { a: val, b: val }.
+  	var pairs = [];
+
+  	var getProto = Object.getPrototypeOf || function (obj) {
+  		return obj.__proto__;
+  	};
+
+  	function useStrictEquality(a, b) {
+
+  		// This only gets called if a and b are not strict equal, and is used to compare on
+  		// the primitive values inside object wrappers. For example:
+  		// `var i = 1;`
+  		// `var j = new Number(1);`
+  		// Neither a nor b can be null, as a !== b and they have the same type.
+  		if ((typeof a === "undefined" ? "undefined" : _typeof(a)) === "object") {
+  			a = a.valueOf();
+  		}
+  		if ((typeof b === "undefined" ? "undefined" : _typeof(b)) === "object") {
+  			b = b.valueOf();
+  		}
+
+  		return a === b;
+  	}
+
+  	function compareConstructors(a, b) {
+  		var protoA = getProto(a);
+  		var protoB = getProto(b);
+
+  		// Comparing constructors is more strict than using `instanceof`
+  		if (a.constructor === b.constructor) {
+  			return true;
+  		}
+
+  		// Ref #851
+  		// If the obj prototype descends from a null constructor, treat it
+  		// as a null prototype.
+  		if (protoA && protoA.constructor === null) {
+  			protoA = null;
+  		}
+  		if (protoB && protoB.constructor === null) {
+  			protoB = null;
+  		}
+
+  		// Allow objects with no prototype to be equivalent to
+  		// objects with Object as their constructor.
+  		if (protoA === null && protoB === Object.prototype || protoB === null && protoA === Object.prototype) {
+  			return true;
+  		}
+
+  		return false;
+  	}
+
+  	function getRegExpFlags(regexp) {
+  		return "flags" in regexp ? regexp.flags : regexp.toString().match(/[gimuy]*$/)[0];
+  	}
+
+  	function isContainer(val) {
+  		return ["object", "array", "map", "set"].indexOf(objectType(val)) !== -1;
+  	}
+
+  	function breadthFirstCompareChild(a, b) {
+
+  		// If a is a container not reference-equal to b, postpone the comparison to the
+  		// end of the pairs queue -- unless (a, b) has been seen before, in which case skip
+  		// over the pair.
+  		if (a === b) {
+  			return true;
+  		}
+  		if (!isContainer(a)) {
+  			return typeEquiv(a, b);
+  		}
+  		if (pairs.every(function (pair) {
+  			return pair.a !== a || pair.b !== b;
+  		})) {
+
+  			// Not yet started comparing this pair
+  			pairs.push({ a: a, b: b });
+  		}
+  		return true;
+  	}
+
+  	var callbacks = {
+  		"string": useStrictEquality,
+  		"boolean": useStrictEquality,
+  		"number": useStrictEquality,
+  		"null": useStrictEquality,
+  		"undefined": useStrictEquality,
+  		"symbol": useStrictEquality,
+  		"date": useStrictEquality,
+
+  		"nan": function nan() {
+  			return true;
+  		},
+
+  		"regexp": function regexp(a, b) {
+  			return a.source === b.source &&
+
+  			// Include flags in the comparison
+  			getRegExpFlags(a) === getRegExpFlags(b);
+  		},
+
+  		// abort (identical references / instance methods were skipped earlier)
+  		"function": function _function() {
+  			return false;
+  		},
+
+  		"array": function array(a, b) {
+  			var i, len;
+
+  			len = a.length;
+  			if (len !== b.length) {
+
+  				// Safe and faster
+  				return false;
+  			}
+
+  			for (i = 0; i < len; i++) {
+
+  				// Compare non-containers; queue non-reference-equal containers
+  				if (!breadthFirstCompareChild(a[i], b[i])) {
+  					return false;
+  				}
+  			}
+  			return true;
+  		},
+
+  		// Define sets a and b to be equivalent if for each element aVal in a, there
+  		// is some element bVal in b such that aVal and bVal are equivalent. Element
+  		// repetitions are not counted, so these are equivalent:
+  		// a = new Set( [ {}, [], [] ] );
+  		// b = new Set( [ {}, {}, [] ] );
+  		"set": function set$$1(a, b) {
+  			var innerEq,
+  			    outerEq = true;
+
+  			if (a.size !== b.size) {
+
+  				// This optimization has certain quirks because of the lack of
+  				// repetition counting. For instance, adding the same
+  				// (reference-identical) element to two equivalent sets can
+  				// make them non-equivalent.
+  				return false;
+  			}
+
+  			a.forEach(function (aVal) {
+
+  				// Short-circuit if the result is already known. (Using for...of
+  				// with a break clause would be cleaner here, but it would cause
+  				// a syntax error on older Javascript implementations even if
+  				// Set is unused)
+  				if (!outerEq) {
+  					return;
+  				}
+
+  				innerEq = false;
+
+  				b.forEach(function (bVal) {
+  					var parentPairs;
+
+  					// Likewise, short-circuit if the result is already known
+  					if (innerEq) {
+  						return;
+  					}
+
+  					// Swap out the global pairs list, as the nested call to
+  					// innerEquiv will clobber its contents
+  					parentPairs = pairs;
+  					if (innerEquiv(bVal, aVal)) {
+  						innerEq = true;
+  					}
+
+  					// Replace the global pairs list
+  					pairs = parentPairs;
+  				});
+
+  				if (!innerEq) {
+  					outerEq = false;
+  				}
+  			});
+
+  			return outerEq;
+  		},
+
+  		// Define maps a and b to be equivalent if for each key-value pair (aKey, aVal)
+  		// in a, there is some key-value pair (bKey, bVal) in b such that
+  		// [ aKey, aVal ] and [ bKey, bVal ] are equivalent. Key repetitions are not
+  		// counted, so these are equivalent:
+  		// a = new Map( [ [ {}, 1 ], [ {}, 1 ], [ [], 1 ] ] );
+  		// b = new Map( [ [ {}, 1 ], [ [], 1 ], [ [], 1 ] ] );
+  		"map": function map(a, b) {
+  			var innerEq,
+  			    outerEq = true;
+
+  			if (a.size !== b.size) {
+
+  				// This optimization has certain quirks because of the lack of
+  				// repetition counting. For instance, adding the same
+  				// (reference-identical) key-value pair to two equivalent maps
+  				// can make them non-equivalent.
+  				return false;
+  			}
+
+  			a.forEach(function (aVal, aKey) {
+
+  				// Short-circuit if the result is already known. (Using for...of
+  				// with a break clause would be cleaner here, but it would cause
+  				// a syntax error on older Javascript implementations even if
+  				// Map is unused)
+  				if (!outerEq) {
+  					return;
+  				}
+
+  				innerEq = false;
+
+  				b.forEach(function (bVal, bKey) {
+  					var parentPairs;
+
+  					// Likewise, short-circuit if the result is already known
+  					if (innerEq) {
+  						return;
+  					}
+
+  					// Swap out the global pairs list, as the nested call to
+  					// innerEquiv will clobber its contents
+  					parentPairs = pairs;
+  					if (innerEquiv([bVal, bKey], [aVal, aKey])) {
+  						innerEq = true;
+  					}
+
+  					// Replace the global pairs list
+  					pairs = parentPairs;
+  				});
+
+  				if (!innerEq) {
+  					outerEq = false;
+  				}
+  			});
+
+  			return outerEq;
+  		},
+
+  		"object": function object(a, b) {
+  			var i,
+  			    aProperties = [],
+  			    bProperties = [];
+
+  			if (compareConstructors(a, b) === false) {
+  				return false;
+  			}
+
+  			// Be strict: don't ensure hasOwnProperty and go deep
+  			for (i in a) {
+
+  				// Collect a's properties
+  				aProperties.push(i);
+
+  				// Skip OOP methods that look the same
+  				if (a.constructor !== Object && typeof a.constructor !== "undefined" && typeof a[i] === "function" && typeof b[i] === "function" && a[i].toString() === b[i].toString()) {
+  					continue;
+  				}
+
+  				// Compare non-containers; queue non-reference-equal containers
+  				if (!breadthFirstCompareChild(a[i], b[i])) {
+  					return false;
+  				}
+  			}
+
+  			for (i in b) {
+
+  				// Collect b's properties
+  				bProperties.push(i);
+  			}
+
+  			// Ensures identical properties name
+  			return typeEquiv(aProperties.sort(), bProperties.sort());
+  		}
+  	};
+
+  	function typeEquiv(a, b) {
+  		var type = objectType(a);
+
+  		// Callbacks for containers will append to the pairs queue to achieve breadth-first
+  		// search order. The pairs queue is also used to avoid reprocessing any pair of
+  		// containers that are reference-equal to a previously visited pair (a special case
+  		// this being recursion detection).
+  		//
+  		// Because of this approach, once typeEquiv returns a false value, it should not be
+  		// called again without clearing the pair queue else it may wrongly report a visited
+  		// pair as being equivalent.
+  		return objectType(b) === type && callbacks[type](a, b);
+  	}
+
+  	function innerEquiv(a, b) {
+  		var i, pair;
+
+  		// We're done when there's nothing more to compare
+  		if (arguments.length < 2) {
+  			return true;
+  		}
+
+  		// Clear the global pair queue and add the top-level values being compared
+  		pairs = [{ a: a, b: b }];
+
+  		for (i = 0; i < pairs.length; i++) {
+  			pair = pairs[i];
+
+  			// Perform type-specific comparison on any pairs that are not strictly
+  			// equal. For container types, that comparison will postpone comparison
+  			// of any sub-container pair to the end of the pair queue. This gives
+  			// breadth-first search order. It also avoids the reprocessing of
+  			// reference-equal siblings, cousins etc, which can have a significant speed
+  			// impact when comparing a container of small objects each of which has a
+  			// reference to the same (singleton) large object.
+  			if (pair.a !== pair.b && !typeEquiv(pair.a, pair.b)) {
+  				return false;
+  			}
+  		}
+
+  		// ...across all consecutive argument pairs
+  		return arguments.length === 2 || innerEquiv.apply(this, [].slice.call(arguments, 1));
+  	}
+
+  	return function () {
+  		var result = innerEquiv.apply(undefined, arguments);
+
+  		// Release any retained objects
+  		pairs.length = 0;
+  		return result;
+  	};
+  })();
+
+  /**
+   * Config object: Maintain internal state
+   * Later exposed as QUnit.config
+   * `config` initialized at top of scope
+   */
+  var config = {
+
+  	// The queue of tests to run
+  	queue: [],
+
+  	// Block until document ready
+  	blocking: true,
+
+  	// By default, run previously failed tests first
+  	// very useful in combination with "Hide passed tests" checked
+  	reorder: true,
+
+  	// By default, modify document.title when suite is done
+  	altertitle: true,
+
+  	// HTML Reporter: collapse every test except the first failing test
+  	// If false, all failing tests will be expanded
+  	collapse: true,
+
+  	// By default, scroll to top of the page when suite is done
+  	scrolltop: true,
+
+  	// Depth up-to which object will be dumped
+  	maxDepth: 5,
+
+  	// When enabled, all tests must call expect()
+  	requireExpects: false,
+
+  	// Placeholder for user-configurable form-exposed URL parameters
+  	urlConfig: [],
+
+  	// Set of all modules.
+  	modules: [],
+
+  	// The first unnamed module
+  	currentModule: {
+  		name: "",
+  		tests: [],
+  		childModules: [],
+  		testsRun: 0,
+  		unskippedTestsRun: 0,
+  		hooks: {
+  			before: [],
+  			beforeEach: [],
+  			afterEach: [],
+  			after: []
+  		}
+  	},
+
+  	callbacks: {},
+
+  	// The storage module to use for reordering tests
+  	storage: localSessionStorage
+  };
+
+  // take a predefined QUnit.config and extend the defaults
+  var globalConfig = window && window.QUnit && window.QUnit.config;
+
+  // only extend the global config if there is no QUnit overload
+  if (window && window.QUnit && !window.QUnit.version) {
+  	extend(config, globalConfig);
+  }
+
+  // Push a loose unnamed module to the modules collection
+  config.modules.push(config.currentModule);
+
+  // Based on jsDump by Ariel Flesler
+  // http://flesler.blogspot.com/2008/05/jsdump-pretty-dump-of-any-javascript.html
+  var dump = (function () {
+  	function quote(str) {
+  		return "\"" + str.toString().replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
+  	}
+  	function literal(o) {
+  		return o + "";
+  	}
+  	function join(pre, arr, post) {
+  		var s = dump.separator(),
+  		    base = dump.indent(),
+  		    inner = dump.indent(1);
+  		if (arr.join) {
+  			arr = arr.join("," + s + inner);
+  		}
+  		if (!arr) {
+  			return pre + post;
+  		}
+  		return [pre, inner + arr, base + post].join(s);
+  	}
+  	function array(arr, stack) {
+  		var i = arr.length,
+  		    ret = new Array(i);
+
+  		if (dump.maxDepth && dump.depth > dump.maxDepth) {
+  			return "[object Array]";
+  		}
+
+  		this.up();
+  		while (i--) {
+  			ret[i] = this.parse(arr[i], undefined, stack);
+  		}
+  		this.down();
+  		return join("[", ret, "]");
+  	}
+
+  	function isArray(obj) {
+  		return (
+
+  			//Native Arrays
+  			toString.call(obj) === "[object Array]" ||
+
+  			// NodeList objects
+  			typeof obj.length === "number" && obj.item !== undefined && (obj.length ? obj.item(0) === obj[0] : obj.item(0) === null && obj[0] === undefined)
+  		);
+  	}
+
+  	var reName = /^function (\w+)/,
+  	    dump = {
+
+  		// The objType is used mostly internally, you can fix a (custom) type in advance
+  		parse: function parse(obj, objType, stack) {
+  			stack = stack || [];
+  			var res,
+  			    parser,
+  			    parserType,
+  			    objIndex = stack.indexOf(obj);
+
+  			if (objIndex !== -1) {
+  				return "recursion(" + (objIndex - stack.length) + ")";
+  			}
+
+  			objType = objType || this.typeOf(obj);
+  			parser = this.parsers[objType];
+  			parserType = typeof parser === "undefined" ? "undefined" : _typeof(parser);
+
+  			if (parserType === "function") {
+  				stack.push(obj);
+  				res = parser.call(this, obj, stack);
+  				stack.pop();
+  				return res;
+  			}
+  			return parserType === "string" ? parser : this.parsers.error;
+  		},
+  		typeOf: function typeOf(obj) {
+  			var type;
+
+  			if (obj === null) {
+  				type = "null";
+  			} else if (typeof obj === "undefined") {
+  				type = "undefined";
+  			} else if (is("regexp", obj)) {
+  				type = "regexp";
+  			} else if (is("date", obj)) {
+  				type = "date";
+  			} else if (is("function", obj)) {
+  				type = "function";
+  			} else if (obj.setInterval !== undefined && obj.document !== undefined && obj.nodeType === undefined) {
+  				type = "window";
+  			} else if (obj.nodeType === 9) {
+  				type = "document";
+  			} else if (obj.nodeType) {
+  				type = "node";
+  			} else if (isArray(obj)) {
+  				type = "array";
+  			} else if (obj.constructor === Error.prototype.constructor) {
+  				type = "error";
+  			} else {
+  				type = typeof obj === "undefined" ? "undefined" : _typeof(obj);
+  			}
+  			return type;
+  		},
+
+  		separator: function separator() {
+  			if (this.multiline) {
+  				return this.HTML ? "<br />" : "\n";
+  			} else {
+  				return this.HTML ? "&#160;" : " ";
+  			}
+  		},
+
+  		// Extra can be a number, shortcut for increasing-calling-decreasing
+  		indent: function indent(extra) {
+  			if (!this.multiline) {
+  				return "";
+  			}
+  			var chr = this.indentChar;
+  			if (this.HTML) {
+  				chr = chr.replace(/\t/g, "   ").replace(/ /g, "&#160;");
+  			}
+  			return new Array(this.depth + (extra || 0)).join(chr);
+  		},
+  		up: function up(a) {
+  			this.depth += a || 1;
+  		},
+  		down: function down(a) {
+  			this.depth -= a || 1;
+  		},
+  		setParser: function setParser(name, parser) {
+  			this.parsers[name] = parser;
+  		},
+
+  		// The next 3 are exposed so you can use them
+  		quote: quote,
+  		literal: literal,
+  		join: join,
+  		depth: 1,
+  		maxDepth: config.maxDepth,
+
+  		// This is the list of parsers, to modify them, use dump.setParser
+  		parsers: {
+  			window: "[Window]",
+  			document: "[Document]",
+  			error: function error(_error) {
+  				return "Error(\"" + _error.message + "\")";
+  			},
+  			unknown: "[Unknown]",
+  			"null": "null",
+  			"undefined": "undefined",
+  			"function": function _function(fn) {
+  				var ret = "function",
+
+
+  				// Functions never have name in IE
+  				name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1];
+
+  				if (name) {
+  					ret += " " + name;
+  				}
+  				ret += "(";
+
+  				ret = [ret, dump.parse(fn, "functionArgs"), "){"].join("");
+  				return join(ret, dump.parse(fn, "functionCode"), "}");
+  			},
+  			array: array,
+  			nodelist: array,
+  			"arguments": array,
+  			object: function object(map, stack) {
+  				var keys,
+  				    key,
+  				    val,
+  				    i,
+  				    nonEnumerableProperties,
+  				    ret = [];
+
+  				if (dump.maxDepth && dump.depth > dump.maxDepth) {
+  					return "[object Object]";
+  				}
+
+  				dump.up();
+  				keys = [];
+  				for (key in map) {
+  					keys.push(key);
+  				}
+
+  				// Some properties are not always enumerable on Error objects.
+  				nonEnumerableProperties = ["message", "name"];
+  				for (i in nonEnumerableProperties) {
+  					key = nonEnumerableProperties[i];
+  					if (key in map && !inArray(key, keys)) {
+  						keys.push(key);
+  					}
+  				}
+  				keys.sort();
+  				for (i = 0; i < keys.length; i++) {
+  					key = keys[i];
+  					val = map[key];
+  					ret.push(dump.parse(key, "key") + ": " + dump.parse(val, undefined, stack));
+  				}
+  				dump.down();
+  				return join("{", ret, "}");
+  			},
+  			node: function node(_node) {
+  				var len,
+  				    i,
+  				    val,
+  				    open = dump.HTML ? "&lt;" : "<",
+  				    close = dump.HTML ? "&gt;" : ">",
+  				    tag = _node.nodeName.toLowerCase(),
+  				    ret = open + tag,
+  				    attrs = _node.attributes;
+
+  				if (attrs) {
+  					for (i = 0, len = attrs.length; i < len; i++) {
+  						val = attrs[i].nodeValue;
+
+  						// IE6 includes all attributes in .attributes, even ones not explicitly
+  						// set. Those have values like undefined, null, 0, false, "" or
+  						// "inherit".
+  						if (val && val !== "inherit") {
+  							ret += " " + attrs[i].nodeName + "=" + dump.parse(val, "attribute");
+  						}
+  					}
+  				}
+  				ret += close;
+
+  				// Show content of TextNode or CDATASection
+  				if (_node.nodeType === 3 || _node.nodeType === 4) {
+  					ret += _node.nodeValue;
+  				}
+
+  				return ret + open + "/" + tag + close;
+  			},
+
+  			// Function calls it internally, it's the arguments part of the function
+  			functionArgs: function functionArgs(fn) {
+  				var args,
+  				    l = fn.length;
+
+  				if (!l) {
+  					return "";
+  				}
+
+  				args = new Array(l);
+  				while (l--) {
+
+  					// 97 is 'a'
+  					args[l] = String.fromCharCode(97 + l);
+  				}
+  				return " " + args.join(", ") + " ";
+  			},
+
+  			// Object calls it internally, the key part of an item in a map
+  			key: quote,
+
+  			// Function calls it internally, it's the content of the function
+  			functionCode: "[code]",
+
+  			// Node calls it internally, it's a html attribute value
+  			attribute: quote,
+  			string: quote,
+  			date: quote,
+  			regexp: literal,
+  			number: literal,
+  			"boolean": literal,
+  			symbol: function symbol(sym) {
+  				return sym.toString();
+  			}
+  		},
+
+  		// If true, entities are escaped ( <, >, \t, space and \n )
+  		HTML: false,
+
+  		// Indentation unit
+  		indentChar: "  ",
+
+  		// If true, items in a collection, are separated by a \n, else just a space.
+  		multiline: true
+  	};
+
+  	return dump;
+  })();
+
+  var LISTENERS = Object.create(null);
+  var SUPPORTED_EVENTS = ["runStart", "suiteStart", "testStart", "assertion", "testEnd", "suiteEnd", "runEnd"];
+
+  /**
+   * Emits an event with the specified data to all currently registered listeners.
+   * Callbacks will fire in the order in which they are registered (FIFO). This
+   * function is not exposed publicly; it is used by QUnit internals to emit
+   * logging events.
+   *
+   * @private
+   * @method emit
+   * @param {String} eventName
+   * @param {Object} data
+   * @return {Void}
+   */
+  function emit(eventName, data) {
+  	if (objectType(eventName) !== "string") {
+  		throw new TypeError("eventName must be a string when emitting an event");
+  	}
+
+  	// Clone the callbacks in case one of them registers a new callback
+  	var originalCallbacks = LISTENERS[eventName];
+  	var callbacks = originalCallbacks ? [].concat(toConsumableArray(originalCallbacks)) : [];
+
+  	for (var i = 0; i < callbacks.length; i++) {
+  		callbacks[i](data);
+  	}
+  }
+
+  /**
+   * Registers a callback as a listener to the specified event.
+   *
+   * @public
+   * @method on
+   * @param {String} eventName
+   * @param {Function} callback
+   * @return {Void}
+   */
+  function on(eventName, callback) {
+  	if (objectType(eventName) !== "string") {
+  		throw new TypeError("eventName must be a string when registering a listener");
+  	} else if (!inArray(eventName, SUPPORTED_EVENTS)) {
+  		var events = SUPPORTED_EVENTS.join(", ");
+  		throw new Error("\"" + eventName + "\" is not a valid event; must be one of: " + events + ".");
+  	} else if (objectType(callback) !== "function") {
+  		throw new TypeError("callback must be a function when registering a listener");
+  	}
+
+  	if (!LISTENERS[eventName]) {
+  		LISTENERS[eventName] = [];
+  	}
+
+  	// Don't register the same callback more than once
+  	if (!inArray(callback, LISTENERS[eventName])) {
+  		LISTENERS[eventName].push(callback);
+  	}
+  }
+
+  // Register logging callbacks
+  function registerLoggingCallbacks(obj) {
+  	var i,
+  	    l,
+  	    key,
+  	    callbackNames = ["begin", "done", "log", "testStart", "testDone", "moduleStart", "moduleDone"];
+
+  	function registerLoggingCallback(key) {
+  		var loggingCallback = function loggingCallback(callback) {
+  			if (objectType(callback) !== "function") {
+  				throw new Error("QUnit logging methods require a callback function as their first parameters.");
+  			}
+
+  			config.callbacks[key].push(callback);
+  		};
+
+  		return loggingCallback;
+  	}
+
+  	for (i = 0, l = callbackNames.length; i < l; i++) {
+  		key = callbackNames[i];
+
+  		// Initialize key collection of logging callback
+  		if (objectType(config.callbacks[key]) === "undefined") {
+  			config.callbacks[key] = [];
+  		}
+
+  		obj[key] = registerLoggingCallback(key);
+  	}
+  }
+
+  function runLoggingCallbacks(key, args) {
+  	var i, l, callbacks;
+
+  	callbacks = config.callbacks[key];
+  	for (i = 0, l = callbacks.length; i < l; i++) {
+  		callbacks[i](args);
+  	}
+  }
+
+  // Doesn't support IE9, it will return undefined on these browsers
+  // See also https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error/Stack
+  var fileName = (sourceFromStacktrace(0) || "").replace(/(:\d+)+\)?/, "").replace(/.+\//, "");
+
+  function extractStacktrace(e, offset) {
+  	offset = offset === undefined ? 4 : offset;
+
+  	var stack, include, i;
+
+  	if (e && e.stack) {
+  		stack = e.stack.split("\n");
+  		if (/^error$/i.test(stack[0])) {
+  			stack.shift();
+  		}
+  		if (fileName) {
+  			include = [];
+  			for (i = offset; i < stack.length; i++) {
+  				if (stack[i].indexOf(fileName) !== -1) {
+  					break;
+  				}
+  				include.push(stack[i]);
+  			}
+  			if (include.length) {
+  				return include.join("\n");
+  			}
+  		}
+  		return stack[offset];
+  	}
+  }
+
+  function sourceFromStacktrace(offset) {
+  	var error = new Error();
+
+  	// Support: Safari <=7 only, IE <=10 - 11 only
+  	// Not all browsers generate the `stack` property for `new Error()`, see also #636
+  	if (!error.stack) {
+  		try {
+  			throw error;
+  		} catch (err) {
+  			error = err;
+  		}
+  	}
+
+  	return extractStacktrace(error, offset);
+  }
+
+  var priorityCount = 0;
+  var unitSampler = void 0;
+
+  /**
+   * Advances the ProcessingQueue to the next item if it is ready.
+   * @param {Boolean} last
+   */
+  function advance() {
+  	var start = now();
+  	config.depth = (config.depth || 0) + 1;
+
+  	while (config.queue.length && !config.blocking) {
+  		var elapsedTime = now() - start;
+
+  		if (!defined.setTimeout || config.updateRate <= 0 || elapsedTime < config.updateRate) {
+  			if (priorityCount > 0) {
+  				priorityCount--;
+  			}
+
+  			config.queue.shift()();
+  		} else {
+  			setTimeout(advance, 13);
+  			break;
+  		}
+  	}
+
+  	config.depth--;
+
+  	if (!config.blocking && !config.queue.length && config.depth === 0) {
+  		done();
+  	}
+  }
+
+  function addToQueueImmediate(callback) {
+  	if (objectType(callback) === "array") {
+  		while (callback.length) {
+  			addToQueueImmediate(callback.pop());
+  		}
+
+  		return;
+  	}
+
+  	config.queue.unshift(callback);
+  	priorityCount++;
+  }
+
+  /**
+   * Adds a function to the ProcessingQueue for execution.
+   * @param {Function|Array} callback
+   * @param {Boolean} priority
+   * @param {String} seed
+   */
+  function addToQueue(callback, prioritize, seed) {
+  	if (prioritize) {
+  		config.queue.splice(priorityCount++, 0, callback);
+  	} else if (seed) {
+  		if (!unitSampler) {
+  			unitSampler = unitSamplerGenerator(seed);
+  		}
+
+  		// Insert into a random position after all prioritized items
+  		var index = Math.floor(unitSampler() * (config.queue.length - priorityCount + 1));
+  		config.queue.splice(priorityCount + index, 0, callback);
+  	} else {
+  		config.queue.push(callback);
+  	}
+  }
+
+  /**
+   * Creates a seeded "sample" generator which is used for randomizing tests.
+   */
+  function unitSamplerGenerator(seed) {
+
+  	// 32-bit xorshift, requires only a nonzero seed
+  	// http://excamera.com/sphinx/article-xorshift.html
+  	var sample = parseInt(generateHash(seed), 16) || -1;
+  	return function () {
+  		sample ^= sample << 13;
+  		sample ^= sample >>> 17;
+  		sample ^= sample << 5;
+
+  		// ECMAScript has no unsigned number type
+  		if (sample < 0) {
+  			sample += 0x100000000;
+  		}
+
+  		return sample / 0x100000000;
+  	};
+  }
+
+  /**
+   * This function is called when the ProcessingQueue is done processing all
+   * items. It handles emitting the final run events.
+   */
+  function done() {
+  	var storage = config.storage;
+
+  	ProcessingQueue.finished = true;
+
+  	var runtime = now() - config.started;
+  	var passed = config.stats.all - config.stats.bad;
+
+  	emit("runEnd", globalSuite.end(true));
+  	runLoggingCallbacks("done", {
+  		passed: passed,
+  		failed: config.stats.bad,
+  		total: config.stats.all,
+  		runtime: runtime
+  	});
+
+  	// Clear own storage items if all tests passed
+  	if (storage && config.stats.bad === 0) {
+  		for (var i = storage.length - 1; i >= 0; i--) {
+  			var key = storage.key(i);
+
+  			if (key.indexOf("qunit-test-") === 0) {
+  				storage.removeItem(key);
+  			}
+  		}
+  	}
+  }
+
+  var ProcessingQueue = {
+  	finished: false,
+  	add: addToQueue,
+  	addImmediate: addToQueueImmediate,
+  	advance: advance
+  };
+
+  var TestReport = function () {
+  	function TestReport(name, suite, options) {
+  		classCallCheck(this, TestReport);
+
+  		this.name = name;
+  		this.suiteName = suite.name;
+  		this.fullName = suite.fullName.concat(name);
+  		this.runtime = 0;
+  		this.assertions = [];
+
+  		this.skipped = !!options.skip;
+  		this.todo = !!options.todo;
+
+  		this.valid = options.valid;
+
+  		this._startTime = 0;
+  		this._endTime = 0;
+
+  		suite.pushTest(this);
+  	}
+
+  	createClass(TestReport, [{
+  		key: "start",
+  		value: function start(recordTime) {
+  			if (recordTime) {
+  				this._startTime = Date.now();
+  			}
+
+  			return {
+  				name: this.name,
+  				suiteName: this.suiteName,
+  				fullName: this.fullName.slice()
+  			};
+  		}
+  	}, {
+  		key: "end",
+  		value: function end(recordTime) {
+  			if (recordTime) {
+  				this._endTime = Date.now();
+  			}
+
+  			return extend(this.start(), {
+  				runtime: this.getRuntime(),
+  				status: this.getStatus(),
+  				errors: this.getFailedAssertions(),
+  				assertions: this.getAssertions()
+  			});
+  		}
+  	}, {
+  		key: "pushAssertion",
+  		value: function pushAssertion(assertion) {
+  			this.assertions.push(assertion);
+  		}
+  	}, {
+  		key: "getRuntime",
+  		value: function getRuntime() {
+  			return this._endTime - this._startTime;
+  		}
+  	}, {
+  		key: "getStatus",
+  		value: function getStatus() {
+  			if (this.skipped) {
+  				return "skipped";
+  			}
+
+  			var testPassed = this.getFailedAssertions().length > 0 ? this.todo : !this.todo;
+
+  			if (!testPassed) {
+  				return "failed";
+  			} else if (this.todo) {
+  				return "todo";
+  			} else {
+  				return "passed";
+  			}
+  		}
+  	}, {
+  		key: "getFailedAssertions",
+  		value: function getFailedAssertions() {
+  			return this.assertions.filter(function (assertion) {
+  				return !assertion.passed;
+  			});
+  		}
+  	}, {
+  		key: "getAssertions",
+  		value: function getAssertions() {
+  			return this.assertions.slice();
+  		}
+
+  		// Remove actual and expected values from assertions. This is to prevent
+  		// leaking memory throughout a test suite.
+
+  	}, {
+  		key: "slimAssertions",
+  		value: function slimAssertions() {
+  			this.assertions = this.assertions.map(function (assertion) {
+  				delete assertion.actual;
+  				delete assertion.expected;
+  				return assertion;
+  			});
+  		}
+  	}]);
+  	return TestReport;
+  }();
+
+  var focused$1 = false;
+
+  function Test(settings) {
+  	var i, l;
+
+  	++Test.count;
+
+  	this.expected = null;
+  	this.assertions = [];
+  	this.semaphore = 0;
+  	this.module = config.currentModule;
+  	this.stack = sourceFromStacktrace(3);
+  	this.steps = [];
+  	this.timeout = undefined;
+
+  	// If a module is skipped, all its tests and the tests of the child suites
+  	// should be treated as skipped even if they are defined as `only` or `todo`.
+  	// As for `todo` module, all its tests will be treated as `todo` except for
+  	// tests defined as `skip` which will be left intact.
+  	//
+  	// So, if a test is defined as `todo` and is inside a skipped module, we should
+  	// then treat that test as if was defined as `skip`.
+  	if (this.module.skip) {
+  		settings.skip = true;
+  		settings.todo = false;
+
+  		// Skipped tests should be left intact
+  	} else if (this.module.todo && !settings.skip) {
+  		settings.todo = true;
+  	}
+
+  	extend(this, settings);
+
+  	this.testReport = new TestReport(settings.testName, this.module.suiteReport, {
+  		todo: settings.todo,
+  		skip: settings.skip,
+  		valid: this.valid()
+  	});
+
+  	// Register unique strings
+  	for (i = 0, l = this.module.tests; i < l.length; i++) {
+  		if (this.module.tests[i].name === this.testName) {
+  			this.testName += " ";
+  		}
+  	}
+
+  	this.testId = generateHash(this.module.name, this.testName);
+
+  	this.module.tests.push({
+  		name: this.testName,
+  		testId: this.testId,
+  		skip: !!settings.skip
+  	});
+
+  	if (settings.skip) {
+
+  		// Skipped tests will fully ignore any sent callback
+  		this.callback = function () {};
+  		this.async = false;
+  		this.expected = 0;
+  	} else {
+  		if (typeof this.callback !== "function") {
+  			var method = this.todo ? "todo" : "test";
+
+  			// eslint-disable-next-line max-len
+  			throw new TypeError("You must provide a function as a test callback to QUnit." + method + "(\"" + settings.testName + "\")");
+  		}
+
+  		this.assert = new Assert(this);
+  	}
+  }
+
+  Test.count = 0;
+
+  function getNotStartedModules(startModule) {
+  	var module = startModule,
+  	    modules = [];
+
+  	while (module && module.testsRun === 0) {
+  		modules.push(module);
+  		module = module.parentModule;
+  	}
+
+  	return modules;
+  }
+
+  Test.prototype = {
+  	before: function before() {
+  		var i,
+  		    startModule,
+  		    module = this.module,
+  		    notStartedModules = getNotStartedModules(module);
+
+  		for (i = notStartedModules.length - 1; i >= 0; i--) {
+  			startModule = notStartedModules[i];
+  			startModule.stats = { all: 0, bad: 0, started: now() };
+  			emit("suiteStart", startModule.suiteReport.start(true));
+  			runLoggingCallbacks("moduleStart", {
+  				name: startModule.name,
+  				tests: startModule.tests
+  			});
+  		}
+
+  		config.current = this;
+
+  		this.testEnvironment = extend({}, module.testEnvironment);
+
+  		this.started = now();
+  		emit("testStart", this.testReport.start(true));
+  		runLoggingCallbacks("testStart", {
+  			name: this.testName,
+  			module: module.name,
+  			testId: this.testId,
+  			previousFailure: this.previousFailure
+  		});
+
+  		if (!config.pollution) {
+  			saveGlobal();
+  		}
+  	},
+
+  	run: function run() {
+  		var promise;
+
+  		config.current = this;
+
+  		this.callbackStarted = now();
+
+  		if (config.notrycatch) {
+  			runTest(this);
+  			return;
+  		}
+
+  		try {
+  			runTest(this);
+  		} catch (e) {
+  			this.pushFailure("Died on test #" + (this.assertions.length + 1) + " " + this.stack + ": " + (e.message || e), extractStacktrace(e, 0));
+
+  			// Else next test will carry the responsibility
+  			saveGlobal();
+
+  			// Restart the tests if they're blocking
+  			if (config.blocking) {
+  				internalRecover(this);
+  			}
+  		}
+
+  		function runTest(test) {
+  			promise = test.callback.call(test.testEnvironment, test.assert);
+  			test.resolvePromise(promise);
+
+  			// If the test has a "lock" on it, but the timeout is 0, then we push a
+  			// failure as the test should be synchronous.
+  			if (test.timeout === 0 && test.semaphore !== 0) {
+  				pushFailure("Test did not finish synchronously even though assert.timeout( 0 ) was used.", sourceFromStacktrace(2));
+  			}
+  		}
+  	},
+
+  	after: function after() {
+  		checkPollution();
+  	},
+
+  	queueHook: function queueHook(hook, hookName, hookOwner) {
+  		var _this = this;
+
+  		var callHook = function callHook() {
+  			var promise = hook.call(_this.testEnvironment, _this.assert);
+  			_this.resolvePromise(promise, hookName);
+  		};
+
+  		var runHook = function runHook() {
+  			if (hookName === "before") {
+  				if (hookOwner.unskippedTestsRun !== 0) {
+  					return;
+  				}
+
+  				_this.preserveEnvironment = true;
+  			}
+
+  			if (hookName === "after" && hookOwner.unskippedTestsRun !== numberOfUnskippedTests(hookOwner) - 1 && config.queue.length > 2) {
+  				return;
+  			}
+
+  			config.current = _this;
+  			if (config.notrycatch) {
+  				callHook();
+  				return;
+  			}
+  			try {
+  				callHook();
+  			} catch (error) {
+  				_this.pushFailure(hookName + " failed on " + _this.testName + ": " + (error.message || error), extractStacktrace(error, 0));
+  			}
+  		};
+
+  		return runHook;
+  	},
+
+
+  	// Currently only used for module level hooks, can be used to add global level ones
+  	hooks: function hooks(handler) {
+  		var hooks = [];
+
+  		function processHooks(test, module) {
+  			if (module.parentModule) {
+  				processHooks(test, module.parentModule);
+  			}
+
+  			if (module.hooks[handler].length) {
+  				for (var i = 0; i < module.hooks[handler].length; i++) {
+  					hooks.push(test.queueHook(module.hooks[handler][i], handler, module));
+  				}
+  			}
+  		}
+
+  		// Hooks are ignored on skipped tests
+  		if (!this.skip) {
+  			processHooks(this, this.module);
+  		}
+
+  		return hooks;
+  	},
+
+
+  	finish: function finish() {
+  		config.current = this;
+  		if (config.requireExpects && this.expected === null) {
+  			this.pushFailure("Expected number of assertions to be defined, but expect() was " + "not called.", this.stack);
+  		} else if (this.expected !== null && this.expected !== this.assertions.length) {
+  			this.pushFailure("Expected " + this.expected + " assertions, but " + this.assertions.length + " were run", this.stack);
+  		} else if (this.expected === null && !this.assertions.length) {
+  			this.pushFailure("Expected at least one assertion, but none were run - call " + "expect(0) to accept zero assertions.", this.stack);
+  		}
+
+  		var i,
+  		    module = this.module,
+  		    moduleName = module.name,
+  		    testName = this.testName,
+  		    skipped = !!this.skip,
+  		    todo = !!this.todo,
+  		    bad = 0,
+  		    storage = config.storage;
+
+  		this.runtime = now() - this.started;
+
+  		config.stats.all += this.assertions.length;
+  		module.stats.all += this.assertions.length;
+
+  		for (i = 0; i < this.assertions.length; i++) {
+  			if (!this.assertions[i].result) {
+  				bad++;
+  				config.stats.bad++;
+  				module.stats.bad++;
+  			}
+  		}
+
+  		notifyTestsRan(module, skipped);
+
+  		// Store result when possible
+  		if (storage) {
+  			if (bad) {
+  				storage.setItem("qunit-test-" + moduleName + "-" + testName, bad);
+  			} else {
+  				storage.removeItem("qunit-test-" + moduleName + "-" + testName);
+  			}
+  		}
+
+  		// After emitting the js-reporters event we cleanup the assertion data to
+  		// avoid leaking it. It is not used by the legacy testDone callbacks.
+  		emit("testEnd", this.testReport.end(true));
+  		this.testReport.slimAssertions();
+
+  		runLoggingCallbacks("testDone", {
+  			name: testName,
+  			module: moduleName,
+  			skipped: skipped,
+  			todo: todo,
+  			failed: bad,
+  			passed: this.assertions.length - bad,
+  			total: this.assertions.length,
+  			runtime: skipped ? 0 : this.runtime,
+
+  			// HTML Reporter use
+  			assertions: this.assertions,
+  			testId: this.testId,
+
+  			// Source of Test
+  			source: this.stack
+  		});
+
+  		if (module.testsRun === numberOfTests(module)) {
+  			logSuiteEnd(module);
+
+  			// Check if the parent modules, iteratively, are done. If that the case,
+  			// we emit the `suiteEnd` event and trigger `moduleDone` callback.
+  			var parent = module.parentModule;
+  			while (parent && parent.testsRun === numberOfTests(parent)) {
+  				logSuiteEnd(parent);
+  				parent = parent.parentModule;
+  			}
+  		}
+
+  		config.current = undefined;
+
+  		function logSuiteEnd(module) {
+  			emit("suiteEnd", module.suiteReport.end(true));
+  			runLoggingCallbacks("moduleDone", {
+  				name: module.name,
+  				tests: module.tests,
+  				failed: module.stats.bad,
+  				passed: module.stats.all - module.stats.bad,
+  				total: module.stats.all,
+  				runtime: now() - module.stats.started
+  			});
+  		}
+  	},
+
+  	preserveTestEnvironment: function preserveTestEnvironment() {
+  		if (this.preserveEnvironment) {
+  			this.module.testEnvironment = this.testEnvironment;
+  			this.testEnvironment = extend({}, this.module.testEnvironment);
+  		}
+  	},
+
+  	queue: function queue() {
+  		var test = this;
+
+  		if (!this.valid()) {
+  			return;
+  		}
+
+  		function runTest() {
+
+  			// Each of these can by async
+  			ProcessingQueue.addImmediate([function () {
+  				test.before();
+  			}, test.hooks("before"), function () {
+  				test.preserveTestEnvironment();
+  			}, test.hooks("beforeEach"), function () {
+  				test.run();
+  			}, test.hooks("afterEach").reverse(), test.hooks("after").reverse(), function () {
+  				test.after();
+  			}, function () {
+  				test.finish();
+  			}]);
+  		}
+
+  		var previousFailCount = config.storage && +config.storage.getItem("qunit-test-" + this.module.name + "-" + this.testName);
+
+  		// Prioritize previously failed tests, detected from storage
+  		var prioritize = config.reorder && !!previousFailCount;
+
+  		this.previousFailure = !!previousFailCount;
+
+  		ProcessingQueue.add(runTest, prioritize, config.seed);
+
+  		// If the queue has already finished, we manually process the new test
+  		if (ProcessingQueue.finished) {
+  			ProcessingQueue.advance();
+  		}
+  	},
+
+
+  	pushResult: function pushResult(resultInfo) {
+  		if (this !== config.current) {
+  			throw new Error("Assertion occured after test had finished.");
+  		}
+
+  		// Destructure of resultInfo = { result, actual, expected, message, negative }
+  		var source,
+  		    details = {
+  			module: this.module.name,
+  			name: this.testName,
+  			result: resultInfo.result,
+  			message: resultInfo.message,
+  			actual: resultInfo.actual,
+  			testId: this.testId,
+  			negative: resultInfo.negative || false,
+  			runtime: now() - this.started,
+  			todo: !!this.todo
+  		};
+
+  		if (hasOwn.call(resultInfo, "expected")) {
+  			details.expected = resultInfo.expected;
+  		}
+
+  		if (!resultInfo.result) {
+  			source = resultInfo.source || sourceFromStacktrace();
+
+  			if (source) {
+  				details.source = source;
+  			}
+  		}
+
+  		this.logAssertion(details);
+
+  		this.assertions.push({
+  			result: !!resultInfo.result,
+  			message: resultInfo.message
+  		});
+  	},
+
+  	pushFailure: function pushFailure(message, source, actual) {
+  		if (!(this instanceof Test)) {
+  			throw new Error("pushFailure() assertion outside test context, was " + sourceFromStacktrace(2));
+  		}
+
+  		this.pushResult({
+  			result: false,
+  			message: message || "error",
+  			actual: actual || null,
+  			source: source
+  		});
+  	},
+
+  	/**
+    * Log assertion details using both the old QUnit.log interface and
+    * QUnit.on( "assertion" ) interface.
+    *
+    * @private
+    */
+  	logAssertion: function logAssertion(details) {
+  		runLoggingCallbacks("log", details);
+
+  		var assertion = {
+  			passed: details.result,
+  			actual: details.actual,
+  			expected: details.expected,
+  			message: details.message,
+  			stack: details.source,
+  			todo: details.todo
+  		};
+  		this.testReport.pushAssertion(assertion);
+  		emit("assertion", assertion);
+  	},
+
+
+  	resolvePromise: function resolvePromise(promise, phase) {
+  		var then,
+  		    resume,
+  		    message,
+  		    test = this;
+  		if (promise != null) {
+  			then = promise.then;
+  			if (objectType(then) === "function") {
+  				resume = internalStop(test);
+  				then.call(promise, function () {
+  					resume();
+  				}, function (error) {
+  					message = "Promise rejected " + (!phase ? "during" : phase.replace(/Each$/, "")) + " \"" + test.testName + "\": " + (error && error.message || error);
+  					test.pushFailure(message, extractStacktrace(error, 0));
+
+  					// Else next test will carry the responsibility
+  					saveGlobal();
+
+  					// Unblock
+  					resume();
+  				});
+  			}
+  		}
+  	},
+
+  	valid: function valid() {
+  		var filter = config.filter,
+  		    regexFilter = /^(!?)\/([\w\W]*)\/(i?$)/.exec(filter),
+  		    module = config.module && config.module.toLowerCase(),
+  		    fullName = this.module.name + ": " + this.testName;
+
+  		function moduleChainNameMatch(testModule) {
+  			var testModuleName = testModule.name ? testModule.name.toLowerCase() : null;
+  			if (testModuleName === module) {
+  				return true;
+  			} else if (testModule.parentModule) {
+  				return moduleChainNameMatch(testModule.parentModule);
+  			} else {
+  				return false;
+  			}
+  		}
+
+  		function moduleChainIdMatch(testModule) {
+  			return inArray(testModule.moduleId, config.moduleId) || testModule.parentModule && moduleChainIdMatch(testModule.parentModule);
+  		}
+
+  		// Internally-generated tests are always valid
+  		if (this.callback && this.callback.validTest) {
+  			return true;
+  		}
+
+  		if (config.moduleId && config.moduleId.length > 0 && !moduleChainIdMatch(this.module)) {
+
+  			return false;
+  		}
+
+  		if (config.testId && config.testId.length > 0 && !inArray(this.testId, config.testId)) {
+
+  			return false;
+  		}
+
+  		if (module && !moduleChainNameMatch(this.module)) {
+  			return false;
+  		}
+
+  		if (!filter) {
+  			return true;
+  		}
+
+  		return regexFilter ? this.regexFilter(!!regexFilter[1], regexFilter[2], regexFilter[3], fullName) : this.stringFilter(filter, fullName);
+  	},
+
+  	regexFilter: function regexFilter(exclude, pattern, flags, fullName) {
+  		var regex = new RegExp(pattern, flags);
+  		var match = regex.test(fullName);
+
+  		return match !== exclude;
+  	},
+
+  	stringFilter: function stringFilter(filter, fullName) {
+  		filter = filter.toLowerCase();
+  		fullName = fullName.toLowerCase();
+
+  		var include = filter.charAt(0) !== "!";
+  		if (!include) {
+  			filter = filter.slice(1);
+  		}
+
+  		// If the filter matches, we need to honour include
+  		if (fullName.indexOf(filter) !== -1) {
+  			return include;
+  		}
+
+  		// Otherwise, do the opposite
+  		return !include;
+  	}
+  };
+
+  function pushFailure() {
+  	if (!config.current) {
+  		throw new Error("pushFailure() assertion outside test context, in " + sourceFromStacktrace(2));
+  	}
+
+  	// Gets current test obj
+  	var currentTest = config.current;
+
+  	return currentTest.pushFailure.apply(currentTest, arguments);
+  }
+
+  function saveGlobal() {
+  	config.pollution = [];
+
+  	if (config.noglobals) {
+  		for (var key in global$1) {
+  			if (hasOwn.call(global$1, key)) {
+
+  				// In Opera sometimes DOM element ids show up here, ignore them
+  				if (/^qunit-test-output/.test(key)) {
+  					continue;
+  				}
+  				config.pollution.push(key);
+  			}
+  		}
+  	}
+  }
+
+  function checkPollution() {
+  	var newGlobals,
+  	    deletedGlobals,
+  	    old = config.pollution;
+
+  	saveGlobal();
+
+  	newGlobals = diff(config.pollution, old);
+  	if (newGlobals.length > 0) {
+  		pushFailure("Introduced global variable(s): " + newGlobals.join(", "));
+  	}
+
+  	deletedGlobals = diff(old, config.pollution);
+  	if (deletedGlobals.length > 0) {
+  		pushFailure("Deleted global variable(s): " + deletedGlobals.join(", "));
+  	}
+  }
+
+  // Will be exposed as QUnit.test
+  function test(testName, callback) {
+  	if (focused$1) {
+  		return;
+  	}
+
+  	var newTest = new Test({
+  		testName: testName,
+  		callback: callback
+  	});
+
+  	newTest.queue();
+  }
+
+  function todo(testName, callback) {
+  	if (focused$1) {
+  		return;
+  	}
+
+  	var newTest = new Test({
+  		testName: testName,
+  		callback: callback,
+  		todo: true
+  	});
+
+  	newTest.queue();
+  }
+
+  // Will be exposed as QUnit.skip
+  function skip(testName) {
+  	if (focused$1) {
+  		return;
+  	}
+
+  	var test = new Test({
+  		testName: testName,
+  		skip: true
+  	});
+
+  	test.queue();
+  }
+
+  // Will be exposed as QUnit.only
+  function only(testName, callback) {
+  	if (focused$1) {
+  		return;
+  	}
+
+  	config.queue.length = 0;
+  	focused$1 = true;
+
+  	var newTest = new Test({
+  		testName: testName,
+  		callback: callback
+  	});
+
+  	newTest.queue();
+  }
+
+  // Put a hold on processing and return a function that will release it.
+  function internalStop(test) {
+  	test.semaphore += 1;
+  	config.blocking = true;
+
+  	// Set a recovery timeout, if so configured.
+  	if (defined.setTimeout) {
+  		var timeoutDuration = void 0;
+
+  		if (typeof test.timeout === "number") {
+  			timeoutDuration = test.timeout;
+  		} else if (typeof config.testTimeout === "number") {
+  			timeoutDuration = config.testTimeout;
+  		}
+
+  		if (typeof timeoutDuration === "number" && timeoutDuration > 0) {
+  			clearTimeout(config.timeout);
+  			config.timeout = setTimeout(function () {
+  				pushFailure("Test took longer than " + timeoutDuration + "ms; test timed out.", sourceFromStacktrace(2));
+  				internalRecover(test);
+  			}, timeoutDuration);
+  		}
+  	}
+
+  	var released = false;
+  	return function resume() {
+  		if (released) {
+  			return;
+  		}
+
+  		released = true;
+  		test.semaphore -= 1;
+  		internalStart(test);
+  	};
+  }
+
+  // Forcefully release all processing holds.
+  function internalRecover(test) {
+  	test.semaphore = 0;
+  	internalStart(test);
+  }
+
+  // Release a processing hold, scheduling a resumption attempt if no holds remain.
+  function internalStart(test) {
+
+  	// If semaphore is non-numeric, throw error
+  	if (isNaN(test.semaphore)) {
+  		test.semaphore = 0;
+
+  		pushFailure("Invalid value on test.semaphore", sourceFromStacktrace(2));
+  		return;
+  	}
+
+  	// Don't start until equal number of stop-calls
+  	if (test.semaphore > 0) {
+  		return;
+  	}
+
+  	// Throw an Error if start is called more often than stop
+  	if (test.semaphore < 0) {
+  		test.semaphore = 0;
+
+  		pushFailure("Tried to restart test while already started (test's semaphore was 0 already)", sourceFromStacktrace(2));
+  		return;
+  	}
+
+  	// Add a slight delay to allow more assertions etc.
+  	if (defined.setTimeout) {
+  		if (config.timeout) {
+  			clearTimeout(config.timeout);
+  		}
+  		config.timeout = setTimeout(function () {
+  			if (test.semaphore > 0) {
+  				return;
+  			}
+
+  			if (config.timeout) {
+  				clearTimeout(config.timeout);
+  			}
+
+  			begin();
+  		}, 13);
+  	} else {
+  		begin();
+  	}
+  }
+
+  function collectTests(module) {
+  	var tests = [].concat(module.tests);
+  	var modules = [].concat(toConsumableArray(module.childModules));
+
+  	// Do a breadth-first traversal of the child modules
+  	while (modules.length) {
+  		var nextModule = modules.shift();
+  		tests.push.apply(tests, nextModule.tests);
+  		modules.push.apply(modules, toConsumableArray(nextModule.childModules));
+  	}
+
+  	return tests;
+  }
+
+  function numberOfTests(module) {
+  	return collectTests(module).length;
+  }
+
+  function numberOfUnskippedTests(module) {
+  	return collectTests(module).filter(function (test) {
+  		return !test.skip;
+  	}).length;
+  }
+
+  function notifyTestsRan(module, skipped) {
+  	module.testsRun++;
+  	if (!skipped) {
+  		module.unskippedTestsRun++;
+  	}
+  	while (module = module.parentModule) {
+  		module.testsRun++;
+  		if (!skipped) {
+  			module.unskippedTestsRun++;
+  		}
+  	}
+  }
+
+  /**
+   * Returns a function that proxies to the given method name on the globals
+   * console object. The proxy will also detect if the console doesn't exist and
+   * will appropriately no-op. This allows support for IE9, which doesn't have a
+   * console if the developer tools are not open.
+   */
+  function consoleProxy(method) {
+  	return function () {
+  		if (console) {
+  			console[method].apply(console, arguments);
+  		}
+  	};
+  }
+
+  var Logger = {
+  	warn: consoleProxy("warn")
+  };
+
+  var Assert = function () {
+  	function Assert(testContext) {
+  		classCallCheck(this, Assert);
+
+  		this.test = testContext;
+  	}
+
+  	// Assert helpers
+
+  	createClass(Assert, [{
+  		key: "timeout",
+  		value: function timeout(duration) {
+  			if (typeof duration !== "number") {
+  				throw new Error("You must pass a number as the duration to assert.timeout");
+  			}
+
+  			this.test.timeout = duration;
+  		}
+
+  		// Documents a "step", which is a string value, in a test as a passing assertion
+
+  	}, {
+  		key: "step",
+  		value: function step(message) {
+  			var result = !!message;
+
+  			this.test.steps.push(message);
+
+  			return this.pushResult({
+  				result: result,
+  				message: message || "You must provide a message to assert.step"
+  			});
+  		}
+
+  		// Verifies the steps in a test match a given array of string values
+
+  	}, {
+  		key: "verifySteps",
+  		value: function verifySteps(steps, message) {
+  			this.deepEqual(this.test.steps, steps, message);
+  		}
+
+  		// Specify the number of expected assertions to guarantee that failed test
+  		// (no assertions are run at all) don't slip through.
+
+  	}, {
+  		key: "expect",
+  		value: function expect(asserts) {
+  			if (arguments.length === 1) {
+  				this.test.expected = asserts;
+  			} else {
+  				return this.test.expected;
+  			}
+  		}
+
+  		// Put a hold on processing and return a function that will release it a maximum of once.
+
+  	}, {
+  		key: "async",
+  		value: function async(count) {
+  			var test$$1 = this.test;
+
+  			var popped = false,
+  			    acceptCallCount = count;
+
+  			if (typeof acceptCallCount === "undefined") {
+  				acceptCallCount = 1;
+  			}
+
+  			var resume = internalStop(test$$1);
+
+  			return function done() {
+  				if (config.current !== test$$1) {
+  					throw Error("assert.async callback called after test finished.");
+  				}
+
+  				if (popped) {
+  					test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
+  					return;
+  				}
+
+  				acceptCallCount -= 1;
+  				if (acceptCallCount > 0) {
+  					return;
+  				}
+
+  				popped = true;
+  				resume();
+  			};
+  		}
+
+  		// Exports test.push() to the user API
+  		// Alias of pushResult.
+
+  	}, {
+  		key: "push",
+  		value: function push(result, actual, expected, message, negative) {
+  			Logger.warn("assert.push is deprecated and will be removed in QUnit 3.0." + " Please use assert.pushResult instead (https://api.qunitjs.com/assert/pushResult).");
+
+  			var currentAssert = this instanceof Assert ? this : config.current.assert;
+  			return currentAssert.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: negative
+  			});
+  		}
+  	}, {
+  		key: "pushResult",
+  		value: function pushResult(resultInfo) {
+
+  			// Destructure of resultInfo = { result, actual, expected, message, negative }
+  			var assert = this;
+  			var currentTest = assert instanceof Assert && assert.test || config.current;
+
+  			// Backwards compatibility fix.
+  			// Allows the direct use of global exported assertions and QUnit.assert.*
+  			// Although, it's use is not recommended as it can leak assertions
+  			// to other tests from async tests, because we only get a reference to the current test,
+  			// not exactly the test where assertion were intended to be called.
+  			if (!currentTest) {
+  				throw new Error("assertion outside test context, in " + sourceFromStacktrace(2));
+  			}
+
+  			if (!(assert instanceof Assert)) {
+  				assert = currentTest.assert;
+  			}
+
+  			return assert.test.pushResult(resultInfo);
+  		}
+  	}, {
+  		key: "ok",
+  		value: function ok(result, message) {
+  			if (!message) {
+  				message = result ? "okay" : "failed, expected argument to be truthy, was: " + dump.parse(result);
+  			}
+
+  			this.pushResult({
+  				result: !!result,
+  				actual: result,
+  				expected: true,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notOk",
+  		value: function notOk(result, message) {
+  			if (!message) {
+  				message = !result ? "okay" : "failed, expected argument to be falsy, was: " + dump.parse(result);
+  			}
+
+  			this.pushResult({
+  				result: !result,
+  				actual: result,
+  				expected: false,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "equal",
+  		value: function equal(actual, expected, message) {
+
+  			// eslint-disable-next-line eqeqeq
+  			var result = expected == actual;
+
+  			this.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notEqual",
+  		value: function notEqual(actual, expected, message) {
+
+  			// eslint-disable-next-line eqeqeq
+  			var result = expected != actual;
+
+  			this.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "propEqual",
+  		value: function propEqual(actual, expected, message) {
+  			actual = objectValues(actual);
+  			expected = objectValues(expected);
+
+  			this.pushResult({
+  				result: equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notPropEqual",
+  		value: function notPropEqual(actual, expected, message) {
+  			actual = objectValues(actual);
+  			expected = objectValues(expected);
+
+  			this.pushResult({
+  				result: !equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "deepEqual",
+  		value: function deepEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notDeepEqual",
+  		value: function notDeepEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: !equiv(actual, expected),
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "strictEqual",
+  		value: function strictEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: expected === actual,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}, {
+  		key: "notStrictEqual",
+  		value: function notStrictEqual(actual, expected, message) {
+  			this.pushResult({
+  				result: expected !== actual,
+  				actual: actual,
+  				expected: expected,
+  				message: message,
+  				negative: true
+  			});
+  		}
+  	}, {
+  		key: "throws",
+  		value: function throws(block, expected, message) {
+  			var actual = void 0,
+  			    result = false;
+
+  			var currentTest = this instanceof Assert && this.test || config.current;
+
+  			// 'expected' is optional unless doing string comparison
+  			if (objectType(expected) === "string") {
+  				if (message == null) {
+  					message = expected;
+  					expected = null;
+  				} else {
+  					throw new Error("throws/raises does not accept a string value for the expected argument.\n" + "Use a non-string object value (e.g. regExp) instead if it's necessary.");
+  				}
+  			}
+
+  			currentTest.ignoreGlobalErrors = true;
+  			try {
+  				block.call(currentTest.testEnvironment);
+  			} catch (e) {
+  				actual = e;
+  			}
+  			currentTest.ignoreGlobalErrors = false;
+
+  			if (actual) {
+  				var expectedType = objectType(expected);
+
+  				// We don't want to validate thrown error
+  				if (!expected) {
+  					result = true;
+  					expected = null;
+
+  					// Expected is a regexp
+  				} else if (expectedType === "regexp") {
+  					result = expected.test(errorString(actual));
+
+  					// Expected is a constructor, maybe an Error constructor
+  				} else if (expectedType === "function" && actual instanceof expected) {
+  					result = true;
+
+  					// Expected is an Error object
+  				} else if (expectedType === "object") {
+  					result = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
+
+  					// Expected is a validation function which returns true if validation passed
+  				} else if (expectedType === "function" && expected.call({}, actual) === true) {
+  					expected = null;
+  					result = true;
+  				}
+  			}
+
+  			currentTest.assert.pushResult({
+  				result: result,
+  				actual: actual,
+  				expected: expected,
+  				message: message
+  			});
+  		}
+  	}]);
+  	return Assert;
+  }();
+
+  // Provide an alternative to assert.throws(), for environments that consider throws a reserved word
+  // Known to us are: Closure Compiler, Narwhal
+  // eslint-disable-next-line dot-notation
+
+
+  Assert.prototype.raises = Assert.prototype["throws"];
+
+  /**
+   * Converts an error into a simple string for comparisons.
+   *
+   * @param {Error} error
+   * @return {String}
+   */
+  function errorString(error) {
+  	var resultErrorString = error.toString();
+
+  	if (resultErrorString.substring(0, 7) === "[object") {
+  		var name = error.name ? error.name.toString() : "Error";
+  		var message = error.message ? error.message.toString() : "";
+
+  		if (name && message) {
+  			return name + ": " + message;
+  		} else if (name) {
+  			return name;
+  		} else if (message) {
+  			return message;
+  		} else {
+  			return "Error";
+  		}
+  	} else {
+  		return resultErrorString;
+  	}
+  }
+
+  /* global module, exports, define */
+  function exportQUnit(QUnit) {
+
+  	if (defined.document) {
+
+  		// QUnit may be defined when it is preconfigured but then only QUnit and QUnit.config may be defined.
+  		if (window.QUnit && window.QUnit.version) {
+  			throw new Error("QUnit has already been defined.");
+  		}
+
+  		window.QUnit = QUnit;
+  	}
+
+  	// For nodejs
+  	if (typeof module !== "undefined" && module && module.exports) {
+  		module.exports = QUnit;
+
+  		// For consistency with CommonJS environments' exports
+  		module.exports.QUnit = QUnit;
+  	}
+
+  	// For CommonJS with exports, but without module.exports, like Rhino
+  	if (typeof exports !== "undefined" && exports) {
+  		exports.QUnit = QUnit;
+  	}
+
+  	if (typeof define === "function" && define.amd) {
+  		define(function () {
+  			return QUnit;
+  		});
+  		QUnit.config.autostart = false;
+  	}
+
+  	// For Web/Service Workers
+  	if (self$1 && self$1.WorkerGlobalScope && self$1 instanceof self$1.WorkerGlobalScope) {
+  		self$1.QUnit = QUnit;
+  	}
+  }
+
+  var SuiteReport = function () {
+  	function SuiteReport(name, parentSuite) {
+  		classCallCheck(this, SuiteReport);
+
+  		this.name = name;
+  		this.fullName = parentSuite ? parentSuite.fullName.concat(name) : [];
+
+  		this.tests = [];
+  		this.childSuites = [];
+
+  		if (parentSuite) {
+  			parentSuite.pushChildSuite(this);
+  		}
+  	}
+
+  	createClass(SuiteReport, [{
+  		key: "start",
+  		value: function start(recordTime) {
+  			if (recordTime) {
+  				this._startTime = Date.now();
+  			}
+
+  			return {
+  				name: this.name,
+  				fullName: this.fullName.slice(),
+  				tests: this.tests.map(function (test) {
+  					return test.start();
+  				}),
+  				childSuites: this.childSuites.map(function (suite) {
+  					return suite.start();
+  				}),
+  				testCounts: {
+  					total: this.getTestCounts().total
+  				}
+  			};
+  		}
+  	}, {
+  		key: "end",
+  		value: function end(recordTime) {
+  			if (recordTime) {
+  				this._endTime = Date.now();
+  			}
+
+  			return {
+  				name: this.name,
+  				fullName: this.fullName.slice(),
+  				tests: this.tests.map(function (test) {
+  					return test.end();
+  				}),
+  				childSuites: this.childSuites.map(function (suite) {
+  					return suite.end();
+  				}),
+  				testCounts: this.getTestCounts(),
+  				runtime: this.getRuntime(),
+  				status: this.getStatus()
+  			};
+  		}
+  	}, {
+  		key: "pushChildSuite",
+  		value: function pushChildSuite(suite) {
+  			this.childSuites.push(suite);
+  		}
+  	}, {
+  		key: "pushTest",
+  		value: function pushTest(test) {
+  			this.tests.push(test);
+  		}
+  	}, {
+  		key: "getRuntime",
+  		value: function getRuntime() {
+  			return this._endTime - this._startTime;
+  		}
+  	}, {
+  		key: "getTestCounts",
+  		value: function getTestCounts() {
+  			var counts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { passed: 0, failed: 0, skipped: 0, todo: 0, total: 0 };
+
+  			counts = this.tests.reduce(function (counts, test) {
+  				if (test.valid) {
+  					counts[test.getStatus()]++;
+  					counts.total++;
+  				}
+
+  				return counts;
+  			}, counts);
+
+  			return this.childSuites.reduce(function (counts, suite) {
+  				return suite.getTestCounts(counts);
+  			}, counts);
+  		}
+  	}, {
+  		key: "getStatus",
+  		value: function getStatus() {
+  			var _getTestCounts = this.getTestCounts(),
+  			    total = _getTestCounts.total,
+  			    failed = _getTestCounts.failed,
+  			    skipped = _getTestCounts.skipped,
+  			    todo = _getTestCounts.todo;
+
+  			if (failed) {
+  				return "failed";
+  			} else {
+  				if (skipped === total) {
+  					return "skipped";
+  				} else if (todo === total) {
+  					return "todo";
+  				} else {
+  					return "passed";
+  				}
+  			}
+  		}
+  	}]);
+  	return SuiteReport;
+  }();
+
+  // Handle an unhandled exception. By convention, returns true if further
+  // error handling should be suppressed and false otherwise.
+  // In this case, we will only suppress further error handling if the
+  // "ignoreGlobalErrors" configuration option is enabled.
+  function onError(error) {
+  	for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+  		args[_key - 1] = arguments[_key];
+  	}
+
+  	if (config.current) {
+  		if (config.current.ignoreGlobalErrors) {
+  			return true;
+  		}
+  		pushFailure.apply(undefined, [error.message, error.fileName + ":" + error.lineNumber].concat(args));
+  	} else {
+  		test("global failure", extend(function () {
+  			pushFailure.apply(undefined, [error.message, error.fileName + ":" + error.lineNumber].concat(args));
+  		}, { validTest: true }));
+  	}
+
+  	return false;
+  }
+
+  var focused = false;
+  var QUnit = {};
+  var globalSuite = new SuiteReport();
+
+  // The initial "currentModule" represents the global (or top-level) module that
+  // is not explicitly defined by the user, therefore we add the "globalSuite" to
+  // it since each module has a suiteReport associated with it.
+  config.currentModule.suiteReport = globalSuite;
+
+  var moduleStack = [];
+  var globalStartCalled = false;
+  var runStarted = false;
+
+  // Figure out if we're running the tests from a server or not
+  QUnit.isLocal = !(defined.document && window.location.protocol !== "file:");
+
+  // Expose the current QUnit version
+  QUnit.version = "2.4.1";
+
+  function createModule(name, testEnvironment, modifiers) {
+  	var parentModule = moduleStack.length ? moduleStack.slice(-1)[0] : null;
+  	var moduleName = parentModule !== null ? [parentModule.name, name].join(" > ") : name;
+  	var parentSuite = parentModule ? parentModule.suiteReport : globalSuite;
+
+  	var skip$$1 = parentModule !== null && parentModule.skip || modifiers.skip;
+  	var todo$$1 = parentModule !== null && parentModule.todo || modifiers.todo;
+
+  	var module = {
+  		name: moduleName,
+  		parentModule: parentModule,
+  		tests: [],
+  		moduleId: generateHash(moduleName),
+  		testsRun: 0,
+  		unskippedTestsRun: 0,
+  		childModules: [],
+  		suiteReport: new SuiteReport(name, parentSuite),
+
+  		// Pass along `skip` and `todo` properties from parent module, in case
+  		// there is one, to childs. And use own otherwise.
+  		// This property will be used to mark own tests and tests of child suites
+  		// as either `skipped` or `todo`.
+  		skip: skip$$1,
+  		todo: skip$$1 ? false : todo$$1
+  	};
+
+  	var env = {};
+  	if (parentModule) {
+  		parentModule.childModules.push(module);
+  		extend(env, parentModule.testEnvironment);
+  	}
+  	extend(env, testEnvironment);
+  	module.testEnvironment = env;
+
+  	config.modules.push(module);
+  	return module;
+  }
+
+  function processModule(name, options, executeNow) {
+  	var modifiers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+  	var module = createModule(name, options, modifiers);
+
+  	// Move any hooks to a 'hooks' object
+  	var testEnvironment = module.testEnvironment;
+  	var hooks = module.hooks = {};
+
+  	setHookFromEnvironment(hooks, testEnvironment, "before");
+  	setHookFromEnvironment(hooks, testEnvironment, "beforeEach");
+  	setHookFromEnvironment(hooks, testEnvironment, "afterEach");
+  	setHookFromEnvironment(hooks, testEnvironment, "after");
+
+  	function setHookFromEnvironment(hooks, environment, name) {
+  		var potentialHook = environment[name];
+  		hooks[name] = typeof potentialHook === "function" ? [potentialHook] : [];
+  		delete environment[name];
+  	}
+
+  	var moduleFns = {
+  		before: setHookFunction(module, "before"),
+  		beforeEach: setHookFunction(module, "beforeEach"),
+  		afterEach: setHookFunction(module, "afterEach"),
+  		after: setHookFunction(module, "after")
+  	};
+
+  	var currentModule = config.currentModule;
+  	if (objectType(executeNow) === "function") {
+  		moduleStack.push(module);
+  		config.currentModule = module;
+  		executeNow.call(module.testEnvironment, moduleFns);
+  		moduleStack.pop();
+  		module = module.parentModule || currentModule;
+  	}
+
+  	config.currentModule = module;
+  }
+
+  // TODO: extract this to a new file alongside its related functions
+  function module$1(name, options, executeNow) {
+  	if (focused) {
+  		return;
+  	}
+
+  	if (arguments.length === 2) {
+  		if (objectType(options) === "function") {
+  			executeNow = options;
+  			options = undefined;
+  		}
+  	}
+
+  	processModule(name, options, executeNow);
+  }
+
+  module$1.only = function () {
+  	if (focused) {
+  		return;
+  	}
+
+  	config.modules.length = 0;
+  	config.queue.length = 0;
+
+  	module$1.apply(undefined, arguments);
+
+  	focused = true;
+  };
+
+  module$1.skip = function (name, options, executeNow) {
+  	if (focused) {
+  		return;
+  	}
+
+  	if (arguments.length === 2) {
+  		if (objectType(options) === "function") {
+  			executeNow = options;
+  			options = undefined;
+  		}
+  	}
+
+  	processModule(name, options, executeNow, { skip: true });
+  };
+
+  module$1.todo = function (name, options, executeNow) {
+  	if (focused) {
+  		return;
+  	}
+
+  	if (arguments.length === 2) {
+  		if (objectType(options) === "function") {
+  			executeNow = options;
+  			options = undefined;
+  		}
+  	}
+
+  	processModule(name, options, executeNow, { todo: true });
+  };
+
+  extend(QUnit, {
+  	on: on,
+
+  	module: module$1,
+
+  	test: test,
+
+  	todo: todo,
+
+  	skip: skip,
+
+  	only: only,
+
+  	start: function start(count) {
+  		var globalStartAlreadyCalled = globalStartCalled;
+
+  		if (!config.current) {
+  			globalStartCalled = true;
+
+  			if (runStarted) {
+  				throw new Error("Called start() while test already started running");
+  			} else if (globalStartAlreadyCalled || count > 1) {
+  				throw new Error("Called start() outside of a test context too many times");
+  			} else if (config.autostart) {
+  				throw new Error("Called start() outside of a test context when " + "QUnit.config.autostart was true");
+  			} else if (!config.pageLoaded) {
+
+  				// The page isn't completely loaded yet, so we set autostart and then
+  				// load if we're in Node or wait for the browser's load event.
+  				config.autostart = true;
+
+  				// Starts from Node even if .load was not previously called. We still return
+  				// early otherwise we'll wind up "beginning" twice.
+  				if (!defined.document) {
+  					QUnit.load();
+  				}
+
+  				return;
+  			}
+  		} else {
+  			throw new Error("QUnit.start cannot be called inside a test context.");
+  		}
+
+  		scheduleBegin();
+  	},
+
+  	config: config,
+
+  	is: is,
+
+  	objectType: objectType,
+
+  	extend: extend,
+
+  	load: function load() {
+  		config.pageLoaded = true;
+
+  		// Initialize the configuration options
+  		extend(config, {
+  			stats: { all: 0, bad: 0 },
+  			started: 0,
+  			updateRate: 1000,
+  			autostart: true,
+  			filter: ""
+  		}, true);
+
+  		if (!runStarted) {
+  			config.blocking = false;
+
+  			if (config.autostart) {
+  				scheduleBegin();
+  			}
+  		}
+  	},
+
+  	stack: function stack(offset) {
+  		offset = (offset || 0) + 2;
+  		return sourceFromStacktrace(offset);
+  	},
+
+  	onError: onError
+  });
+
+  QUnit.pushFailure = pushFailure;
+  QUnit.assert = Assert.prototype;
+  QUnit.equiv = equiv;
+  QUnit.dump = dump;
+
+  registerLoggingCallbacks(QUnit);
+
+  function scheduleBegin() {
+
+  	runStarted = true;
+
+  	// Add a slight delay to allow definition of more modules and tests.
+  	if (defined.setTimeout) {
+  		setTimeout(function () {
+  			begin();
+  		}, 13);
+  	} else {
+  		begin();
+  	}
+  }
+
+  function begin() {
+  	var i,
+  	    l,
+  	    modulesLog = [];
+
+  	// If the test run hasn't officially begun yet
+  	if (!config.started) {
+
+  		// Record the time of the test run's beginning
+  		config.started = now();
+
+  		// Delete the loose unnamed module if unused.
+  		if (config.modules[0].name === "" && config.modules[0].tests.length === 0) {
+  			config.modules.shift();
+  		}
+
+  		// Avoid unnecessary information by not logging modules' test environments
+  		for (i = 0, l = config.modules.length; i < l; i++) {
+  			modulesLog.push({
+  				name: config.modules[i].name,
+  				tests: config.modules[i].tests
+  			});
+  		}
+
+  		// The test run is officially beginning now
+  		emit("runStart", globalSuite.start(true));
+  		runLoggingCallbacks("begin", {
+  			totalTests: Test.count,
+  			modules: modulesLog
+  		});
+  	}
+
+  	config.blocking = false;
+  	ProcessingQueue.advance();
+  }
+
+  function setHookFunction(module, hookName) {
+  	return function setHook(callback) {
+  		module.hooks[hookName].push(callback);
+  	};
+  }
+
+  exportQUnit(QUnit);
+
+  (function () {
+
+  	if (typeof window === "undefined" || typeof document === "undefined") {
+  		return;
+  	}
+
+  	var config = QUnit.config,
+  	    hasOwn = Object.prototype.hasOwnProperty;
+
+  	// Stores fixture HTML for resetting later
+  	function storeFixture() {
+
+  		// Avoid overwriting user-defined values
+  		if (hasOwn.call(config, "fixture")) {
+  			return;
+  		}
+
+  		var fixture = document.getElementById("qunit-fixture");
+  		if (fixture) {
+  			config.fixture = fixture.innerHTML;
+  		}
+  	}
+
+  	QUnit.begin(storeFixture);
+
+  	// Resets the fixture DOM element if available.
+  	function resetFixture() {
+  		if (config.fixture == null) {
+  			return;
+  		}
+
+  		var fixture = document.getElementById("qunit-fixture");
+  		if (fixture) {
+  			fixture.innerHTML = config.fixture;
+  		}
+  	}
+
+  	QUnit.testStart(resetFixture);
+  })();
+
+  (function () {
+
+  	// Only interact with URLs via window.location
+  	var location = typeof window !== "undefined" && window.location;
+  	if (!location) {
+  		return;
+  	}
+
+  	var urlParams = getUrlParams();
+
+  	QUnit.urlParams = urlParams;
+
+  	// Match module/test by inclusion in an array
+  	QUnit.config.moduleId = [].concat(urlParams.moduleId || []);
+  	QUnit.config.testId = [].concat(urlParams.testId || []);
+
+  	// Exact case-insensitive match of the module name
+  	QUnit.config.module = urlParams.module;
+
+  	// Regular expression or case-insenstive substring match against "moduleName: testName"
+  	QUnit.config.filter = urlParams.filter;
+
+  	// Test order randomization
+  	if (urlParams.seed === true) {
+
+  		// Generate a random seed if the option is specified without a value
+  		QUnit.config.seed = Math.random().toString(36).slice(2);
+  	} else if (urlParams.seed) {
+  		QUnit.config.seed = urlParams.seed;
+  	}
+
+  	// Add URL-parameter-mapped config values with UI form rendering data
+  	QUnit.config.urlConfig.push({
+  		id: "hidepassed",
+  		label: "Hide passed tests",
+  		tooltip: "Only show tests and assertions that fail. Stored as query-strings."
+  	}, {
+  		id: "noglobals",
+  		label: "Check for Globals",
+  		tooltip: "Enabling this will test if any test introduces new properties on the " + "global object (`window` in Browsers). Stored as query-strings."
+  	}, {
+  		id: "notrycatch",
+  		label: "No try-catch",
+  		tooltip: "Enabling this will run tests outside of a try-catch block. Makes debugging " + "exceptions in IE reasonable. Stored as query-strings."
+  	});
+
+  	QUnit.begin(function () {
+  		var i,
+  		    option,
+  		    urlConfig = QUnit.config.urlConfig;
+
+  		for (i = 0; i < urlConfig.length; i++) {
+
+  			// Options can be either strings or objects with nonempty "id" properties
+  			option = QUnit.config.urlConfig[i];
+  			if (typeof option !== "string") {
+  				option = option.id;
+  			}
+
+  			if (QUnit.config[option] === undefined) {
+  				QUnit.config[option] = urlParams[option];
+  			}
+  		}
+  	});
+
+  	function getUrlParams() {
+  		var i, param, name, value;
+  		var urlParams = Object.create(null);
+  		var params = location.search.slice(1).split("&");
+  		var length = params.length;
+
+  		for (i = 0; i < length; i++) {
+  			if (params[i]) {
+  				param = params[i].split("=");
+  				name = decodeQueryParam(param[0]);
+
+  				// Allow just a key to turn on a flag, e.g., test.html?noglobals
+  				value = param.length === 1 || decodeQueryParam(param.slice(1).join("="));
+  				if (name in urlParams) {
+  					urlParams[name] = [].concat(urlParams[name], value);
+  				} else {
+  					urlParams[name] = value;
+  				}
+  			}
+  		}
+
+  		return urlParams;
+  	}
+
+  	function decodeQueryParam(param) {
+  		return decodeURIComponent(param.replace(/\+/g, "%20"));
+  	}
+  })();
+
+  var stats = {
+  	passedTests: 0,
+  	failedTests: 0,
+  	skippedTests: 0,
+  	todoTests: 0
+  };
+
+  // Escape text for attribute or text content.
+  function escapeText(s) {
+  	if (!s) {
+  		return "";
+  	}
+  	s = s + "";
+
+  	// Both single quotes and double quotes (for attributes)
+  	return s.replace(/['"<>&]/g, function (s) {
+  		switch (s) {
+  			case "'":
+  				return "&#039;";
+  			case "\"":
+  				return "&quot;";
+  			case "<":
+  				return "&lt;";
+  			case ">":
+  				return "&gt;";
+  			case "&":
+  				return "&amp;";
+  		}
+  	});
+  }
+
+  (function () {
+
+  	// Don't load the HTML Reporter on non-browser environments
+  	if (typeof window === "undefined" || !window.document) {
+  		return;
+  	}
+
+  	var config = QUnit.config,
+  	    document$$1 = window.document,
+  	    collapseNext = false,
+  	    hasOwn = Object.prototype.hasOwnProperty,
+  	    unfilteredUrl = setUrl({ filter: undefined, module: undefined,
+  		moduleId: undefined, testId: undefined }),
+  	    modulesList = [];
+
+  	function addEvent(elem, type, fn) {
+  		elem.addEventListener(type, fn, false);
+  	}
+
+  	function removeEvent(elem, type, fn) {
+  		elem.removeEventListener(type, fn, false);
+  	}
+
+  	function addEvents(elems, type, fn) {
+  		var i = elems.length;
+  		while (i--) {
+  			addEvent(elems[i], type, fn);
+  		}
+  	}
+
+  	function hasClass(elem, name) {
+  		return (" " + elem.className + " ").indexOf(" " + name + " ") >= 0;
+  	}
+
+  	function addClass(elem, name) {
+  		if (!hasClass(elem, name)) {
+  			elem.className += (elem.className ? " " : "") + name;
+  		}
+  	}
+
+  	function toggleClass(elem, name, force) {
+  		if (force || typeof force === "undefined" && !hasClass(elem, name)) {
+  			addClass(elem, name);
+  		} else {
+  			removeClass(elem, name);
+  		}
+  	}
+
+  	function removeClass(elem, name) {
+  		var set = " " + elem.className + " ";
+
+  		// Class name may appear multiple times
+  		while (set.indexOf(" " + name + " ") >= 0) {
+  			set = set.replace(" " + name + " ", " ");
+  		}
+
+  		// Trim for prettiness
+  		elem.className = typeof set.trim === "function" ? set.trim() : set.replace(/^\s+|\s+$/g, "");
+  	}
+
+  	function id(name) {
+  		return document$$1.getElementById && document$$1.getElementById(name);
+  	}
+
+  	function abortTests() {
+  		var abortButton = id("qunit-abort-tests-button");
+  		if (abortButton) {
+  			abortButton.disabled = true;
+  			abortButton.innerHTML = "Aborting...";
+  		}
+  		QUnit.config.queue.length = 0;
+  		return false;
+  	}
+
+  	function interceptNavigation(ev) {
+  		applyUrlParams();
+
+  		if (ev && ev.preventDefault) {
+  			ev.preventDefault();
+  		}
+
+  		return false;
+  	}
+
+  	function getUrlConfigHtml() {
+  		var i,
+  		    j,
+  		    val,
+  		    escaped,
+  		    escapedTooltip,
+  		    selection = false,
+  		    urlConfig = config.urlConfig,
+  		    urlConfigHtml = "";
+
+  		for (i = 0; i < urlConfig.length; i++) {
+
+  			// Options can be either strings or objects with nonempty "id" properties
+  			val = config.urlConfig[i];
+  			if (typeof val === "string") {
+  				val = {
+  					id: val,
+  					label: val
+  				};
+  			}
+
+  			escaped = escapeText(val.id);
+  			escapedTooltip = escapeText(val.tooltip);
+
+  			if (!val.value || typeof val.value === "string") {
+  				urlConfigHtml += "<label for='qunit-urlconfig-" + escaped + "' title='" + escapedTooltip + "'><input id='qunit-urlconfig-" + escaped + "' name='" + escaped + "' type='checkbox'" + (val.value ? " value='" + escapeText(val.value) + "'" : "") + (config[val.id] ? " checked='checked'" : "") + " title='" + escapedTooltip + "' />" + escapeText(val.label) + "</label>";
+  			} else {
+  				urlConfigHtml += "<label for='qunit-urlconfig-" + escaped + "' title='" + escapedTooltip + "'>" + val.label + ": </label><select id='qunit-urlconfig-" + escaped + "' name='" + escaped + "' title='" + escapedTooltip + "'><option></option>";
+
+  				if (QUnit.is("array", val.value)) {
+  					for (j = 0; j < val.value.length; j++) {
+  						escaped = escapeText(val.value[j]);
+  						urlConfigHtml += "<option value='" + escaped + "'" + (config[val.id] === val.value[j] ? (selection = true) && " selected='selected'" : "") + ">" + escaped + "</option>";
+  					}
+  				} else {
+  					for (j in val.value) {
+  						if (hasOwn.call(val.value, j)) {
+  							urlConfigHtml += "<option value='" + escapeText(j) + "'" + (config[val.id] === j ? (selection = true) && " selected='selected'" : "") + ">" + escapeText(val.value[j]) + "</option>";
+  						}
+  					}
+  				}
+  				if (config[val.id] && !selection) {
+  					escaped = escapeText(config[val.id]);
+  					urlConfigHtml += "<option value='" + escaped + "' selected='selected' disabled='disabled'>" + escaped + "</option>";
+  				}
+  				urlConfigHtml += "</select>";
+  			}
+  		}
+
+  		return urlConfigHtml;
+  	}
+
+  	// Handle "click" events on toolbar checkboxes and "change" for select menus.
+  	// Updates the URL with the new state of `config.urlConfig` values.
+  	function toolbarChanged() {
+  		var updatedUrl,
+  		    value,
+  		    tests,
+  		    field = this,
+  		    params = {};
+
+  		// Detect if field is a select menu or a checkbox
+  		if ("selectedIndex" in field) {
+  			value = field.options[field.selectedIndex].value || undefined;
+  		} else {
+  			value = field.checked ? field.defaultValue || true : undefined;
+  		}
+
+  		params[field.name] = value;
+  		updatedUrl = setUrl(params);
+
+  		// Check if we can apply the change without a page refresh
+  		if ("hidepassed" === field.name && "replaceState" in window.history) {
+  			QUnit.urlParams[field.name] = value;
+  			config[field.name] = value || false;
+  			tests = id("qunit-tests");
+  			if (tests) {
+  				toggleClass(tests, "hidepass", value || false);
+  			}
+  			window.history.replaceState(null, "", updatedUrl);
+  		} else {
+  			window.location = updatedUrl;
+  		}
+  	}
+
+  	function setUrl(params) {
+  		var key,
+  		    arrValue,
+  		    i,
+  		    querystring = "?",
+  		    location = window.location;
+
+  		params = QUnit.extend(QUnit.extend({}, QUnit.urlParams), params);
+
+  		for (key in params) {
+
+  			// Skip inherited or undefined properties
+  			if (hasOwn.call(params, key) && params[key] !== undefined) {
+
+  				// Output a parameter for each value of this key
+  				// (but usually just one)
+  				arrValue = [].concat(params[key]);
+  				for (i = 0; i < arrValue.length; i++) {
+  					querystring += encodeURIComponent(key);
+  					if (arrValue[i] !== true) {
+  						querystring += "=" + encodeURIComponent(arrValue[i]);
+  					}
+  					querystring += "&";
+  				}
+  			}
+  		}
+  		return location.protocol + "//" + location.host + location.pathname + querystring.slice(0, -1);
+  	}
+
+  	function applyUrlParams() {
+  		var i,
+  		    selectedModules = [],
+  		    modulesList = id("qunit-modulefilter-dropdown-list").getElementsByTagName("input"),
+  		    filter = id("qunit-filter-input").value;
+
+  		for (i = 0; i < modulesList.length; i++) {
+  			if (modulesList[i].checked) {
+  				selectedModules.push(modulesList[i].value);
+  			}
+  		}
+
+  		window.location = setUrl({
+  			filter: filter === "" ? undefined : filter,
+  			moduleId: selectedModules.length === 0 ? undefined : selectedModules,
+
+  			// Remove module and testId filter
+  			module: undefined,
+  			testId: undefined
+  		});
+  	}
+
+  	function toolbarUrlConfigContainer() {
+  		var urlConfigContainer = document$$1.createElement("span");
+
+  		urlConfigContainer.innerHTML = getUrlConfigHtml();
+  		addClass(urlConfigContainer, "qunit-url-config");
+
+  		addEvents(urlConfigContainer.getElementsByTagName("input"), "change", toolbarChanged);
+  		addEvents(urlConfigContainer.getElementsByTagName("select"), "change", toolbarChanged);
+
+  		return urlConfigContainer;
+  	}
+
+  	function abortTestsButton() {
+  		var button = document$$1.createElement("button");
+  		button.id = "qunit-abort-tests-button";
+  		button.innerHTML = "Abort";
+  		addEvent(button, "click", abortTests);
+  		return button;
+  	}
+
+  	function toolbarLooseFilter() {
+  		var filter = document$$1.createElement("form"),
+  		    label = document$$1.createElement("label"),
+  		    input = document$$1.createElement("input"),
+  		    button = document$$1.createElement("button");
+
+  		addClass(filter, "qunit-filter");
+
+  		label.innerHTML = "Filter: ";
+
+  		input.type = "text";
+  		input.value = config.filter || "";
+  		input.name = "filter";
+  		input.id = "qunit-filter-input";
+
+  		button.innerHTML = "Go";
+
+  		label.appendChild(input);
+
+  		filter.appendChild(label);
+  		filter.appendChild(document$$1.createTextNode(" "));
+  		filter.appendChild(button);
+  		addEvent(filter, "submit", interceptNavigation);
+
+  		return filter;
+  	}
+
+  	function moduleListHtml() {
+  		var i,
+  		    checked,
+  		    html = "";
+
+  		for (i = 0; i < config.modules.length; i++) {
+  			if (config.modules[i].name !== "") {
+  				checked = config.moduleId.indexOf(config.modules[i].moduleId) > -1;
+  				html += "<li><label class='clickable" + (checked ? " checked" : "") + "'><input type='checkbox' " + "value='" + config.modules[i].moduleId + "'" + (checked ? " checked='checked'" : "") + " />" + escapeText(config.modules[i].name) + "</label></li>";
+  			}
+  		}
+
+  		return html;
+  	}
+
+  	function toolbarModuleFilter() {
+  		var allCheckbox,
+  		    commit,
+  		    reset,
+  		    moduleFilter = document$$1.createElement("form"),
+  		    label = document$$1.createElement("label"),
+  		    moduleSearch = document$$1.createElement("input"),
+  		    dropDown = document$$1.createElement("div"),
+  		    actions = document$$1.createElement("span"),
+  		    dropDownList = document$$1.createElement("ul"),
+  		    dirty = false;
+
+  		moduleSearch.id = "qunit-modulefilter-search";
+  		addEvent(moduleSearch, "input", searchInput);
+  		addEvent(moduleSearch, "input", searchFocus);
+  		addEvent(moduleSearch, "focus", searchFocus);
+  		addEvent(moduleSearch, "click", searchFocus);
+
+  		label.id = "qunit-modulefilter-search-container";
+  		label.innerHTML = "Module: ";
+  		label.appendChild(moduleSearch);
+
+  		actions.id = "qunit-modulefilter-actions";
+  		actions.innerHTML = "<button style='display:none'>Apply</button>" + "<button type='reset' style='display:none'>Reset</button>" + "<label class='clickable" + (config.moduleId.length ? "" : " checked") + "'><input type='checkbox'" + (config.moduleId.length ? "" : " checked='checked'") + ">All modules</label>";
+  		allCheckbox = actions.lastChild.firstChild;
+  		commit = actions.firstChild;
+  		reset = commit.nextSibling;
+  		addEvent(commit, "click", applyUrlParams);
+
+  		dropDownList.id = "qunit-modulefilter-dropdown-list";
+  		dropDownList.innerHTML = moduleListHtml();
+
+  		dropDown.id = "qunit-modulefilter-dropdown";
+  		dropDown.style.display = "none";
+  		dropDown.appendChild(actions);
+  		dropDown.appendChild(dropDownList);
+  		addEvent(dropDown, "change", selectionChange);
+  		selectionChange();
+
+  		moduleFilter.id = "qunit-modulefilter";
+  		moduleFilter.appendChild(label);
+  		moduleFilter.appendChild(dropDown);
+  		addEvent(moduleFilter, "submit", interceptNavigation);
+  		addEvent(moduleFilter, "reset", function () {
+
+  			// Let the reset happen, then update styles
+  			window.setTimeout(selectionChange);
+  		});
+
+  		// Enables show/hide for the dropdown
+  		function searchFocus() {
+  			if (dropDown.style.display !== "none") {
+  				return;
+  			}
+
+  			dropDown.style.display = "block";
+  			addEvent(document$$1, "click", hideHandler);
+  			addEvent(document$$1, "keydown", hideHandler);
+
+  			// Hide on Escape keydown or outside-container click
+  			function hideHandler(e) {
+  				var inContainer = moduleFilter.contains(e.target);
+
+  				if (e.keyCode === 27 || !inContainer) {
+  					if (e.keyCode === 27 && inContainer) {
+  						moduleSearch.focus();
+  					}
+  					dropDown.style.display = "none";
+  					removeEvent(document$$1, "click", hideHandler);
+  					removeEvent(document$$1, "keydown", hideHandler);
+  					moduleSearch.value = "";
+  					searchInput();
+  				}
+  			}
+  		}
+
+  		// Processes module search box input
+  		function searchInput() {
+  			var i,
+  			    item,
+  			    searchText = moduleSearch.value.toLowerCase(),
+  			    listItems = dropDownList.children;
+
+  			for (i = 0; i < listItems.length; i++) {
+  				item = listItems[i];
+  				if (!searchText || item.textContent.toLowerCase().indexOf(searchText) > -1) {
+  					item.style.display = "";
+  				} else {
+  					item.style.display = "none";
+  				}
+  			}
+  		}
+
+  		// Processes selection changes
+  		function selectionChange(evt) {
+  			var i,
+  			    item,
+  			    checkbox = evt && evt.target || allCheckbox,
+  			    modulesList = dropDownList.getElementsByTagName("input"),
+  			    selectedNames = [];
+
+  			toggleClass(checkbox.parentNode, "checked", checkbox.checked);
+
+  			dirty = false;
+  			if (checkbox.checked && checkbox !== allCheckbox) {
+  				allCheckbox.checked = false;
+  				removeClass(allCheckbox.parentNode, "checked");
+  			}
+  			for (i = 0; i < modulesList.length; i++) {
+  				item = modulesList[i];
+  				if (!evt) {
+  					toggleClass(item.parentNode, "checked", item.checked);
+  				} else if (checkbox === allCheckbox && checkbox.checked) {
+  					item.checked = false;
+  					removeClass(item.parentNode, "checked");
+  				}
+  				dirty = dirty || item.checked !== item.defaultChecked;
+  				if (item.checked) {
+  					selectedNames.push(item.parentNode.textContent);
+  				}
+  			}
+
+  			commit.style.display = reset.style.display = dirty ? "" : "none";
+  			moduleSearch.placeholder = selectedNames.join(", ") || allCheckbox.parentNode.textContent;
+  			moduleSearch.title = "Type to filter list. Current selection:\n" + (selectedNames.join("\n") || allCheckbox.parentNode.textContent);
+  		}
+
+  		return moduleFilter;
+  	}
+
+  	function appendToolbar() {
+  		var toolbar = id("qunit-testrunner-toolbar");
+
+  		if (toolbar) {
+  			toolbar.appendChild(toolbarUrlConfigContainer());
+  			toolbar.appendChild(toolbarModuleFilter());
+  			toolbar.appendChild(toolbarLooseFilter());
+  			toolbar.appendChild(document$$1.createElement("div")).className = "clearfix";
+  		}
+  	}
+
+  	function appendHeader() {
+  		var header = id("qunit-header");
+
+  		if (header) {
+  			header.innerHTML = "<a href='" + escapeText(unfilteredUrl) + "'>" + header.innerHTML + "</a> ";
+  		}
+  	}
+
+  	function appendBanner() {
+  		var banner = id("qunit-banner");
+
+  		if (banner) {
+  			banner.className = "";
+  		}
+  	}
+
+  	function appendTestResults() {
+  		var tests = id("qunit-tests"),
+  		    result = id("qunit-testresult"),
+  		    controls;
+
+  		if (result) {
+  			result.parentNode.removeChild(result);
+  		}
+
+  		if (tests) {
+  			tests.innerHTML = "";
+  			result = document$$1.createElement("p");
+  			result.id = "qunit-testresult";
+  			result.className = "result";
+  			tests.parentNode.insertBefore(result, tests);
+  			result.innerHTML = "<div id=\"qunit-testresult-display\">Running...<br />&#160;</div>" + "<div id=\"qunit-testresult-controls\"></div>" + "<div class=\"clearfix\"></div>";
+  			controls = id("qunit-testresult-controls");
+  		}
+
+  		if (controls) {
+  			controls.appendChild(abortTestsButton());
+  		}
+  	}
+
+  	function appendFilteredTest() {
+  		var testId = QUnit.config.testId;
+  		if (!testId || testId.length <= 0) {
+  			return "";
+  		}
+  		return "<div id='qunit-filteredTest'>Rerunning selected tests: " + escapeText(testId.join(", ")) + " <a id='qunit-clearFilter' href='" + escapeText(unfilteredUrl) + "'>Run all tests</a></div>";
+  	}
+
+  	function appendUserAgent() {
+  		var userAgent = id("qunit-userAgent");
+
+  		if (userAgent) {
+  			userAgent.innerHTML = "";
+  			userAgent.appendChild(document$$1.createTextNode("QUnit " + QUnit.version + "; " + navigator.userAgent));
+  		}
+  	}
+
+  	function appendInterface() {
+  		var qunit = id("qunit");
+
+  		if (qunit) {
+  			qunit.innerHTML = "<h1 id='qunit-header'>" + escapeText(document$$1.title) + "</h1>" + "<h2 id='qunit-banner'></h2>" + "<div id='qunit-testrunner-toolbar'></div>" + appendFilteredTest() + "<h2 id='qunit-userAgent'></h2>" + "<ol id='qunit-tests'></ol>";
+  		}
+
+  		appendHeader();
+  		appendBanner();
+  		appendTestResults();
+  		appendUserAgent();
+  		appendToolbar();
+  	}
+
+  	function appendTestsList(modules) {
+  		var i, l, x, z, test, moduleObj;
+
+  		for (i = 0, l = modules.length; i < l; i++) {
+  			moduleObj = modules[i];
+
+  			for (x = 0, z = moduleObj.tests.length; x < z; x++) {
+  				test = moduleObj.tests[x];
+
+  				appendTest(test.name, test.testId, moduleObj.name);
+  			}
+  		}
+  	}
+
+  	function appendTest(name, testId, moduleName) {
+  		var title,
+  		    rerunTrigger,
+  		    testBlock,
+  		    assertList,
+  		    tests = id("qunit-tests");
+
+  		if (!tests) {
+  			return;
+  		}
+
+  		title = document$$1.createElement("strong");
+  		title.innerHTML = getNameHtml(name, moduleName);
+
+  		rerunTrigger = document$$1.createElement("a");
+  		rerunTrigger.innerHTML = "Rerun";
+  		rerunTrigger.href = setUrl({ testId: testId });
+
+  		testBlock = document$$1.createElement("li");
+  		testBlock.appendChild(title);
+  		testBlock.appendChild(rerunTrigger);
+  		testBlock.id = "qunit-test-output-" + testId;
+
+  		assertList = document$$1.createElement("ol");
+  		assertList.className = "qunit-assert-list";
+
+  		testBlock.appendChild(assertList);
+
+  		tests.appendChild(testBlock);
+  	}
+
+  	// HTML Reporter initialization and load
+  	QUnit.begin(function (details) {
+  		var i, moduleObj, tests;
+
+  		// Sort modules by name for the picker
+  		for (i = 0; i < details.modules.length; i++) {
+  			moduleObj = details.modules[i];
+  			if (moduleObj.name) {
+  				modulesList.push(moduleObj.name);
+  			}
+  		}
+  		modulesList.sort(function (a, b) {
+  			return a.localeCompare(b);
+  		});
+
+  		// Initialize QUnit elements
+  		appendInterface();
+  		appendTestsList(details.modules);
+  		tests = id("qunit-tests");
+  		if (tests && config.hidepassed) {
+  			addClass(tests, "hidepass");
+  		}
+  	});
+
+  	QUnit.done(function (details) {
+  		var banner = id("qunit-banner"),
+  		    tests = id("qunit-tests"),
+  		    abortButton = id("qunit-abort-tests-button"),
+  		    totalTests = stats.passedTests + stats.skippedTests + stats.todoTests + stats.failedTests,
+  		    html = [totalTests, " tests completed in ", details.runtime, " milliseconds, with ", stats.failedTests, " failed, ", stats.skippedTests, " skipped, and ", stats.todoTests, " todo.<br />", "<span class='passed'>", details.passed, "</span> assertions of <span class='total'>", details.total, "</span> passed, <span class='failed'>", details.failed, "</span> failed."].join(""),
+  		    test,
+  		    assertLi,
+  		    assertList;
+
+  		// Update remaing tests to aborted
+  		if (abortButton && abortButton.disabled) {
+  			html = "Tests aborted after " + details.runtime + " milliseconds.";
+
+  			for (var i = 0; i < tests.children.length; i++) {
+  				test = tests.children[i];
+  				if (test.className === "" || test.className === "running") {
+  					test.className = "aborted";
+  					assertList = test.getElementsByTagName("ol")[0];
+  					assertLi = document$$1.createElement("li");
+  					assertLi.className = "fail";
+  					assertLi.innerHTML = "Test aborted.";
+  					assertList.appendChild(assertLi);
+  				}
+  			}
+  		}
+
+  		if (banner && (!abortButton || abortButton.disabled === false)) {
+  			banner.className = stats.failedTests ? "qunit-fail" : "qunit-pass";
+  		}
+
+  		if (abortButton) {
+  			abortButton.parentNode.removeChild(abortButton);
+  		}
+
+  		if (tests) {
+  			id("qunit-testresult-display").innerHTML = html;
+  		}
+
+  		if (config.altertitle && document$$1.title) {
+
+  			// Show ✖ for good, ✔ for bad suite result in title
+  			// use escape sequences in case file gets loaded with non-utf-8
+  			// charset
+  			document$$1.title = [stats.failedTests ? "\u2716" : "\u2714", document$$1.title.replace(/^[\u2714\u2716] /i, "")].join(" ");
+  		}
+
+  		// Scroll back to top to show results
+  		if (config.scrolltop && window.scrollTo) {
+  			window.scrollTo(0, 0);
+  		}
+  	});
+
+  	function getNameHtml(name, module) {
+  		var nameHtml = "";
+
+  		if (module) {
+  			nameHtml = "<span class='module-name'>" + escapeText(module) + "</span>: ";
+  		}
+
+  		nameHtml += "<span class='test-name'>" + escapeText(name) + "</span>";
+
+  		return nameHtml;
+  	}
+
+  	QUnit.testStart(function (details) {
+  		var running, testBlock, bad;
+
+  		testBlock = id("qunit-test-output-" + details.testId);
+  		if (testBlock) {
+  			testBlock.className = "running";
+  		} else {
+
+  			// Report later registered tests
+  			appendTest(details.name, details.testId, details.module);
+  		}
+
+  		running = id("qunit-testresult-display");
+  		if (running) {
+  			bad = QUnit.config.reorder && details.previousFailure;
+
+  			running.innerHTML = [bad ? "Rerunning previously failed test: <br />" : "Running: <br />", getNameHtml(details.name, details.module)].join("");
+  		}
+  	});
+
+  	function stripHtml(string) {
+
+  		// Strip tags, html entity and whitespaces
+  		return string.replace(/<\/?[^>]+(>|$)/g, "").replace(/\&quot;/g, "").replace(/\s+/g, "");
+  	}
+
+  	QUnit.log(function (details) {
+  		var assertList,
+  		    assertLi,
+  		    message,
+  		    expected,
+  		    actual,
+  		    diff,
+  		    showDiff = false,
+  		    testItem = id("qunit-test-output-" + details.testId);
+
+  		if (!testItem) {
+  			return;
+  		}
+
+  		message = escapeText(details.message) || (details.result ? "okay" : "failed");
+  		message = "<span class='test-message'>" + message + "</span>";
+  		message += "<span class='runtime'>@ " + details.runtime + " ms</span>";
+
+  		// The pushFailure doesn't provide details.expected
+  		// when it calls, it's implicit to also not show expected and diff stuff
+  		// Also, we need to check details.expected existence, as it can exist and be undefined
+  		if (!details.result && hasOwn.call(details, "expected")) {
+  			if (details.negative) {
+  				expected = "NOT " + QUnit.dump.parse(details.expected);
+  			} else {
+  				expected = QUnit.dump.parse(details.expected);
+  			}
+
+  			actual = QUnit.dump.parse(details.actual);
+  			message += "<table><tr class='test-expected'><th>Expected: </th><td><pre>" + escapeText(expected) + "</pre></td></tr>";
+
+  			if (actual !== expected) {
+
+  				message += "<tr class='test-actual'><th>Result: </th><td><pre>" + escapeText(actual) + "</pre></td></tr>";
+
+  				if (typeof details.actual === "number" && typeof details.expected === "number") {
+  					if (!isNaN(details.actual) && !isNaN(details.expected)) {
+  						showDiff = true;
+  						diff = details.actual - details.expected;
+  						diff = (diff > 0 ? "+" : "") + diff;
+  					}
+  				} else if (typeof details.actual !== "boolean" && typeof details.expected !== "boolean") {
+  					diff = QUnit.diff(expected, actual);
+
+  					// don't show diff if there is zero overlap
+  					showDiff = stripHtml(diff).length !== stripHtml(expected).length + stripHtml(actual).length;
+  				}
+
+  				if (showDiff) {
+  					message += "<tr class='test-diff'><th>Diff: </th><td><pre>" + diff + "</pre></td></tr>";
+  				}
+  			} else if (expected.indexOf("[object Array]") !== -1 || expected.indexOf("[object Object]") !== -1) {
+  				message += "<tr class='test-message'><th>Message: </th><td>" + "Diff suppressed as the depth of object is more than current max depth (" + QUnit.config.maxDepth + ").<p>Hint: Use <code>QUnit.dump.maxDepth</code> to " + " run with a higher max depth or <a href='" + escapeText(setUrl({ maxDepth: -1 })) + "'>" + "Rerun</a> without max depth.</p></td></tr>";
+  			} else {
+  				message += "<tr class='test-message'><th>Message: </th><td>" + "Diff suppressed as the expected and actual results have an equivalent" + " serialization</td></tr>";
+  			}
+
+  			if (details.source) {
+  				message += "<tr class='test-source'><th>Source: </th><td><pre>" + escapeText(details.source) + "</pre></td></tr>";
+  			}
+
+  			message += "</table>";
+
+  			// This occurs when pushFailure is set and we have an extracted stack trace
+  		} else if (!details.result && details.source) {
+  			message += "<table>" + "<tr class='test-source'><th>Source: </th><td><pre>" + escapeText(details.source) + "</pre></td></tr>" + "</table>";
+  		}
+
+  		assertList = testItem.getElementsByTagName("ol")[0];
+
+  		assertLi = document$$1.createElement("li");
+  		assertLi.className = details.result ? "pass" : "fail";
+  		assertLi.innerHTML = message;
+  		assertList.appendChild(assertLi);
+  	});
+
+  	QUnit.testDone(function (details) {
+  		var testTitle,
+  		    time,
+  		    testItem,
+  		    assertList,
+  		    good,
+  		    bad,
+  		    testCounts,
+  		    skipped,
+  		    sourceName,
+  		    tests = id("qunit-tests");
+
+  		if (!tests) {
+  			return;
+  		}
+
+  		testItem = id("qunit-test-output-" + details.testId);
+
+  		assertList = testItem.getElementsByTagName("ol")[0];
+
+  		good = details.passed;
+  		bad = details.failed;
+
+  		// This test passed if it has no unexpected failed assertions
+  		var testPassed = details.failed > 0 ? details.todo : !details.todo;
+
+  		if (testPassed) {
+
+  			// Collapse the passing tests
+  			addClass(assertList, "qunit-collapsed");
+  		} else if (config.collapse) {
+  			if (!collapseNext) {
+
+  				// Skip collapsing the first failing test
+  				collapseNext = true;
+  			} else {
+
+  				// Collapse remaining tests
+  				addClass(assertList, "qunit-collapsed");
+  			}
+  		}
+
+  		// The testItem.firstChild is the test name
+  		testTitle = testItem.firstChild;
+
+  		testCounts = bad ? "<b class='failed'>" + bad + "</b>, " + "<b class='passed'>" + good + "</b>, " : "";
+
+  		testTitle.innerHTML += " <b class='counts'>(" + testCounts + details.assertions.length + ")</b>";
+
+  		if (details.skipped) {
+  			stats.skippedTests++;
+
+  			testItem.className = "skipped";
+  			skipped = document$$1.createElement("em");
+  			skipped.className = "qunit-skipped-label";
+  			skipped.innerHTML = "skipped";
+  			testItem.insertBefore(skipped, testTitle);
+  		} else {
+  			addEvent(testTitle, "click", function () {
+  				toggleClass(assertList, "qunit-collapsed");
+  			});
+
+  			testItem.className = testPassed ? "pass" : "fail";
+
+  			if (details.todo) {
+  				var todoLabel = document$$1.createElement("em");
+  				todoLabel.className = "qunit-todo-label";
+  				todoLabel.innerHTML = "todo";
+  				testItem.className += " todo";
+  				testItem.insertBefore(todoLabel, testTitle);
+  			}
+
+  			time = document$$1.createElement("span");
+  			time.className = "runtime";
+  			time.innerHTML = details.runtime + " ms";
+  			testItem.insertBefore(time, assertList);
+
+  			if (!testPassed) {
+  				stats.failedTests++;
+  			} else if (details.todo) {
+  				stats.todoTests++;
+  			} else {
+  				stats.passedTests++;
+  			}
+  		}
+
+  		// Show the source of the test when showing assertions
+  		if (details.source) {
+  			sourceName = document$$1.createElement("p");
+  			sourceName.innerHTML = "<strong>Source: </strong>" + details.source;
+  			addClass(sourceName, "qunit-source");
+  			if (testPassed) {
+  				addClass(sourceName, "qunit-collapsed");
+  			}
+  			addEvent(testTitle, "click", function () {
+  				toggleClass(sourceName, "qunit-collapsed");
+  			});
+  			testItem.appendChild(sourceName);
+  		}
+  	});
+
+  	// Avoid readyState issue with phantomjs
+  	// Ref: #818
+  	var notPhantom = function (p) {
+  		return !(p && p.version && p.version.major > 0);
+  	}(window.phantom);
+
+  	if (notPhantom && document$$1.readyState === "complete") {
+  		QUnit.load();
+  	} else {
+  		addEvent(window, "load", QUnit.load);
+  	}
+
+  	// Wrap window.onerror. We will call the original window.onerror to see if
+  	// the existing handler fully handles the error; if not, we will call the
+  	// QUnit.onError function.
+  	var originalWindowOnError = window.onerror;
+
+  	// Cover uncaught exceptions
+  	// Returning true will suppress the default browser handler,
+  	// returning false will let it run.
+  	window.onerror = function (message, fileName, lineNumber) {
+  		var ret = false;
+  		if (originalWindowOnError) {
+  			for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+  				args[_key - 3] = arguments[_key];
+  			}
+
+  			ret = originalWindowOnError.call.apply(originalWindowOnError, [this, message, fileName, lineNumber].concat(args));
+  		}
+
+  		// Treat return value as window.onerror itself does,
+  		// Only do our handling if not suppressed.
+  		if (ret !== true) {
+  			var error = {
+  				message: message,
+  				fileName: fileName,
+  				lineNumber: lineNumber
+  			};
+
+  			ret = QUnit.onError(error);
+  		}
+
+  		return ret;
+  	};
+  })();
+
+  /*
+   * This file is a modified version of google-diff-match-patch's JavaScript implementation
+   * (https://code.google.com/p/google-diff-match-patch/source/browse/trunk/javascript/diff_match_patch_uncompressed.js),
+   * modifications are licensed as more fully set forth in LICENSE.txt.
+   *
+   * The original source of google-diff-match-patch is attributable and licensed as follows:
+   *
+   * Copyright 2006 Google Inc.
+   * https://code.google.com/p/google-diff-match-patch/
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * https://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   *
+   * More Info:
+   *  https://code.google.com/p/google-diff-match-patch/
+   *
+   * Usage: QUnit.diff(expected, actual)
+   *
+   */
+  QUnit.diff = function () {
+  	function DiffMatchPatch() {}
+
+  	//  DIFF FUNCTIONS
+
+  	/**
+    * The data structure representing a diff is an array of tuples:
+    * [[DIFF_DELETE, 'Hello'], [DIFF_INSERT, 'Goodbye'], [DIFF_EQUAL, ' world.']]
+    * which means: delete 'Hello', add 'Goodbye' and keep ' world.'
+    */
+  	var DIFF_DELETE = -1,
+  	    DIFF_INSERT = 1,
+  	    DIFF_EQUAL = 0;
+
+  	/**
+    * Find the differences between two texts.  Simplifies the problem by stripping
+    * any common prefix or suffix off the texts before diffing.
+    * @param {string} text1 Old string to be diffed.
+    * @param {string} text2 New string to be diffed.
+    * @param {boolean=} optChecklines Optional speedup flag. If present and false,
+    *     then don't run a line-level diff first to identify the changed areas.
+    *     Defaults to true, which does a faster, slightly less optimal diff.
+    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
+    */
+  	DiffMatchPatch.prototype.DiffMain = function (text1, text2, optChecklines) {
+  		var deadline, checklines, commonlength, commonprefix, commonsuffix, diffs;
+
+  		// The diff must be complete in up to 1 second.
+  		deadline = new Date().getTime() + 1000;
+
+  		// Check for null inputs.
+  		if (text1 === null || text2 === null) {
+  			throw new Error("Null input. (DiffMain)");
+  		}
+
+  		// Check for equality (speedup).
+  		if (text1 === text2) {
+  			if (text1) {
+  				return [[DIFF_EQUAL, text1]];
+  			}
+  			return [];
+  		}
+
+  		if (typeof optChecklines === "undefined") {
+  			optChecklines = true;
+  		}
+
+  		checklines = optChecklines;
+
+  		// Trim off common prefix (speedup).
+  		commonlength = this.diffCommonPrefix(text1, text2);
+  		commonprefix = text1.substring(0, commonlength);
+  		text1 = text1.substring(commonlength);
+  		text2 = text2.substring(commonlength);
+
+  		// Trim off common suffix (speedup).
+  		commonlength = this.diffCommonSuffix(text1, text2);
+  		commonsuffix = text1.substring(text1.length - commonlength);
+  		text1 = text1.substring(0, text1.length - commonlength);
+  		text2 = text2.substring(0, text2.length - commonlength);
+
+  		// Compute the diff on the middle block.
+  		diffs = this.diffCompute(text1, text2, checklines, deadline);
+
+  		// Restore the prefix and suffix.
+  		if (commonprefix) {
+  			diffs.unshift([DIFF_EQUAL, commonprefix]);
+  		}
+  		if (commonsuffix) {
+  			diffs.push([DIFF_EQUAL, commonsuffix]);
+  		}
+  		this.diffCleanupMerge(diffs);
+  		return diffs;
+  	};
+
+  	/**
+    * Reduce the number of edits by eliminating operationally trivial equalities.
+    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
+    */
+  	DiffMatchPatch.prototype.diffCleanupEfficiency = function (diffs) {
+  		var changes, equalities, equalitiesLength, lastequality, pointer, preIns, preDel, postIns, postDel;
+  		changes = false;
+  		equalities = []; // Stack of indices where equalities are found.
+  		equalitiesLength = 0; // Keeping our own length var is faster in JS.
+  		/** @type {?string} */
+  		lastequality = null;
+
+  		// Always equal to diffs[equalities[equalitiesLength - 1]][1]
+  		pointer = 0; // Index of current position.
+
+  		// Is there an insertion operation before the last equality.
+  		preIns = false;
+
+  		// Is there a deletion operation before the last equality.
+  		preDel = false;
+
+  		// Is there an insertion operation after the last equality.
+  		postIns = false;
+
+  		// Is there a deletion operation after the last equality.
+  		postDel = false;
+  		while (pointer < diffs.length) {
+
+  			// Equality found.
+  			if (diffs[pointer][0] === DIFF_EQUAL) {
+  				if (diffs[pointer][1].length < 4 && (postIns || postDel)) {
+
+  					// Candidate found.
+  					equalities[equalitiesLength++] = pointer;
+  					preIns = postIns;
+  					preDel = postDel;
+  					lastequality = diffs[pointer][1];
+  				} else {
+
+  					// Not a candidate, and can never become one.
+  					equalitiesLength = 0;
+  					lastequality = null;
+  				}
+  				postIns = postDel = false;
+
+  				// An insertion or deletion.
+  			} else {
+
+  				if (diffs[pointer][0] === DIFF_DELETE) {
+  					postDel = true;
+  				} else {
+  					postIns = true;
+  				}
+
+  				/*
+       * Five types to be split:
+       * <ins>A</ins><del>B</del>XY<ins>C</ins><del>D</del>
+       * <ins>A</ins>X<ins>C</ins><del>D</del>
+       * <ins>A</ins><del>B</del>X<ins>C</ins>
+       * <ins>A</del>X<ins>C</ins><del>D</del>
+       * <ins>A</ins><del>B</del>X<del>C</del>
+       */
+  				if (lastequality && (preIns && preDel && postIns && postDel || lastequality.length < 2 && preIns + preDel + postIns + postDel === 3)) {
+
+  					// Duplicate record.
+  					diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]);
+
+  					// Change second copy to insert.
+  					diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
+  					equalitiesLength--; // Throw away the equality we just deleted;
+  					lastequality = null;
+  					if (preIns && preDel) {
+
+  						// No changes made which could affect previous entry, keep going.
+  						postIns = postDel = true;
+  						equalitiesLength = 0;
+  					} else {
+  						equalitiesLength--; // Throw away the previous equality.
+  						pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
+  						postIns = postDel = false;
+  					}
+  					changes = true;
+  				}
+  			}
+  			pointer++;
+  		}
+
+  		if (changes) {
+  			this.diffCleanupMerge(diffs);
+  		}
+  	};
+
+  	/**
+    * Convert a diff array into a pretty HTML report.
+    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
+    * @param {integer} string to be beautified.
+    * @return {string} HTML representation.
+    */
+  	DiffMatchPatch.prototype.diffPrettyHtml = function (diffs) {
+  		var op,
+  		    data,
+  		    x,
+  		    html = [];
+  		for (x = 0; x < diffs.length; x++) {
+  			op = diffs[x][0]; // Operation (insert, delete, equal)
+  			data = diffs[x][1]; // Text of change.
+  			switch (op) {
+  				case DIFF_INSERT:
+  					html[x] = "<ins>" + escapeText(data) + "</ins>";
+  					break;
+  				case DIFF_DELETE:
+  					html[x] = "<del>" + escapeText(data) + "</del>";
+  					break;
+  				case DIFF_EQUAL:
+  					html[x] = "<span>" + escapeText(data) + "</span>";
+  					break;
+  			}
+  		}
+  		return html.join("");
+  	};
+
+  	/**
+    * Determine the common prefix of two strings.
+    * @param {string} text1 First string.
+    * @param {string} text2 Second string.
+    * @return {number} The number of characters common to the start of each
+    *     string.
+    */
+  	DiffMatchPatch.prototype.diffCommonPrefix = function (text1, text2) {
+  		var pointermid, pointermax, pointermin, pointerstart;
+
+  		// Quick check for common null cases.
+  		if (!text1 || !text2 || text1.charAt(0) !== text2.charAt(0)) {
+  			return 0;
+  		}
+
+  		// Binary search.
+  		// Performance analysis: https://neil.fraser.name/news/2007/10/09/
+  		pointermin = 0;
+  		pointermax = Math.min(text1.length, text2.length);
+  		pointermid = pointermax;
+  		pointerstart = 0;
+  		while (pointermin < pointermid) {
+  			if (text1.substring(pointerstart, pointermid) === text2.substring(pointerstart, pointermid)) {
+  				pointermin = pointermid;
+  				pointerstart = pointermin;
+  			} else {
+  				pointermax = pointermid;
+  			}
+  			pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
+  		}
+  		return pointermid;
+  	};
+
+  	/**
+    * Determine the common suffix of two strings.
+    * @param {string} text1 First string.
+    * @param {string} text2 Second string.
+    * @return {number} The number of characters common to the end of each string.
+    */
+  	DiffMatchPatch.prototype.diffCommonSuffix = function (text1, text2) {
+  		var pointermid, pointermax, pointermin, pointerend;
+
+  		// Quick check for common null cases.
+  		if (!text1 || !text2 || text1.charAt(text1.length - 1) !== text2.charAt(text2.length - 1)) {
+  			return 0;
+  		}
+
+  		// Binary search.
+  		// Performance analysis: https://neil.fraser.name/news/2007/10/09/
+  		pointermin = 0;
+  		pointermax = Math.min(text1.length, text2.length);
+  		pointermid = pointermax;
+  		pointerend = 0;
+  		while (pointermin < pointermid) {
+  			if (text1.substring(text1.length - pointermid, text1.length - pointerend) === text2.substring(text2.length - pointermid, text2.length - pointerend)) {
+  				pointermin = pointermid;
+  				pointerend = pointermin;
+  			} else {
+  				pointermax = pointermid;
+  			}
+  			pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
+  		}
+  		return pointermid;
+  	};
+
+  	/**
+    * Find the differences between two texts.  Assumes that the texts do not
+    * have any common prefix or suffix.
+    * @param {string} text1 Old string to be diffed.
+    * @param {string} text2 New string to be diffed.
+    * @param {boolean} checklines Speedup flag.  If false, then don't run a
+    *     line-level diff first to identify the changed areas.
+    *     If true, then run a faster, slightly less optimal diff.
+    * @param {number} deadline Time when the diff should be complete by.
+    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffCompute = function (text1, text2, checklines, deadline) {
+  		var diffs, longtext, shorttext, i, hm, text1A, text2A, text1B, text2B, midCommon, diffsA, diffsB;
+
+  		if (!text1) {
+
+  			// Just add some text (speedup).
+  			return [[DIFF_INSERT, text2]];
+  		}
+
+  		if (!text2) {
+
+  			// Just delete some text (speedup).
+  			return [[DIFF_DELETE, text1]];
+  		}
+
+  		longtext = text1.length > text2.length ? text1 : text2;
+  		shorttext = text1.length > text2.length ? text2 : text1;
+  		i = longtext.indexOf(shorttext);
+  		if (i !== -1) {
+
+  			// Shorter text is inside the longer text (speedup).
+  			diffs = [[DIFF_INSERT, longtext.substring(0, i)], [DIFF_EQUAL, shorttext], [DIFF_INSERT, longtext.substring(i + shorttext.length)]];
+
+  			// Swap insertions for deletions if diff is reversed.
+  			if (text1.length > text2.length) {
+  				diffs[0][0] = diffs[2][0] = DIFF_DELETE;
+  			}
+  			return diffs;
+  		}
+
+  		if (shorttext.length === 1) {
+
+  			// Single character string.
+  			// After the previous speedup, the character can't be an equality.
+  			return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
+  		}
+
+  		// Check to see if the problem can be split in two.
+  		hm = this.diffHalfMatch(text1, text2);
+  		if (hm) {
+
+  			// A half-match was found, sort out the return data.
+  			text1A = hm[0];
+  			text1B = hm[1];
+  			text2A = hm[2];
+  			text2B = hm[3];
+  			midCommon = hm[4];
+
+  			// Send both pairs off for separate processing.
+  			diffsA = this.DiffMain(text1A, text2A, checklines, deadline);
+  			diffsB = this.DiffMain(text1B, text2B, checklines, deadline);
+
+  			// Merge the results.
+  			return diffsA.concat([[DIFF_EQUAL, midCommon]], diffsB);
+  		}
+
+  		if (checklines && text1.length > 100 && text2.length > 100) {
+  			return this.diffLineMode(text1, text2, deadline);
+  		}
+
+  		return this.diffBisect(text1, text2, deadline);
+  	};
+
+  	/**
+    * Do the two texts share a substring which is at least half the length of the
+    * longer text?
+    * This speedup can produce non-minimal diffs.
+    * @param {string} text1 First string.
+    * @param {string} text2 Second string.
+    * @return {Array.<string>} Five element Array, containing the prefix of
+    *     text1, the suffix of text1, the prefix of text2, the suffix of
+    *     text2 and the common middle.  Or null if there was no match.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffHalfMatch = function (text1, text2) {
+  		var longtext, shorttext, dmp, text1A, text2B, text2A, text1B, midCommon, hm1, hm2, hm;
+
+  		longtext = text1.length > text2.length ? text1 : text2;
+  		shorttext = text1.length > text2.length ? text2 : text1;
+  		if (longtext.length < 4 || shorttext.length * 2 < longtext.length) {
+  			return null; // Pointless.
+  		}
+  		dmp = this; // 'this' becomes 'window' in a closure.
+
+  		/**
+     * Does a substring of shorttext exist within longtext such that the substring
+     * is at least half the length of longtext?
+     * Closure, but does not reference any external variables.
+     * @param {string} longtext Longer string.
+     * @param {string} shorttext Shorter string.
+     * @param {number} i Start index of quarter length substring within longtext.
+     * @return {Array.<string>} Five element Array, containing the prefix of
+     *     longtext, the suffix of longtext, the prefix of shorttext, the suffix
+     *     of shorttext and the common middle.  Or null if there was no match.
+     * @private
+     */
+  		function diffHalfMatchI(longtext, shorttext, i) {
+  			var seed, j, bestCommon, prefixLength, suffixLength, bestLongtextA, bestLongtextB, bestShorttextA, bestShorttextB;
+
+  			// Start with a 1/4 length substring at position i as a seed.
+  			seed = longtext.substring(i, i + Math.floor(longtext.length / 4));
+  			j = -1;
+  			bestCommon = "";
+  			while ((j = shorttext.indexOf(seed, j + 1)) !== -1) {
+  				prefixLength = dmp.diffCommonPrefix(longtext.substring(i), shorttext.substring(j));
+  				suffixLength = dmp.diffCommonSuffix(longtext.substring(0, i), shorttext.substring(0, j));
+  				if (bestCommon.length < suffixLength + prefixLength) {
+  					bestCommon = shorttext.substring(j - suffixLength, j) + shorttext.substring(j, j + prefixLength);
+  					bestLongtextA = longtext.substring(0, i - suffixLength);
+  					bestLongtextB = longtext.substring(i + prefixLength);
+  					bestShorttextA = shorttext.substring(0, j - suffixLength);
+  					bestShorttextB = shorttext.substring(j + prefixLength);
+  				}
+  			}
+  			if (bestCommon.length * 2 >= longtext.length) {
+  				return [bestLongtextA, bestLongtextB, bestShorttextA, bestShorttextB, bestCommon];
+  			} else {
+  				return null;
+  			}
+  		}
+
+  		// First check if the second quarter is the seed for a half-match.
+  		hm1 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 4));
+
+  		// Check again based on the third quarter.
+  		hm2 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 2));
+  		if (!hm1 && !hm2) {
+  			return null;
+  		} else if (!hm2) {
+  			hm = hm1;
+  		} else if (!hm1) {
+  			hm = hm2;
+  		} else {
+
+  			// Both matched.  Select the longest.
+  			hm = hm1[4].length > hm2[4].length ? hm1 : hm2;
+  		}
+
+  		// A half-match was found, sort out the return data.
+  		if (text1.length > text2.length) {
+  			text1A = hm[0];
+  			text1B = hm[1];
+  			text2A = hm[2];
+  			text2B = hm[3];
+  		} else {
+  			text2A = hm[0];
+  			text2B = hm[1];
+  			text1A = hm[2];
+  			text1B = hm[3];
+  		}
+  		midCommon = hm[4];
+  		return [text1A, text1B, text2A, text2B, midCommon];
+  	};
+
+  	/**
+    * Do a quick line-level diff on both strings, then rediff the parts for
+    * greater accuracy.
+    * This speedup can produce non-minimal diffs.
+    * @param {string} text1 Old string to be diffed.
+    * @param {string} text2 New string to be diffed.
+    * @param {number} deadline Time when the diff should be complete by.
+    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffLineMode = function (text1, text2, deadline) {
+  		var a, diffs, linearray, pointer, countInsert, countDelete, textInsert, textDelete, j;
+
+  		// Scan the text on a line-by-line basis first.
+  		a = this.diffLinesToChars(text1, text2);
+  		text1 = a.chars1;
+  		text2 = a.chars2;
+  		linearray = a.lineArray;
+
+  		diffs = this.DiffMain(text1, text2, false, deadline);
+
+  		// Convert the diff back to original text.
+  		this.diffCharsToLines(diffs, linearray);
+
+  		// Eliminate freak matches (e.g. blank lines)
+  		this.diffCleanupSemantic(diffs);
+
+  		// Rediff any replacement blocks, this time character-by-character.
+  		// Add a dummy entry at the end.
+  		diffs.push([DIFF_EQUAL, ""]);
+  		pointer = 0;
+  		countDelete = 0;
+  		countInsert = 0;
+  		textDelete = "";
+  		textInsert = "";
+  		while (pointer < diffs.length) {
+  			switch (diffs[pointer][0]) {
+  				case DIFF_INSERT:
+  					countInsert++;
+  					textInsert += diffs[pointer][1];
+  					break;
+  				case DIFF_DELETE:
+  					countDelete++;
+  					textDelete += diffs[pointer][1];
+  					break;
+  				case DIFF_EQUAL:
+
+  					// Upon reaching an equality, check for prior redundancies.
+  					if (countDelete >= 1 && countInsert >= 1) {
+
+  						// Delete the offending records and add the merged ones.
+  						diffs.splice(pointer - countDelete - countInsert, countDelete + countInsert);
+  						pointer = pointer - countDelete - countInsert;
+  						a = this.DiffMain(textDelete, textInsert, false, deadline);
+  						for (j = a.length - 1; j >= 0; j--) {
+  							diffs.splice(pointer, 0, a[j]);
+  						}
+  						pointer = pointer + a.length;
+  					}
+  					countInsert = 0;
+  					countDelete = 0;
+  					textDelete = "";
+  					textInsert = "";
+  					break;
+  			}
+  			pointer++;
+  		}
+  		diffs.pop(); // Remove the dummy entry at the end.
+
+  		return diffs;
+  	};
+
+  	/**
+    * Find the 'middle snake' of a diff, split the problem in two
+    * and return the recursively constructed diff.
+    * See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.
+    * @param {string} text1 Old string to be diffed.
+    * @param {string} text2 New string to be diffed.
+    * @param {number} deadline Time at which to bail if not yet complete.
+    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffBisect = function (text1, text2, deadline) {
+  		var text1Length, text2Length, maxD, vOffset, vLength, v1, v2, x, delta, front, k1start, k1end, k2start, k2end, k2Offset, k1Offset, x1, x2, y1, y2, d, k1, k2;
+
+  		// Cache the text lengths to prevent multiple calls.
+  		text1Length = text1.length;
+  		text2Length = text2.length;
+  		maxD = Math.ceil((text1Length + text2Length) / 2);
+  		vOffset = maxD;
+  		vLength = 2 * maxD;
+  		v1 = new Array(vLength);
+  		v2 = new Array(vLength);
+
+  		// Setting all elements to -1 is faster in Chrome & Firefox than mixing
+  		// integers and undefined.
+  		for (x = 0; x < vLength; x++) {
+  			v1[x] = -1;
+  			v2[x] = -1;
+  		}
+  		v1[vOffset + 1] = 0;
+  		v2[vOffset + 1] = 0;
+  		delta = text1Length - text2Length;
+
+  		// If the total number of characters is odd, then the front path will collide
+  		// with the reverse path.
+  		front = delta % 2 !== 0;
+
+  		// Offsets for start and end of k loop.
+  		// Prevents mapping of space beyond the grid.
+  		k1start = 0;
+  		k1end = 0;
+  		k2start = 0;
+  		k2end = 0;
+  		for (d = 0; d < maxD; d++) {
+
+  			// Bail out if deadline is reached.
+  			if (new Date().getTime() > deadline) {
+  				break;
+  			}
+
+  			// Walk the front path one step.
+  			for (k1 = -d + k1start; k1 <= d - k1end; k1 += 2) {
+  				k1Offset = vOffset + k1;
+  				if (k1 === -d || k1 !== d && v1[k1Offset - 1] < v1[k1Offset + 1]) {
+  					x1 = v1[k1Offset + 1];
+  				} else {
+  					x1 = v1[k1Offset - 1] + 1;
+  				}
+  				y1 = x1 - k1;
+  				while (x1 < text1Length && y1 < text2Length && text1.charAt(x1) === text2.charAt(y1)) {
+  					x1++;
+  					y1++;
+  				}
+  				v1[k1Offset] = x1;
+  				if (x1 > text1Length) {
+
+  					// Ran off the right of the graph.
+  					k1end += 2;
+  				} else if (y1 > text2Length) {
+
+  					// Ran off the bottom of the graph.
+  					k1start += 2;
+  				} else if (front) {
+  					k2Offset = vOffset + delta - k1;
+  					if (k2Offset >= 0 && k2Offset < vLength && v2[k2Offset] !== -1) {
+
+  						// Mirror x2 onto top-left coordinate system.
+  						x2 = text1Length - v2[k2Offset];
+  						if (x1 >= x2) {
+
+  							// Overlap detected.
+  							return this.diffBisectSplit(text1, text2, x1, y1, deadline);
+  						}
+  					}
+  				}
+  			}
+
+  			// Walk the reverse path one step.
+  			for (k2 = -d + k2start; k2 <= d - k2end; k2 += 2) {
+  				k2Offset = vOffset + k2;
+  				if (k2 === -d || k2 !== d && v2[k2Offset - 1] < v2[k2Offset + 1]) {
+  					x2 = v2[k2Offset + 1];
+  				} else {
+  					x2 = v2[k2Offset - 1] + 1;
+  				}
+  				y2 = x2 - k2;
+  				while (x2 < text1Length && y2 < text2Length && text1.charAt(text1Length - x2 - 1) === text2.charAt(text2Length - y2 - 1)) {
+  					x2++;
+  					y2++;
+  				}
+  				v2[k2Offset] = x2;
+  				if (x2 > text1Length) {
+
+  					// Ran off the left of the graph.
+  					k2end += 2;
+  				} else if (y2 > text2Length) {
+
+  					// Ran off the top of the graph.
+  					k2start += 2;
+  				} else if (!front) {
+  					k1Offset = vOffset + delta - k2;
+  					if (k1Offset >= 0 && k1Offset < vLength && v1[k1Offset] !== -1) {
+  						x1 = v1[k1Offset];
+  						y1 = vOffset + x1 - k1Offset;
+
+  						// Mirror x2 onto top-left coordinate system.
+  						x2 = text1Length - x2;
+  						if (x1 >= x2) {
+
+  							// Overlap detected.
+  							return this.diffBisectSplit(text1, text2, x1, y1, deadline);
+  						}
+  					}
+  				}
+  			}
+  		}
+
+  		// Diff took too long and hit the deadline or
+  		// number of diffs equals number of characters, no commonality at all.
+  		return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
+  	};
+
+  	/**
+    * Given the location of the 'middle snake', split the diff in two parts
+    * and recurse.
+    * @param {string} text1 Old string to be diffed.
+    * @param {string} text2 New string to be diffed.
+    * @param {number} x Index of split point in text1.
+    * @param {number} y Index of split point in text2.
+    * @param {number} deadline Time at which to bail if not yet complete.
+    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffBisectSplit = function (text1, text2, x, y, deadline) {
+  		var text1a, text1b, text2a, text2b, diffs, diffsb;
+  		text1a = text1.substring(0, x);
+  		text2a = text2.substring(0, y);
+  		text1b = text1.substring(x);
+  		text2b = text2.substring(y);
+
+  		// Compute both diffs serially.
+  		diffs = this.DiffMain(text1a, text2a, false, deadline);
+  		diffsb = this.DiffMain(text1b, text2b, false, deadline);
+
+  		return diffs.concat(diffsb);
+  	};
+
+  	/**
+    * Reduce the number of edits by eliminating semantically trivial equalities.
+    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
+    */
+  	DiffMatchPatch.prototype.diffCleanupSemantic = function (diffs) {
+  		var changes, equalities, equalitiesLength, lastequality, pointer, lengthInsertions2, lengthDeletions2, lengthInsertions1, lengthDeletions1, deletion, insertion, overlapLength1, overlapLength2;
+  		changes = false;
+  		equalities = []; // Stack of indices where equalities are found.
+  		equalitiesLength = 0; // Keeping our own length var is faster in JS.
+  		/** @type {?string} */
+  		lastequality = null;
+
+  		// Always equal to diffs[equalities[equalitiesLength - 1]][1]
+  		pointer = 0; // Index of current position.
+
+  		// Number of characters that changed prior to the equality.
+  		lengthInsertions1 = 0;
+  		lengthDeletions1 = 0;
+
+  		// Number of characters that changed after the equality.
+  		lengthInsertions2 = 0;
+  		lengthDeletions2 = 0;
+  		while (pointer < diffs.length) {
+  			if (diffs[pointer][0] === DIFF_EQUAL) {
+  				// Equality found.
+  				equalities[equalitiesLength++] = pointer;
+  				lengthInsertions1 = lengthInsertions2;
+  				lengthDeletions1 = lengthDeletions2;
+  				lengthInsertions2 = 0;
+  				lengthDeletions2 = 0;
+  				lastequality = diffs[pointer][1];
+  			} else {
+  				// An insertion or deletion.
+  				if (diffs[pointer][0] === DIFF_INSERT) {
+  					lengthInsertions2 += diffs[pointer][1].length;
+  				} else {
+  					lengthDeletions2 += diffs[pointer][1].length;
+  				}
+
+  				// Eliminate an equality that is smaller or equal to the edits on both
+  				// sides of it.
+  				if (lastequality && lastequality.length <= Math.max(lengthInsertions1, lengthDeletions1) && lastequality.length <= Math.max(lengthInsertions2, lengthDeletions2)) {
+
+  					// Duplicate record.
+  					diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]);
+
+  					// Change second copy to insert.
+  					diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
+
+  					// Throw away the equality we just deleted.
+  					equalitiesLength--;
+
+  					// Throw away the previous equality (it needs to be reevaluated).
+  					equalitiesLength--;
+  					pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
+
+  					// Reset the counters.
+  					lengthInsertions1 = 0;
+  					lengthDeletions1 = 0;
+  					lengthInsertions2 = 0;
+  					lengthDeletions2 = 0;
+  					lastequality = null;
+  					changes = true;
+  				}
+  			}
+  			pointer++;
+  		}
+
+  		// Normalize the diff.
+  		if (changes) {
+  			this.diffCleanupMerge(diffs);
+  		}
+
+  		// Find any overlaps between deletions and insertions.
+  		// e.g: <del>abcxxx</del><ins>xxxdef</ins>
+  		//   -> <del>abc</del>xxx<ins>def</ins>
+  		// e.g: <del>xxxabc</del><ins>defxxx</ins>
+  		//   -> <ins>def</ins>xxx<del>abc</del>
+  		// Only extract an overlap if it is as big as the edit ahead or behind it.
+  		pointer = 1;
+  		while (pointer < diffs.length) {
+  			if (diffs[pointer - 1][0] === DIFF_DELETE && diffs[pointer][0] === DIFF_INSERT) {
+  				deletion = diffs[pointer - 1][1];
+  				insertion = diffs[pointer][1];
+  				overlapLength1 = this.diffCommonOverlap(deletion, insertion);
+  				overlapLength2 = this.diffCommonOverlap(insertion, deletion);
+  				if (overlapLength1 >= overlapLength2) {
+  					if (overlapLength1 >= deletion.length / 2 || overlapLength1 >= insertion.length / 2) {
+
+  						// Overlap found.  Insert an equality and trim the surrounding edits.
+  						diffs.splice(pointer, 0, [DIFF_EQUAL, insertion.substring(0, overlapLength1)]);
+  						diffs[pointer - 1][1] = deletion.substring(0, deletion.length - overlapLength1);
+  						diffs[pointer + 1][1] = insertion.substring(overlapLength1);
+  						pointer++;
+  					}
+  				} else {
+  					if (overlapLength2 >= deletion.length / 2 || overlapLength2 >= insertion.length / 2) {
+
+  						// Reverse overlap found.
+  						// Insert an equality and swap and trim the surrounding edits.
+  						diffs.splice(pointer, 0, [DIFF_EQUAL, deletion.substring(0, overlapLength2)]);
+
+  						diffs[pointer - 1][0] = DIFF_INSERT;
+  						diffs[pointer - 1][1] = insertion.substring(0, insertion.length - overlapLength2);
+  						diffs[pointer + 1][0] = DIFF_DELETE;
+  						diffs[pointer + 1][1] = deletion.substring(overlapLength2);
+  						pointer++;
+  					}
+  				}
+  				pointer++;
+  			}
+  			pointer++;
+  		}
+  	};
+
+  	/**
+    * Determine if the suffix of one string is the prefix of another.
+    * @param {string} text1 First string.
+    * @param {string} text2 Second string.
+    * @return {number} The number of characters common to the end of the first
+    *     string and the start of the second string.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffCommonOverlap = function (text1, text2) {
+  		var text1Length, text2Length, textLength, best, length, pattern, found;
+
+  		// Cache the text lengths to prevent multiple calls.
+  		text1Length = text1.length;
+  		text2Length = text2.length;
+
+  		// Eliminate the null case.
+  		if (text1Length === 0 || text2Length === 0) {
+  			return 0;
+  		}
+
+  		// Truncate the longer string.
+  		if (text1Length > text2Length) {
+  			text1 = text1.substring(text1Length - text2Length);
+  		} else if (text1Length < text2Length) {
+  			text2 = text2.substring(0, text1Length);
+  		}
+  		textLength = Math.min(text1Length, text2Length);
+
+  		// Quick check for the worst case.
+  		if (text1 === text2) {
+  			return textLength;
+  		}
+
+  		// Start by looking for a single character match
+  		// and increase length until no match is found.
+  		// Performance analysis: https://neil.fraser.name/news/2010/11/04/
+  		best = 0;
+  		length = 1;
+  		while (true) {
+  			pattern = text1.substring(textLength - length);
+  			found = text2.indexOf(pattern);
+  			if (found === -1) {
+  				return best;
+  			}
+  			length += found;
+  			if (found === 0 || text1.substring(textLength - length) === text2.substring(0, length)) {
+  				best = length;
+  				length++;
+  			}
+  		}
+  	};
+
+  	/**
+    * Split two texts into an array of strings.  Reduce the texts to a string of
+    * hashes where each Unicode character represents one line.
+    * @param {string} text1 First string.
+    * @param {string} text2 Second string.
+    * @return {{chars1: string, chars2: string, lineArray: !Array.<string>}}
+    *     An object containing the encoded text1, the encoded text2 and
+    *     the array of unique strings.
+    *     The zeroth element of the array of unique strings is intentionally blank.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffLinesToChars = function (text1, text2) {
+  		var lineArray, lineHash, chars1, chars2;
+  		lineArray = []; // E.g. lineArray[4] === 'Hello\n'
+  		lineHash = {}; // E.g. lineHash['Hello\n'] === 4
+
+  		// '\x00' is a valid character, but various debuggers don't like it.
+  		// So we'll insert a junk entry to avoid generating a null character.
+  		lineArray[0] = "";
+
+  		/**
+     * Split a text into an array of strings.  Reduce the texts to a string of
+     * hashes where each Unicode character represents one line.
+     * Modifies linearray and linehash through being a closure.
+     * @param {string} text String to encode.
+     * @return {string} Encoded string.
+     * @private
+     */
+  		function diffLinesToCharsMunge(text) {
+  			var chars, lineStart, lineEnd, lineArrayLength, line;
+  			chars = "";
+
+  			// Walk the text, pulling out a substring for each line.
+  			// text.split('\n') would would temporarily double our memory footprint.
+  			// Modifying text would create many large strings to garbage collect.
+  			lineStart = 0;
+  			lineEnd = -1;
+
+  			// Keeping our own length variable is faster than looking it up.
+  			lineArrayLength = lineArray.length;
+  			while (lineEnd < text.length - 1) {
+  				lineEnd = text.indexOf("\n", lineStart);
+  				if (lineEnd === -1) {
+  					lineEnd = text.length - 1;
+  				}
+  				line = text.substring(lineStart, lineEnd + 1);
+  				lineStart = lineEnd + 1;
+
+  				var lineHashExists = lineHash.hasOwnProperty ? lineHash.hasOwnProperty(line) : lineHash[line] !== undefined;
+
+  				if (lineHashExists) {
+  					chars += String.fromCharCode(lineHash[line]);
+  				} else {
+  					chars += String.fromCharCode(lineArrayLength);
+  					lineHash[line] = lineArrayLength;
+  					lineArray[lineArrayLength++] = line;
+  				}
+  			}
+  			return chars;
+  		}
+
+  		chars1 = diffLinesToCharsMunge(text1);
+  		chars2 = diffLinesToCharsMunge(text2);
+  		return {
+  			chars1: chars1,
+  			chars2: chars2,
+  			lineArray: lineArray
+  		};
+  	};
+
+  	/**
+    * Rehydrate the text in a diff from a string of line hashes to real lines of
+    * text.
+    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
+    * @param {!Array.<string>} lineArray Array of unique strings.
+    * @private
+    */
+  	DiffMatchPatch.prototype.diffCharsToLines = function (diffs, lineArray) {
+  		var x, chars, text, y;
+  		for (x = 0; x < diffs.length; x++) {
+  			chars = diffs[x][1];
+  			text = [];
+  			for (y = 0; y < chars.length; y++) {
+  				text[y] = lineArray[chars.charCodeAt(y)];
+  			}
+  			diffs[x][1] = text.join("");
+  		}
+  	};
+
+  	/**
+    * Reorder and merge like edit sections.  Merge equalities.
+    * Any edit section can move as long as it doesn't cross an equality.
+    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
+    */
+  	DiffMatchPatch.prototype.diffCleanupMerge = function (diffs) {
+  		var pointer, countDelete, countInsert, textInsert, textDelete, commonlength, changes, diffPointer, position;
+  		diffs.push([DIFF_EQUAL, ""]); // Add a dummy entry at the end.
+  		pointer = 0;
+  		countDelete = 0;
+  		countInsert = 0;
+  		textDelete = "";
+  		textInsert = "";
+
+  		while (pointer < diffs.length) {
+  			switch (diffs[pointer][0]) {
+  				case DIFF_INSERT:
+  					countInsert++;
+  					textInsert += diffs[pointer][1];
+  					pointer++;
+  					break;
+  				case DIFF_DELETE:
+  					countDelete++;
+  					textDelete += diffs[pointer][1];
+  					pointer++;
+  					break;
+  				case DIFF_EQUAL:
+
+  					// Upon reaching an equality, check for prior redundancies.
+  					if (countDelete + countInsert > 1) {
+  						if (countDelete !== 0 && countInsert !== 0) {
+
+  							// Factor out any common prefixes.
+  							commonlength = this.diffCommonPrefix(textInsert, textDelete);
+  							if (commonlength !== 0) {
+  								if (pointer - countDelete - countInsert > 0 && diffs[pointer - countDelete - countInsert - 1][0] === DIFF_EQUAL) {
+  									diffs[pointer - countDelete - countInsert - 1][1] += textInsert.substring(0, commonlength);
+  								} else {
+  									diffs.splice(0, 0, [DIFF_EQUAL, textInsert.substring(0, commonlength)]);
+  									pointer++;
+  								}
+  								textInsert = textInsert.substring(commonlength);
+  								textDelete = textDelete.substring(commonlength);
+  							}
+
+  							// Factor out any common suffixies.
+  							commonlength = this.diffCommonSuffix(textInsert, textDelete);
+  							if (commonlength !== 0) {
+  								diffs[pointer][1] = textInsert.substring(textInsert.length - commonlength) + diffs[pointer][1];
+  								textInsert = textInsert.substring(0, textInsert.length - commonlength);
+  								textDelete = textDelete.substring(0, textDelete.length - commonlength);
+  							}
+  						}
+
+  						// Delete the offending records and add the merged ones.
+  						if (countDelete === 0) {
+  							diffs.splice(pointer - countInsert, countDelete + countInsert, [DIFF_INSERT, textInsert]);
+  						} else if (countInsert === 0) {
+  							diffs.splice(pointer - countDelete, countDelete + countInsert, [DIFF_DELETE, textDelete]);
+  						} else {
+  							diffs.splice(pointer - countDelete - countInsert, countDelete + countInsert, [DIFF_DELETE, textDelete], [DIFF_INSERT, textInsert]);
+  						}
+  						pointer = pointer - countDelete - countInsert + (countDelete ? 1 : 0) + (countInsert ? 1 : 0) + 1;
+  					} else if (pointer !== 0 && diffs[pointer - 1][0] === DIFF_EQUAL) {
+
+  						// Merge this equality with the previous one.
+  						diffs[pointer - 1][1] += diffs[pointer][1];
+  						diffs.splice(pointer, 1);
+  					} else {
+  						pointer++;
+  					}
+  					countInsert = 0;
+  					countDelete = 0;
+  					textDelete = "";
+  					textInsert = "";
+  					break;
+  			}
+  		}
+  		if (diffs[diffs.length - 1][1] === "") {
+  			diffs.pop(); // Remove the dummy entry at the end.
+  		}
+
+  		// Second pass: look for single edits surrounded on both sides by equalities
+  		// which can be shifted sideways to eliminate an equality.
+  		// e.g: A<ins>BA</ins>C -> <ins>AB</ins>AC
+  		changes = false;
+  		pointer = 1;
+
+  		// Intentionally ignore the first and last element (don't need checking).
+  		while (pointer < diffs.length - 1) {
+  			if (diffs[pointer - 1][0] === DIFF_EQUAL && diffs[pointer + 1][0] === DIFF_EQUAL) {
+
+  				diffPointer = diffs[pointer][1];
+  				position = diffPointer.substring(diffPointer.length - diffs[pointer - 1][1].length);
+
+  				// This is a single edit surrounded by equalities.
+  				if (position === diffs[pointer - 1][1]) {
+
+  					// Shift the edit over the previous equality.
+  					diffs[pointer][1] = diffs[pointer - 1][1] + diffs[pointer][1].substring(0, diffs[pointer][1].length - diffs[pointer - 1][1].length);
+  					diffs[pointer + 1][1] = diffs[pointer - 1][1] + diffs[pointer + 1][1];
+  					diffs.splice(pointer - 1, 1);
+  					changes = true;
+  				} else if (diffPointer.substring(0, diffs[pointer + 1][1].length) === diffs[pointer + 1][1]) {
+
+  					// Shift the edit over the next equality.
+  					diffs[pointer - 1][1] += diffs[pointer + 1][1];
+  					diffs[pointer][1] = diffs[pointer][1].substring(diffs[pointer + 1][1].length) + diffs[pointer + 1][1];
+  					diffs.splice(pointer + 1, 1);
+  					changes = true;
+  				}
+  			}
+  			pointer++;
+  		}
+
+  		// If shifts were made, the diff needs reordering and another shift sweep.
+  		if (changes) {
+  			this.diffCleanupMerge(diffs);
+  		}
+  	};
+
+  	return function (o, n) {
+  		var diff, output, text;
+  		diff = new DiffMatchPatch();
+  		output = diff.DiffMain(o, n);
+  		diff.diffCleanupEfficiency(output);
+  		text = diff.diffPrettyHtml(output);
+
+  		return text;
+  	};
+  }();
+
+}((function() { return this; }())));
 
 $(function () {
   'use strict'
@@ -53453,5073 +58520,6 @@ $(function () {
     assert.ok(id !== id2, id + ' !== ' + id2)
   })
 })
-
-/*! jQuery v1.9.1 | (c) 2005, 2012 jQuery Foundation, Inc. | jquery.org/license
-//@ sourceMappingURL=jquery.min.map
-*/(function(e,t){var n,r,i=typeof t,o=e.document,a=e.location,s=e.jQuery,u=e.$,l={},c=[],p="1.9.1",f=c.concat,d=c.push,h=c.slice,g=c.indexOf,m=l.toString,y=l.hasOwnProperty,v=p.trim,b=function(e,t){return new b.fn.init(e,t,r)},x=/[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,w=/\S+/g,T=/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,N=/^(?:(<[\w\W]+>)[^>]*|#([\w-]*))$/,C=/^<(\w+)\s*\/?>(?:<\/\1>|)$/,k=/^[\],:{}\s]*$/,E=/(?:^|:|,)(?:\s*\[)+/g,S=/\\(?:["\\\/bfnrt]|u[\da-fA-F]{4})/g,A=/"[^"\\\r\n]*"|true|false|null|-?(?:\d+\.|)\d+(?:[eE][+-]?\d+|)/g,j=/^-ms-/,D=/-([\da-z])/gi,L=function(e,t){return t.toUpperCase()},H=function(e){(o.addEventListener||"load"===e.type||"complete"===o.readyState)&&(q(),b.ready())},q=function(){o.addEventListener?(o.removeEventListener("DOMContentLoaded",H,!1),e.removeEventListener("load",H,!1)):(o.detachEvent("onreadystatechange",H),e.detachEvent("onload",H))};b.fn=b.prototype={jquery:p,constructor:b,init:function(e,n,r){var i,a;if(!e)return this;if("string"==typeof e){if(i="<"===e.charAt(0)&&">"===e.charAt(e.length-1)&&e.length>=3?[null,e,null]:N.exec(e),!i||!i[1]&&n)return!n||n.jquery?(n||r).find(e):this.constructor(n).find(e);if(i[1]){if(n=n instanceof b?n[0]:n,b.merge(this,b.parseHTML(i[1],n&&n.nodeType?n.ownerDocument||n:o,!0)),C.test(i[1])&&b.isPlainObject(n))for(i in n)b.isFunction(this[i])?this[i](n[i]):this.attr(i,n[i]);return this}if(a=o.getElementById(i[2]),a&&a.parentNode){if(a.id!==i[2])return r.find(e);this.length=1,this[0]=a}return this.context=o,this.selector=e,this}return e.nodeType?(this.context=this[0]=e,this.length=1,this):b.isFunction(e)?r.ready(e):(e.selector!==t&&(this.selector=e.selector,this.context=e.context),b.makeArray(e,this))},selector:"",length:0,size:function(){return this.length},toArray:function(){return h.call(this)},get:function(e){return null==e?this.toArray():0>e?this[this.length+e]:this[e]},pushStack:function(e){var t=b.merge(this.constructor(),e);return t.prevObject=this,t.context=this.context,t},each:function(e,t){return b.each(this,e,t)},ready:function(e){return b.ready.promise().done(e),this},slice:function(){return this.pushStack(h.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(e){var t=this.length,n=+e+(0>e?t:0);return this.pushStack(n>=0&&t>n?[this[n]]:[])},map:function(e){return this.pushStack(b.map(this,function(t,n){return e.call(t,n,t)}))},end:function(){return this.prevObject||this.constructor(null)},push:d,sort:[].sort,splice:[].splice},b.fn.init.prototype=b.fn,b.extend=b.fn.extend=function(){var e,n,r,i,o,a,s=arguments[0]||{},u=1,l=arguments.length,c=!1;for("boolean"==typeof s&&(c=s,s=arguments[1]||{},u=2),"object"==typeof s||b.isFunction(s)||(s={}),l===u&&(s=this,--u);l>u;u++)if(null!=(o=arguments[u]))for(i in o)e=s[i],r=o[i],s!==r&&(c&&r&&(b.isPlainObject(r)||(n=b.isArray(r)))?(n?(n=!1,a=e&&b.isArray(e)?e:[]):a=e&&b.isPlainObject(e)?e:{},s[i]=b.extend(c,a,r)):r!==t&&(s[i]=r));return s},b.extend({noConflict:function(t){return e.$===b&&(e.$=u),t&&e.jQuery===b&&(e.jQuery=s),b},isReady:!1,readyWait:1,holdReady:function(e){e?b.readyWait++:b.ready(!0)},ready:function(e){if(e===!0?!--b.readyWait:!b.isReady){if(!o.body)return setTimeout(b.ready);b.isReady=!0,e!==!0&&--b.readyWait>0||(n.resolveWith(o,[b]),b.fn.trigger&&b(o).trigger("ready").off("ready"))}},isFunction:function(e){return"function"===b.type(e)},isArray:Array.isArray||function(e){return"array"===b.type(e)},isWindow:function(e){return null!=e&&e==e.window},isNumeric:function(e){return!isNaN(parseFloat(e))&&isFinite(e)},type:function(e){return null==e?e+"":"object"==typeof e||"function"==typeof e?l[m.call(e)]||"object":typeof e},isPlainObject:function(e){if(!e||"object"!==b.type(e)||e.nodeType||b.isWindow(e))return!1;try{if(e.constructor&&!y.call(e,"constructor")&&!y.call(e.constructor.prototype,"isPrototypeOf"))return!1}catch(n){return!1}var r;for(r in e);return r===t||y.call(e,r)},isEmptyObject:function(e){var t;for(t in e)return!1;return!0},error:function(e){throw Error(e)},parseHTML:function(e,t,n){if(!e||"string"!=typeof e)return null;"boolean"==typeof t&&(n=t,t=!1),t=t||o;var r=C.exec(e),i=!n&&[];return r?[t.createElement(r[1])]:(r=b.buildFragment([e],t,i),i&&b(i).remove(),b.merge([],r.childNodes))},parseJSON:function(n){return e.JSON&&e.JSON.parse?e.JSON.parse(n):null===n?n:"string"==typeof n&&(n=b.trim(n),n&&k.test(n.replace(S,"@").replace(A,"]").replace(E,"")))?Function("return "+n)():(b.error("Invalid JSON: "+n),t)},parseXML:function(n){var r,i;if(!n||"string"!=typeof n)return null;try{e.DOMParser?(i=new DOMParser,r=i.parseFromString(n,"text/xml")):(r=new ActiveXObject("Microsoft.XMLDOM"),r.async="false",r.loadXML(n))}catch(o){r=t}return r&&r.documentElement&&!r.getElementsByTagName("parsererror").length||b.error("Invalid XML: "+n),r},noop:function(){},globalEval:function(t){t&&b.trim(t)&&(e.execScript||function(t){e.eval.call(e,t)})(t)},camelCase:function(e){return e.replace(j,"ms-").replace(D,L)},nodeName:function(e,t){return e.nodeName&&e.nodeName.toLowerCase()===t.toLowerCase()},each:function(e,t,n){var r,i=0,o=e.length,a=M(e);if(n){if(a){for(;o>i;i++)if(r=t.apply(e[i],n),r===!1)break}else for(i in e)if(r=t.apply(e[i],n),r===!1)break}else if(a){for(;o>i;i++)if(r=t.call(e[i],i,e[i]),r===!1)break}else for(i in e)if(r=t.call(e[i],i,e[i]),r===!1)break;return e},trim:v&&!v.call("\ufeff\u00a0")?function(e){return null==e?"":v.call(e)}:function(e){return null==e?"":(e+"").replace(T,"")},makeArray:function(e,t){var n=t||[];return null!=e&&(M(Object(e))?b.merge(n,"string"==typeof e?[e]:e):d.call(n,e)),n},inArray:function(e,t,n){var r;if(t){if(g)return g.call(t,e,n);for(r=t.length,n=n?0>n?Math.max(0,r+n):n:0;r>n;n++)if(n in t&&t[n]===e)return n}return-1},merge:function(e,n){var r=n.length,i=e.length,o=0;if("number"==typeof r)for(;r>o;o++)e[i++]=n[o];else while(n[o]!==t)e[i++]=n[o++];return e.length=i,e},grep:function(e,t,n){var r,i=[],o=0,a=e.length;for(n=!!n;a>o;o++)r=!!t(e[o],o),n!==r&&i.push(e[o]);return i},map:function(e,t,n){var r,i=0,o=e.length,a=M(e),s=[];if(a)for(;o>i;i++)r=t(e[i],i,n),null!=r&&(s[s.length]=r);else for(i in e)r=t(e[i],i,n),null!=r&&(s[s.length]=r);return f.apply([],s)},guid:1,proxy:function(e,n){var r,i,o;return"string"==typeof n&&(o=e[n],n=e,e=o),b.isFunction(e)?(r=h.call(arguments,2),i=function(){return e.apply(n||this,r.concat(h.call(arguments)))},i.guid=e.guid=e.guid||b.guid++,i):t},access:function(e,n,r,i,o,a,s){var u=0,l=e.length,c=null==r;if("object"===b.type(r)){o=!0;for(u in r)b.access(e,n,u,r[u],!0,a,s)}else if(i!==t&&(o=!0,b.isFunction(i)||(s=!0),c&&(s?(n.call(e,i),n=null):(c=n,n=function(e,t,n){return c.call(b(e),n)})),n))for(;l>u;u++)n(e[u],r,s?i:i.call(e[u],u,n(e[u],r)));return o?e:c?n.call(e):l?n(e[0],r):a},now:function(){return(new Date).getTime()}}),b.ready.promise=function(t){if(!n)if(n=b.Deferred(),"complete"===o.readyState)setTimeout(b.ready);else if(o.addEventListener)o.addEventListener("DOMContentLoaded",H,!1),e.addEventListener("load",H,!1);else{o.attachEvent("onreadystatechange",H),e.attachEvent("onload",H);var r=!1;try{r=null==e.frameElement&&o.documentElement}catch(i){}r&&r.doScroll&&function a(){if(!b.isReady){try{r.doScroll("left")}catch(e){return setTimeout(a,50)}q(),b.ready()}}()}return n.promise(t)},b.each("Boolean Number String Function Array Date RegExp Object Error".split(" "),function(e,t){l["[object "+t+"]"]=t.toLowerCase()});function M(e){var t=e.length,n=b.type(e);return b.isWindow(e)?!1:1===e.nodeType&&t?!0:"array"===n||"function"!==n&&(0===t||"number"==typeof t&&t>0&&t-1 in e)}r=b(o);var _={};function F(e){var t=_[e]={};return b.each(e.match(w)||[],function(e,n){t[n]=!0}),t}b.Callbacks=function(e){e="string"==typeof e?_[e]||F(e):b.extend({},e);var n,r,i,o,a,s,u=[],l=!e.once&&[],c=function(t){for(r=e.memory&&t,i=!0,a=s||0,s=0,o=u.length,n=!0;u&&o>a;a++)if(u[a].apply(t[0],t[1])===!1&&e.stopOnFalse){r=!1;break}n=!1,u&&(l?l.length&&c(l.shift()):r?u=[]:p.disable())},p={add:function(){if(u){var t=u.length;(function i(t){b.each(t,function(t,n){var r=b.type(n);"function"===r?e.unique&&p.has(n)||u.push(n):n&&n.length&&"string"!==r&&i(n)})})(arguments),n?o=u.length:r&&(s=t,c(r))}return this},remove:function(){return u&&b.each(arguments,function(e,t){var r;while((r=b.inArray(t,u,r))>-1)u.splice(r,1),n&&(o>=r&&o--,a>=r&&a--)}),this},has:function(e){return e?b.inArray(e,u)>-1:!(!u||!u.length)},empty:function(){return u=[],this},disable:function(){return u=l=r=t,this},disabled:function(){return!u},lock:function(){return l=t,r||p.disable(),this},locked:function(){return!l},fireWith:function(e,t){return t=t||[],t=[e,t.slice?t.slice():t],!u||i&&!l||(n?l.push(t):c(t)),this},fire:function(){return p.fireWith(this,arguments),this},fired:function(){return!!i}};return p},b.extend({Deferred:function(e){var t=[["resolve","done",b.Callbacks("once memory"),"resolved"],["reject","fail",b.Callbacks("once memory"),"rejected"],["notify","progress",b.Callbacks("memory")]],n="pending",r={state:function(){return n},always:function(){return i.done(arguments).fail(arguments),this},then:function(){var e=arguments;return b.Deferred(function(n){b.each(t,function(t,o){var a=o[0],s=b.isFunction(e[t])&&e[t];i[o[1]](function(){var e=s&&s.apply(this,arguments);e&&b.isFunction(e.promise)?e.promise().done(n.resolve).fail(n.reject).progress(n.notify):n[a+"With"](this===r?n.promise():this,s?[e]:arguments)})}),e=null}).promise()},promise:function(e){return null!=e?b.extend(e,r):r}},i={};return r.pipe=r.then,b.each(t,function(e,o){var a=o[2],s=o[3];r[o[1]]=a.add,s&&a.add(function(){n=s},t[1^e][2].disable,t[2][2].lock),i[o[0]]=function(){return i[o[0]+"With"](this===i?r:this,arguments),this},i[o[0]+"With"]=a.fireWith}),r.promise(i),e&&e.call(i,i),i},when:function(e){var t=0,n=h.call(arguments),r=n.length,i=1!==r||e&&b.isFunction(e.promise)?r:0,o=1===i?e:b.Deferred(),a=function(e,t,n){return function(r){t[e]=this,n[e]=arguments.length>1?h.call(arguments):r,n===s?o.notifyWith(t,n):--i||o.resolveWith(t,n)}},s,u,l;if(r>1)for(s=Array(r),u=Array(r),l=Array(r);r>t;t++)n[t]&&b.isFunction(n[t].promise)?n[t].promise().done(a(t,l,n)).fail(o.reject).progress(a(t,u,s)):--i;return i||o.resolveWith(l,n),o.promise()}}),b.support=function(){var t,n,r,a,s,u,l,c,p,f,d=o.createElement("div");if(d.setAttribute("className","t"),d.innerHTML="  <link/><table></table><a href='/a'>a</a><input type='checkbox'/>",n=d.getElementsByTagName("*"),r=d.getElementsByTagName("a")[0],!n||!r||!n.length)return{};s=o.createElement("select"),l=s.appendChild(o.createElement("option")),a=d.getElementsByTagName("input")[0],r.style.cssText="top:1px;float:left;opacity:.5",t={getSetAttribute:"t"!==d.className,leadingWhitespace:3===d.firstChild.nodeType,tbody:!d.getElementsByTagName("tbody").length,htmlSerialize:!!d.getElementsByTagName("link").length,style:/top/.test(r.getAttribute("style")),hrefNormalized:"/a"===r.getAttribute("href"),opacity:/^0.5/.test(r.style.opacity),cssFloat:!!r.style.cssFloat,checkOn:!!a.value,optSelected:l.selected,enctype:!!o.createElement("form").enctype,html5Clone:"<:nav></:nav>"!==o.createElement("nav").cloneNode(!0).outerHTML,boxModel:"CSS1Compat"===o.compatMode,deleteExpando:!0,noCloneEvent:!0,inlineBlockNeedsLayout:!1,shrinkWrapBlocks:!1,reliableMarginRight:!0,boxSizingReliable:!0,pixelPosition:!1},a.checked=!0,t.noCloneChecked=a.cloneNode(!0).checked,s.disabled=!0,t.optDisabled=!l.disabled;try{delete d.test}catch(h){t.deleteExpando=!1}a=o.createElement("input"),a.setAttribute("value",""),t.input=""===a.getAttribute("value"),a.value="t",a.setAttribute("type","radio"),t.radioValue="t"===a.value,a.setAttribute("checked","t"),a.setAttribute("name","t"),u=o.createDocumentFragment(),u.appendChild(a),t.appendChecked=a.checked,t.checkClone=u.cloneNode(!0).cloneNode(!0).lastChild.checked,d.attachEvent&&(d.attachEvent("onclick",function(){t.noCloneEvent=!1}),d.cloneNode(!0).click());for(f in{submit:!0,change:!0,focusin:!0})d.setAttribute(c="on"+f,"t"),t[f+"Bubbles"]=c in e||d.attributes[c].expando===!1;return d.style.backgroundClip="content-box",d.cloneNode(!0).style.backgroundClip="",t.clearCloneStyle="content-box"===d.style.backgroundClip,b(function(){var n,r,a,s="padding:0;margin:0;border:0;display:block;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;",u=o.getElementsByTagName("body")[0];u&&(n=o.createElement("div"),n.style.cssText="border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px",u.appendChild(n).appendChild(d),d.innerHTML="<table><tr><td></td><td>t</td></tr></table>",a=d.getElementsByTagName("td"),a[0].style.cssText="padding:0;margin:0;border:0;display:none",p=0===a[0].offsetHeight,a[0].style.display="",a[1].style.display="none",t.reliableHiddenOffsets=p&&0===a[0].offsetHeight,d.innerHTML="",d.style.cssText="box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;position:absolute;top:1%;",t.boxSizing=4===d.offsetWidth,t.doesNotIncludeMarginInBodyOffset=1!==u.offsetTop,e.getComputedStyle&&(t.pixelPosition="1%"!==(e.getComputedStyle(d,null)||{}).top,t.boxSizingReliable="4px"===(e.getComputedStyle(d,null)||{width:"4px"}).width,r=d.appendChild(o.createElement("div")),r.style.cssText=d.style.cssText=s,r.style.marginRight=r.style.width="0",d.style.width="1px",t.reliableMarginRight=!parseFloat((e.getComputedStyle(r,null)||{}).marginRight)),typeof d.style.zoom!==i&&(d.innerHTML="",d.style.cssText=s+"width:1px;padding:1px;display:inline;zoom:1",t.inlineBlockNeedsLayout=3===d.offsetWidth,d.style.display="block",d.innerHTML="<div></div>",d.firstChild.style.width="5px",t.shrinkWrapBlocks=3!==d.offsetWidth,t.inlineBlockNeedsLayout&&(u.style.zoom=1)),u.removeChild(n),n=d=a=r=null)}),n=s=u=l=r=a=null,t}();var O=/(?:\{[\s\S]*\}|\[[\s\S]*\])$/,B=/([A-Z])/g;function P(e,n,r,i){if(b.acceptData(e)){var o,a,s=b.expando,u="string"==typeof n,l=e.nodeType,p=l?b.cache:e,f=l?e[s]:e[s]&&s;if(f&&p[f]&&(i||p[f].data)||!u||r!==t)return f||(l?e[s]=f=c.pop()||b.guid++:f=s),p[f]||(p[f]={},l||(p[f].toJSON=b.noop)),("object"==typeof n||"function"==typeof n)&&(i?p[f]=b.extend(p[f],n):p[f].data=b.extend(p[f].data,n)),o=p[f],i||(o.data||(o.data={}),o=o.data),r!==t&&(o[b.camelCase(n)]=r),u?(a=o[n],null==a&&(a=o[b.camelCase(n)])):a=o,a}}function R(e,t,n){if(b.acceptData(e)){var r,i,o,a=e.nodeType,s=a?b.cache:e,u=a?e[b.expando]:b.expando;if(s[u]){if(t&&(o=n?s[u]:s[u].data)){b.isArray(t)?t=t.concat(b.map(t,b.camelCase)):t in o?t=[t]:(t=b.camelCase(t),t=t in o?[t]:t.split(" "));for(r=0,i=t.length;i>r;r++)delete o[t[r]];if(!(n?$:b.isEmptyObject)(o))return}(n||(delete s[u].data,$(s[u])))&&(a?b.cleanData([e],!0):b.support.deleteExpando||s!=s.window?delete s[u]:s[u]=null)}}}b.extend({cache:{},expando:"jQuery"+(p+Math.random()).replace(/\D/g,""),noData:{embed:!0,object:"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000",applet:!0},hasData:function(e){return e=e.nodeType?b.cache[e[b.expando]]:e[b.expando],!!e&&!$(e)},data:function(e,t,n){return P(e,t,n)},removeData:function(e,t){return R(e,t)},_data:function(e,t,n){return P(e,t,n,!0)},_removeData:function(e,t){return R(e,t,!0)},acceptData:function(e){if(e.nodeType&&1!==e.nodeType&&9!==e.nodeType)return!1;var t=e.nodeName&&b.noData[e.nodeName.toLowerCase()];return!t||t!==!0&&e.getAttribute("classid")===t}}),b.fn.extend({data:function(e,n){var r,i,o=this[0],a=0,s=null;if(e===t){if(this.length&&(s=b.data(o),1===o.nodeType&&!b._data(o,"parsedAttrs"))){for(r=o.attributes;r.length>a;a++)i=r[a].name,i.indexOf("data-")||(i=b.camelCase(i.slice(5)),W(o,i,s[i]));b._data(o,"parsedAttrs",!0)}return s}return"object"==typeof e?this.each(function(){b.data(this,e)}):b.access(this,function(n){return n===t?o?W(o,e,b.data(o,e)):null:(this.each(function(){b.data(this,e,n)}),t)},null,n,arguments.length>1,null,!0)},removeData:function(e){return this.each(function(){b.removeData(this,e)})}});function W(e,n,r){if(r===t&&1===e.nodeType){var i="data-"+n.replace(B,"-$1").toLowerCase();if(r=e.getAttribute(i),"string"==typeof r){try{r="true"===r?!0:"false"===r?!1:"null"===r?null:+r+""===r?+r:O.test(r)?b.parseJSON(r):r}catch(o){}b.data(e,n,r)}else r=t}return r}function $(e){var t;for(t in e)if(("data"!==t||!b.isEmptyObject(e[t]))&&"toJSON"!==t)return!1;return!0}b.extend({queue:function(e,n,r){var i;return e?(n=(n||"fx")+"queue",i=b._data(e,n),r&&(!i||b.isArray(r)?i=b._data(e,n,b.makeArray(r)):i.push(r)),i||[]):t},dequeue:function(e,t){t=t||"fx";var n=b.queue(e,t),r=n.length,i=n.shift(),o=b._queueHooks(e,t),a=function(){b.dequeue(e,t)};"inprogress"===i&&(i=n.shift(),r--),o.cur=i,i&&("fx"===t&&n.unshift("inprogress"),delete o.stop,i.call(e,a,o)),!r&&o&&o.empty.fire()},_queueHooks:function(e,t){var n=t+"queueHooks";return b._data(e,n)||b._data(e,n,{empty:b.Callbacks("once memory").add(function(){b._removeData(e,t+"queue"),b._removeData(e,n)})})}}),b.fn.extend({queue:function(e,n){var r=2;return"string"!=typeof e&&(n=e,e="fx",r--),r>arguments.length?b.queue(this[0],e):n===t?this:this.each(function(){var t=b.queue(this,e,n);b._queueHooks(this,e),"fx"===e&&"inprogress"!==t[0]&&b.dequeue(this,e)})},dequeue:function(e){return this.each(function(){b.dequeue(this,e)})},delay:function(e,t){return e=b.fx?b.fx.speeds[e]||e:e,t=t||"fx",this.queue(t,function(t,n){var r=setTimeout(t,e);n.stop=function(){clearTimeout(r)}})},clearQueue:function(e){return this.queue(e||"fx",[])},promise:function(e,n){var r,i=1,o=b.Deferred(),a=this,s=this.length,u=function(){--i||o.resolveWith(a,[a])};"string"!=typeof e&&(n=e,e=t),e=e||"fx";while(s--)r=b._data(a[s],e+"queueHooks"),r&&r.empty&&(i++,r.empty.add(u));return u(),o.promise(n)}});var I,z,X=/[\t\r\n]/g,U=/\r/g,V=/^(?:input|select|textarea|button|object)$/i,Y=/^(?:a|area)$/i,J=/^(?:checked|selected|autofocus|autoplay|async|controls|defer|disabled|hidden|loop|multiple|open|readonly|required|scoped)$/i,G=/^(?:checked|selected)$/i,Q=b.support.getSetAttribute,K=b.support.input;b.fn.extend({attr:function(e,t){return b.access(this,b.attr,e,t,arguments.length>1)},removeAttr:function(e){return this.each(function(){b.removeAttr(this,e)})},prop:function(e,t){return b.access(this,b.prop,e,t,arguments.length>1)},removeProp:function(e){return e=b.propFix[e]||e,this.each(function(){try{this[e]=t,delete this[e]}catch(n){}})},addClass:function(e){var t,n,r,i,o,a=0,s=this.length,u="string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).addClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):" ")){o=0;while(i=t[o++])0>r.indexOf(" "+i+" ")&&(r+=i+" ");n.className=b.trim(r)}return this},removeClass:function(e){var t,n,r,i,o,a=0,s=this.length,u=0===arguments.length||"string"==typeof e&&e;if(b.isFunction(e))return this.each(function(t){b(this).removeClass(e.call(this,t,this.className))});if(u)for(t=(e||"").match(w)||[];s>a;a++)if(n=this[a],r=1===n.nodeType&&(n.className?(" "+n.className+" ").replace(X," "):"")){o=0;while(i=t[o++])while(r.indexOf(" "+i+" ")>=0)r=r.replace(" "+i+" "," ");n.className=e?b.trim(r):""}return this},toggleClass:function(e,t){var n=typeof e,r="boolean"==typeof t;return b.isFunction(e)?this.each(function(n){b(this).toggleClass(e.call(this,n,this.className,t),t)}):this.each(function(){if("string"===n){var o,a=0,s=b(this),u=t,l=e.match(w)||[];while(o=l[a++])u=r?u:!s.hasClass(o),s[u?"addClass":"removeClass"](o)}else(n===i||"boolean"===n)&&(this.className&&b._data(this,"__className__",this.className),this.className=this.className||e===!1?"":b._data(this,"__className__")||"")})},hasClass:function(e){var t=" "+e+" ",n=0,r=this.length;for(;r>n;n++)if(1===this[n].nodeType&&(" "+this[n].className+" ").replace(X," ").indexOf(t)>=0)return!0;return!1},val:function(e){var n,r,i,o=this[0];{if(arguments.length)return i=b.isFunction(e),this.each(function(n){var o,a=b(this);1===this.nodeType&&(o=i?e.call(this,n,a.val()):e,null==o?o="":"number"==typeof o?o+="":b.isArray(o)&&(o=b.map(o,function(e){return null==e?"":e+""})),r=b.valHooks[this.type]||b.valHooks[this.nodeName.toLowerCase()],r&&"set"in r&&r.set(this,o,"value")!==t||(this.value=o))});if(o)return r=b.valHooks[o.type]||b.valHooks[o.nodeName.toLowerCase()],r&&"get"in r&&(n=r.get(o,"value"))!==t?n:(n=o.value,"string"==typeof n?n.replace(U,""):null==n?"":n)}}}),b.extend({valHooks:{option:{get:function(e){var t=e.attributes.value;return!t||t.specified?e.value:e.text}},select:{get:function(e){var t,n,r=e.options,i=e.selectedIndex,o="select-one"===e.type||0>i,a=o?null:[],s=o?i+1:r.length,u=0>i?s:o?i:0;for(;s>u;u++)if(n=r[u],!(!n.selected&&u!==i||(b.support.optDisabled?n.disabled:null!==n.getAttribute("disabled"))||n.parentNode.disabled&&b.nodeName(n.parentNode,"optgroup"))){if(t=b(n).val(),o)return t;a.push(t)}return a},set:function(e,t){var n=b.makeArray(t);return b(e).find("option").each(function(){this.selected=b.inArray(b(this).val(),n)>=0}),n.length||(e.selectedIndex=-1),n}}},attr:function(e,n,r){var o,a,s,u=e.nodeType;if(e&&3!==u&&8!==u&&2!==u)return typeof e.getAttribute===i?b.prop(e,n,r):(a=1!==u||!b.isXMLDoc(e),a&&(n=n.toLowerCase(),o=b.attrHooks[n]||(J.test(n)?z:I)),r===t?o&&a&&"get"in o&&null!==(s=o.get(e,n))?s:(typeof e.getAttribute!==i&&(s=e.getAttribute(n)),null==s?t:s):null!==r?o&&a&&"set"in o&&(s=o.set(e,r,n))!==t?s:(e.setAttribute(n,r+""),r):(b.removeAttr(e,n),t))},removeAttr:function(e,t){var n,r,i=0,o=t&&t.match(w);if(o&&1===e.nodeType)while(n=o[i++])r=b.propFix[n]||n,J.test(n)?!Q&&G.test(n)?e[b.camelCase("default-"+n)]=e[r]=!1:e[r]=!1:b.attr(e,n,""),e.removeAttribute(Q?n:r)},attrHooks:{type:{set:function(e,t){if(!b.support.radioValue&&"radio"===t&&b.nodeName(e,"input")){var n=e.value;return e.setAttribute("type",t),n&&(e.value=n),t}}}},propFix:{tabindex:"tabIndex",readonly:"readOnly","for":"htmlFor","class":"className",maxlength:"maxLength",cellspacing:"cellSpacing",cellpadding:"cellPadding",rowspan:"rowSpan",colspan:"colSpan",usemap:"useMap",frameborder:"frameBorder",contenteditable:"contentEditable"},prop:function(e,n,r){var i,o,a,s=e.nodeType;if(e&&3!==s&&8!==s&&2!==s)return a=1!==s||!b.isXMLDoc(e),a&&(n=b.propFix[n]||n,o=b.propHooks[n]),r!==t?o&&"set"in o&&(i=o.set(e,r,n))!==t?i:e[n]=r:o&&"get"in o&&null!==(i=o.get(e,n))?i:e[n]},propHooks:{tabIndex:{get:function(e){var n=e.getAttributeNode("tabindex");return n&&n.specified?parseInt(n.value,10):V.test(e.nodeName)||Y.test(e.nodeName)&&e.href?0:t}}}}),z={get:function(e,n){var r=b.prop(e,n),i="boolean"==typeof r&&e.getAttribute(n),o="boolean"==typeof r?K&&Q?null!=i:G.test(n)?e[b.camelCase("default-"+n)]:!!i:e.getAttributeNode(n);return o&&o.value!==!1?n.toLowerCase():t},set:function(e,t,n){return t===!1?b.removeAttr(e,n):K&&Q||!G.test(n)?e.setAttribute(!Q&&b.propFix[n]||n,n):e[b.camelCase("default-"+n)]=e[n]=!0,n}},K&&Q||(b.attrHooks.value={get:function(e,n){var r=e.getAttributeNode(n);return b.nodeName(e,"input")?e.defaultValue:r&&r.specified?r.value:t},set:function(e,n,r){return b.nodeName(e,"input")?(e.defaultValue=n,t):I&&I.set(e,n,r)}}),Q||(I=b.valHooks.button={get:function(e,n){var r=e.getAttributeNode(n);return r&&("id"===n||"name"===n||"coords"===n?""!==r.value:r.specified)?r.value:t},set:function(e,n,r){var i=e.getAttributeNode(r);return i||e.setAttributeNode(i=e.ownerDocument.createAttribute(r)),i.value=n+="","value"===r||n===e.getAttribute(r)?n:t}},b.attrHooks.contenteditable={get:I.get,set:function(e,t,n){I.set(e,""===t?!1:t,n)}},b.each(["width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{set:function(e,r){return""===r?(e.setAttribute(n,"auto"),r):t}})})),b.support.hrefNormalized||(b.each(["href","src","width","height"],function(e,n){b.attrHooks[n]=b.extend(b.attrHooks[n],{get:function(e){var r=e.getAttribute(n,2);return null==r?t:r}})}),b.each(["href","src"],function(e,t){b.propHooks[t]={get:function(e){return e.getAttribute(t,4)}}})),b.support.style||(b.attrHooks.style={get:function(e){return e.style.cssText||t},set:function(e,t){return e.style.cssText=t+""}}),b.support.optSelected||(b.propHooks.selected=b.extend(b.propHooks.selected,{get:function(e){var t=e.parentNode;return t&&(t.selectedIndex,t.parentNode&&t.parentNode.selectedIndex),null}})),b.support.enctype||(b.propFix.enctype="encoding"),b.support.checkOn||b.each(["radio","checkbox"],function(){b.valHooks[this]={get:function(e){return null===e.getAttribute("value")?"on":e.value}}}),b.each(["radio","checkbox"],function(){b.valHooks[this]=b.extend(b.valHooks[this],{set:function(e,n){return b.isArray(n)?e.checked=b.inArray(b(e).val(),n)>=0:t}})});var Z=/^(?:input|select|textarea)$/i,et=/^key/,tt=/^(?:mouse|contextmenu)|click/,nt=/^(?:focusinfocus|focusoutblur)$/,rt=/^([^.]*)(?:\.(.+)|)$/;function it(){return!0}function ot(){return!1}b.event={global:{},add:function(e,n,r,o,a){var s,u,l,c,p,f,d,h,g,m,y,v=b._data(e);if(v){r.handler&&(c=r,r=c.handler,a=c.selector),r.guid||(r.guid=b.guid++),(u=v.events)||(u=v.events={}),(f=v.handle)||(f=v.handle=function(e){return typeof b===i||e&&b.event.triggered===e.type?t:b.event.dispatch.apply(f.elem,arguments)},f.elem=e),n=(n||"").match(w)||[""],l=n.length;while(l--)s=rt.exec(n[l])||[],g=y=s[1],m=(s[2]||"").split(".").sort(),p=b.event.special[g]||{},g=(a?p.delegateType:p.bindType)||g,p=b.event.special[g]||{},d=b.extend({type:g,origType:y,data:o,handler:r,guid:r.guid,selector:a,needsContext:a&&b.expr.match.needsContext.test(a),namespace:m.join(".")},c),(h=u[g])||(h=u[g]=[],h.delegateCount=0,p.setup&&p.setup.call(e,o,m,f)!==!1||(e.addEventListener?e.addEventListener(g,f,!1):e.attachEvent&&e.attachEvent("on"+g,f))),p.add&&(p.add.call(e,d),d.handler.guid||(d.handler.guid=r.guid)),a?h.splice(h.delegateCount++,0,d):h.push(d),b.event.global[g]=!0;e=null}},remove:function(e,t,n,r,i){var o,a,s,u,l,c,p,f,d,h,g,m=b.hasData(e)&&b._data(e);if(m&&(c=m.events)){t=(t||"").match(w)||[""],l=t.length;while(l--)if(s=rt.exec(t[l])||[],d=g=s[1],h=(s[2]||"").split(".").sort(),d){p=b.event.special[d]||{},d=(r?p.delegateType:p.bindType)||d,f=c[d]||[],s=s[2]&&RegExp("(^|\\.)"+h.join("\\.(?:.*\\.|)")+"(\\.|$)"),u=o=f.length;while(o--)a=f[o],!i&&g!==a.origType||n&&n.guid!==a.guid||s&&!s.test(a.namespace)||r&&r!==a.selector&&("**"!==r||!a.selector)||(f.splice(o,1),a.selector&&f.delegateCount--,p.remove&&p.remove.call(e,a));u&&!f.length&&(p.teardown&&p.teardown.call(e,h,m.handle)!==!1||b.removeEvent(e,d,m.handle),delete c[d])}else for(d in c)b.event.remove(e,d+t[l],n,r,!0);b.isEmptyObject(c)&&(delete m.handle,b._removeData(e,"events"))}},trigger:function(n,r,i,a){var s,u,l,c,p,f,d,h=[i||o],g=y.call(n,"type")?n.type:n,m=y.call(n,"namespace")?n.namespace.split("."):[];if(l=f=i=i||o,3!==i.nodeType&&8!==i.nodeType&&!nt.test(g+b.event.triggered)&&(g.indexOf(".")>=0&&(m=g.split("."),g=m.shift(),m.sort()),u=0>g.indexOf(":")&&"on"+g,n=n[b.expando]?n:new b.Event(g,"object"==typeof n&&n),n.isTrigger=!0,n.namespace=m.join("."),n.namespace_re=n.namespace?RegExp("(^|\\.)"+m.join("\\.(?:.*\\.|)")+"(\\.|$)"):null,n.result=t,n.target||(n.target=i),r=null==r?[n]:b.makeArray(r,[n]),p=b.event.special[g]||{},a||!p.trigger||p.trigger.apply(i,r)!==!1)){if(!a&&!p.noBubble&&!b.isWindow(i)){for(c=p.delegateType||g,nt.test(c+g)||(l=l.parentNode);l;l=l.parentNode)h.push(l),f=l;f===(i.ownerDocument||o)&&h.push(f.defaultView||f.parentWindow||e)}d=0;while((l=h[d++])&&!n.isPropagationStopped())n.type=d>1?c:p.bindType||g,s=(b._data(l,"events")||{})[n.type]&&b._data(l,"handle"),s&&s.apply(l,r),s=u&&l[u],s&&b.acceptData(l)&&s.apply&&s.apply(l,r)===!1&&n.preventDefault();if(n.type=g,!(a||n.isDefaultPrevented()||p._default&&p._default.apply(i.ownerDocument,r)!==!1||"click"===g&&b.nodeName(i,"a")||!b.acceptData(i)||!u||!i[g]||b.isWindow(i))){f=i[u],f&&(i[u]=null),b.event.triggered=g;try{i[g]()}catch(v){}b.event.triggered=t,f&&(i[u]=f)}return n.result}},dispatch:function(e){e=b.event.fix(e);var n,r,i,o,a,s=[],u=h.call(arguments),l=(b._data(this,"events")||{})[e.type]||[],c=b.event.special[e.type]||{};if(u[0]=e,e.delegateTarget=this,!c.preDispatch||c.preDispatch.call(this,e)!==!1){s=b.event.handlers.call(this,e,l),n=0;while((o=s[n++])&&!e.isPropagationStopped()){e.currentTarget=o.elem,a=0;while((i=o.handlers[a++])&&!e.isImmediatePropagationStopped())(!e.namespace_re||e.namespace_re.test(i.namespace))&&(e.handleObj=i,e.data=i.data,r=((b.event.special[i.origType]||{}).handle||i.handler).apply(o.elem,u),r!==t&&(e.result=r)===!1&&(e.preventDefault(),e.stopPropagation()))}return c.postDispatch&&c.postDispatch.call(this,e),e.result}},handlers:function(e,n){var r,i,o,a,s=[],u=n.delegateCount,l=e.target;if(u&&l.nodeType&&(!e.button||"click"!==e.type))for(;l!=this;l=l.parentNode||this)if(1===l.nodeType&&(l.disabled!==!0||"click"!==e.type)){for(o=[],a=0;u>a;a++)i=n[a],r=i.selector+" ",o[r]===t&&(o[r]=i.needsContext?b(r,this).index(l)>=0:b.find(r,this,null,[l]).length),o[r]&&o.push(i);o.length&&s.push({elem:l,handlers:o})}return n.length>u&&s.push({elem:this,handlers:n.slice(u)}),s},fix:function(e){if(e[b.expando])return e;var t,n,r,i=e.type,a=e,s=this.fixHooks[i];s||(this.fixHooks[i]=s=tt.test(i)?this.mouseHooks:et.test(i)?this.keyHooks:{}),r=s.props?this.props.concat(s.props):this.props,e=new b.Event(a),t=r.length;while(t--)n=r[t],e[n]=a[n];return e.target||(e.target=a.srcElement||o),3===e.target.nodeType&&(e.target=e.target.parentNode),e.metaKey=!!e.metaKey,s.filter?s.filter(e,a):e},props:"altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "),fixHooks:{},keyHooks:{props:"char charCode key keyCode".split(" "),filter:function(e,t){return null==e.which&&(e.which=null!=t.charCode?t.charCode:t.keyCode),e}},mouseHooks:{props:"button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement".split(" "),filter:function(e,n){var r,i,a,s=n.button,u=n.fromElement;return null==e.pageX&&null!=n.clientX&&(i=e.target.ownerDocument||o,a=i.documentElement,r=i.body,e.pageX=n.clientX+(a&&a.scrollLeft||r&&r.scrollLeft||0)-(a&&a.clientLeft||r&&r.clientLeft||0),e.pageY=n.clientY+(a&&a.scrollTop||r&&r.scrollTop||0)-(a&&a.clientTop||r&&r.clientTop||0)),!e.relatedTarget&&u&&(e.relatedTarget=u===e.target?n.toElement:u),e.which||s===t||(e.which=1&s?1:2&s?3:4&s?2:0),e}},special:{load:{noBubble:!0},click:{trigger:function(){return b.nodeName(this,"input")&&"checkbox"===this.type&&this.click?(this.click(),!1):t}},focus:{trigger:function(){if(this!==o.activeElement&&this.focus)try{return this.focus(),!1}catch(e){}},delegateType:"focusin"},blur:{trigger:function(){return this===o.activeElement&&this.blur?(this.blur(),!1):t},delegateType:"focusout"},beforeunload:{postDispatch:function(e){e.result!==t&&(e.originalEvent.returnValue=e.result)}}},simulate:function(e,t,n,r){var i=b.extend(new b.Event,n,{type:e,isSimulated:!0,originalEvent:{}});r?b.event.trigger(i,null,t):b.event.dispatch.call(t,i),i.isDefaultPrevented()&&n.preventDefault()}},b.removeEvent=o.removeEventListener?function(e,t,n){e.removeEventListener&&e.removeEventListener(t,n,!1)}:function(e,t,n){var r="on"+t;e.detachEvent&&(typeof e[r]===i&&(e[r]=null),e.detachEvent(r,n))},b.Event=function(e,n){return this instanceof b.Event?(e&&e.type?(this.originalEvent=e,this.type=e.type,this.isDefaultPrevented=e.defaultPrevented||e.returnValue===!1||e.getPreventDefault&&e.getPreventDefault()?it:ot):this.type=e,n&&b.extend(this,n),this.timeStamp=e&&e.timeStamp||b.now(),this[b.expando]=!0,t):new b.Event(e,n)},b.Event.prototype={isDefaultPrevented:ot,isPropagationStopped:ot,isImmediatePropagationStopped:ot,preventDefault:function(){var e=this.originalEvent;this.isDefaultPrevented=it,e&&(e.preventDefault?e.preventDefault():e.returnValue=!1)},stopPropagation:function(){var e=this.originalEvent;this.isPropagationStopped=it,e&&(e.stopPropagation&&e.stopPropagation(),e.cancelBubble=!0)},stopImmediatePropagation:function(){this.isImmediatePropagationStopped=it,this.stopPropagation()}},b.each({mouseenter:"mouseover",mouseleave:"mouseout"},function(e,t){b.event.special[e]={delegateType:t,bindType:t,handle:function(e){var n,r=this,i=e.relatedTarget,o=e.handleObj;
-return(!i||i!==r&&!b.contains(r,i))&&(e.type=o.origType,n=o.handler.apply(this,arguments),e.type=t),n}}}),b.support.submitBubbles||(b.event.special.submit={setup:function(){return b.nodeName(this,"form")?!1:(b.event.add(this,"click._submit keypress._submit",function(e){var n=e.target,r=b.nodeName(n,"input")||b.nodeName(n,"button")?n.form:t;r&&!b._data(r,"submitBubbles")&&(b.event.add(r,"submit._submit",function(e){e._submit_bubble=!0}),b._data(r,"submitBubbles",!0))}),t)},postDispatch:function(e){e._submit_bubble&&(delete e._submit_bubble,this.parentNode&&!e.isTrigger&&b.event.simulate("submit",this.parentNode,e,!0))},teardown:function(){return b.nodeName(this,"form")?!1:(b.event.remove(this,"._submit"),t)}}),b.support.changeBubbles||(b.event.special.change={setup:function(){return Z.test(this.nodeName)?(("checkbox"===this.type||"radio"===this.type)&&(b.event.add(this,"propertychange._change",function(e){"checked"===e.originalEvent.propertyName&&(this._just_changed=!0)}),b.event.add(this,"click._change",function(e){this._just_changed&&!e.isTrigger&&(this._just_changed=!1),b.event.simulate("change",this,e,!0)})),!1):(b.event.add(this,"beforeactivate._change",function(e){var t=e.target;Z.test(t.nodeName)&&!b._data(t,"changeBubbles")&&(b.event.add(t,"change._change",function(e){!this.parentNode||e.isSimulated||e.isTrigger||b.event.simulate("change",this.parentNode,e,!0)}),b._data(t,"changeBubbles",!0))}),t)},handle:function(e){var n=e.target;return this!==n||e.isSimulated||e.isTrigger||"radio"!==n.type&&"checkbox"!==n.type?e.handleObj.handler.apply(this,arguments):t},teardown:function(){return b.event.remove(this,"._change"),!Z.test(this.nodeName)}}),b.support.focusinBubbles||b.each({focus:"focusin",blur:"focusout"},function(e,t){var n=0,r=function(e){b.event.simulate(t,e.target,b.event.fix(e),!0)};b.event.special[t]={setup:function(){0===n++&&o.addEventListener(e,r,!0)},teardown:function(){0===--n&&o.removeEventListener(e,r,!0)}}}),b.fn.extend({on:function(e,n,r,i,o){var a,s;if("object"==typeof e){"string"!=typeof n&&(r=r||n,n=t);for(a in e)this.on(a,n,r,e[a],o);return this}if(null==r&&null==i?(i=n,r=n=t):null==i&&("string"==typeof n?(i=r,r=t):(i=r,r=n,n=t)),i===!1)i=ot;else if(!i)return this;return 1===o&&(s=i,i=function(e){return b().off(e),s.apply(this,arguments)},i.guid=s.guid||(s.guid=b.guid++)),this.each(function(){b.event.add(this,e,i,r,n)})},one:function(e,t,n,r){return this.on(e,t,n,r,1)},off:function(e,n,r){var i,o;if(e&&e.preventDefault&&e.handleObj)return i=e.handleObj,b(e.delegateTarget).off(i.namespace?i.origType+"."+i.namespace:i.origType,i.selector,i.handler),this;if("object"==typeof e){for(o in e)this.off(o,n,e[o]);return this}return(n===!1||"function"==typeof n)&&(r=n,n=t),r===!1&&(r=ot),this.each(function(){b.event.remove(this,e,r,n)})},bind:function(e,t,n){return this.on(e,null,t,n)},unbind:function(e,t){return this.off(e,null,t)},delegate:function(e,t,n,r){return this.on(t,e,n,r)},undelegate:function(e,t,n){return 1===arguments.length?this.off(e,"**"):this.off(t,e||"**",n)},trigger:function(e,t){return this.each(function(){b.event.trigger(e,t,this)})},triggerHandler:function(e,n){var r=this[0];return r?b.event.trigger(e,n,r,!0):t}}),function(e,t){var n,r,i,o,a,s,u,l,c,p,f,d,h,g,m,y,v,x="sizzle"+-new Date,w=e.document,T={},N=0,C=0,k=it(),E=it(),S=it(),A=typeof t,j=1<<31,D=[],L=D.pop,H=D.push,q=D.slice,M=D.indexOf||function(e){var t=0,n=this.length;for(;n>t;t++)if(this[t]===e)return t;return-1},_="[\\x20\\t\\r\\n\\f]",F="(?:\\\\.|[\\w-]|[^\\x00-\\xa0])+",O=F.replace("w","w#"),B="([*^$|!~]?=)",P="\\["+_+"*("+F+")"+_+"*(?:"+B+_+"*(?:(['\"])((?:\\\\.|[^\\\\])*?)\\3|("+O+")|)|)"+_+"*\\]",R=":("+F+")(?:\\(((['\"])((?:\\\\.|[^\\\\])*?)\\3|((?:\\\\.|[^\\\\()[\\]]|"+P.replace(3,8)+")*)|.*)\\)|)",W=RegExp("^"+_+"+|((?:^|[^\\\\])(?:\\\\.)*)"+_+"+$","g"),$=RegExp("^"+_+"*,"+_+"*"),I=RegExp("^"+_+"*([\\x20\\t\\r\\n\\f>+~])"+_+"*"),z=RegExp(R),X=RegExp("^"+O+"$"),U={ID:RegExp("^#("+F+")"),CLASS:RegExp("^\\.("+F+")"),NAME:RegExp("^\\[name=['\"]?("+F+")['\"]?\\]"),TAG:RegExp("^("+F.replace("w","w*")+")"),ATTR:RegExp("^"+P),PSEUDO:RegExp("^"+R),CHILD:RegExp("^:(only|first|last|nth|nth-last)-(child|of-type)(?:\\("+_+"*(even|odd|(([+-]|)(\\d*)n|)"+_+"*(?:([+-]|)"+_+"*(\\d+)|))"+_+"*\\)|)","i"),needsContext:RegExp("^"+_+"*[>+~]|:(even|odd|eq|gt|lt|nth|first|last)(?:\\("+_+"*((?:-\\d)?\\d*)"+_+"*\\)|)(?=[^-]|$)","i")},V=/[\x20\t\r\n\f]*[+~]/,Y=/^[^{]+\{\s*\[native code/,J=/^(?:#([\w-]+)|(\w+)|\.([\w-]+))$/,G=/^(?:input|select|textarea|button)$/i,Q=/^h\d$/i,K=/'|\\/g,Z=/\=[\x20\t\r\n\f]*([^'"\]]*)[\x20\t\r\n\f]*\]/g,et=/\\([\da-fA-F]{1,6}[\x20\t\r\n\f]?|.)/g,tt=function(e,t){var n="0x"+t-65536;return n!==n?t:0>n?String.fromCharCode(n+65536):String.fromCharCode(55296|n>>10,56320|1023&n)};try{q.call(w.documentElement.childNodes,0)[0].nodeType}catch(nt){q=function(e){var t,n=[];while(t=this[e++])n.push(t);return n}}function rt(e){return Y.test(e+"")}function it(){var e,t=[];return e=function(n,r){return t.push(n+=" ")>i.cacheLength&&delete e[t.shift()],e[n]=r}}function ot(e){return e[x]=!0,e}function at(e){var t=p.createElement("div");try{return e(t)}catch(n){return!1}finally{t=null}}function st(e,t,n,r){var i,o,a,s,u,l,f,g,m,v;if((t?t.ownerDocument||t:w)!==p&&c(t),t=t||p,n=n||[],!e||"string"!=typeof e)return n;if(1!==(s=t.nodeType)&&9!==s)return[];if(!d&&!r){if(i=J.exec(e))if(a=i[1]){if(9===s){if(o=t.getElementById(a),!o||!o.parentNode)return n;if(o.id===a)return n.push(o),n}else if(t.ownerDocument&&(o=t.ownerDocument.getElementById(a))&&y(t,o)&&o.id===a)return n.push(o),n}else{if(i[2])return H.apply(n,q.call(t.getElementsByTagName(e),0)),n;if((a=i[3])&&T.getByClassName&&t.getElementsByClassName)return H.apply(n,q.call(t.getElementsByClassName(a),0)),n}if(T.qsa&&!h.test(e)){if(f=!0,g=x,m=t,v=9===s&&e,1===s&&"object"!==t.nodeName.toLowerCase()){l=ft(e),(f=t.getAttribute("id"))?g=f.replace(K,"\\$&"):t.setAttribute("id",g),g="[id='"+g+"'] ",u=l.length;while(u--)l[u]=g+dt(l[u]);m=V.test(e)&&t.parentNode||t,v=l.join(",")}if(v)try{return H.apply(n,q.call(m.querySelectorAll(v),0)),n}catch(b){}finally{f||t.removeAttribute("id")}}}return wt(e.replace(W,"$1"),t,n,r)}a=st.isXML=function(e){var t=e&&(e.ownerDocument||e).documentElement;return t?"HTML"!==t.nodeName:!1},c=st.setDocument=function(e){var n=e?e.ownerDocument||e:w;return n!==p&&9===n.nodeType&&n.documentElement?(p=n,f=n.documentElement,d=a(n),T.tagNameNoComments=at(function(e){return e.appendChild(n.createComment("")),!e.getElementsByTagName("*").length}),T.attributes=at(function(e){e.innerHTML="<select></select>";var t=typeof e.lastChild.getAttribute("multiple");return"boolean"!==t&&"string"!==t}),T.getByClassName=at(function(e){return e.innerHTML="<div class='hidden e'></div><div class='hidden'></div>",e.getElementsByClassName&&e.getElementsByClassName("e").length?(e.lastChild.className="e",2===e.getElementsByClassName("e").length):!1}),T.getByName=at(function(e){e.id=x+0,e.innerHTML="<a name='"+x+"'></a><div name='"+x+"'></div>",f.insertBefore(e,f.firstChild);var t=n.getElementsByName&&n.getElementsByName(x).length===2+n.getElementsByName(x+0).length;return T.getIdNotName=!n.getElementById(x),f.removeChild(e),t}),i.attrHandle=at(function(e){return e.innerHTML="<a href='#'></a>",e.firstChild&&typeof e.firstChild.getAttribute!==A&&"#"===e.firstChild.getAttribute("href")})?{}:{href:function(e){return e.getAttribute("href",2)},type:function(e){return e.getAttribute("type")}},T.getIdNotName?(i.find.ID=function(e,t){if(typeof t.getElementById!==A&&!d){var n=t.getElementById(e);return n&&n.parentNode?[n]:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){return e.getAttribute("id")===t}}):(i.find.ID=function(e,n){if(typeof n.getElementById!==A&&!d){var r=n.getElementById(e);return r?r.id===e||typeof r.getAttributeNode!==A&&r.getAttributeNode("id").value===e?[r]:t:[]}},i.filter.ID=function(e){var t=e.replace(et,tt);return function(e){var n=typeof e.getAttributeNode!==A&&e.getAttributeNode("id");return n&&n.value===t}}),i.find.TAG=T.tagNameNoComments?function(e,n){return typeof n.getElementsByTagName!==A?n.getElementsByTagName(e):t}:function(e,t){var n,r=[],i=0,o=t.getElementsByTagName(e);if("*"===e){while(n=o[i++])1===n.nodeType&&r.push(n);return r}return o},i.find.NAME=T.getByName&&function(e,n){return typeof n.getElementsByName!==A?n.getElementsByName(name):t},i.find.CLASS=T.getByClassName&&function(e,n){return typeof n.getElementsByClassName===A||d?t:n.getElementsByClassName(e)},g=[],h=[":focus"],(T.qsa=rt(n.querySelectorAll))&&(at(function(e){e.innerHTML="<select><option selected=''></option></select>",e.querySelectorAll("[selected]").length||h.push("\\["+_+"*(?:checked|disabled|ismap|multiple|readonly|selected|value)"),e.querySelectorAll(":checked").length||h.push(":checked")}),at(function(e){e.innerHTML="<input type='hidden' i=''/>",e.querySelectorAll("[i^='']").length&&h.push("[*^$]="+_+"*(?:\"\"|'')"),e.querySelectorAll(":enabled").length||h.push(":enabled",":disabled"),e.querySelectorAll("*,:x"),h.push(",.*:")})),(T.matchesSelector=rt(m=f.matchesSelector||f.mozMatchesSelector||f.webkitMatchesSelector||f.oMatchesSelector||f.msMatchesSelector))&&at(function(e){T.disconnectedMatch=m.call(e,"div"),m.call(e,"[s!='']:x"),g.push("!=",R)}),h=RegExp(h.join("|")),g=RegExp(g.join("|")),y=rt(f.contains)||f.compareDocumentPosition?function(e,t){var n=9===e.nodeType?e.documentElement:e,r=t&&t.parentNode;return e===r||!(!r||1!==r.nodeType||!(n.contains?n.contains(r):e.compareDocumentPosition&&16&e.compareDocumentPosition(r)))}:function(e,t){if(t)while(t=t.parentNode)if(t===e)return!0;return!1},v=f.compareDocumentPosition?function(e,t){var r;return e===t?(u=!0,0):(r=t.compareDocumentPosition&&e.compareDocumentPosition&&e.compareDocumentPosition(t))?1&r||e.parentNode&&11===e.parentNode.nodeType?e===n||y(w,e)?-1:t===n||y(w,t)?1:0:4&r?-1:1:e.compareDocumentPosition?-1:1}:function(e,t){var r,i=0,o=e.parentNode,a=t.parentNode,s=[e],l=[t];if(e===t)return u=!0,0;if(!o||!a)return e===n?-1:t===n?1:o?-1:a?1:0;if(o===a)return ut(e,t);r=e;while(r=r.parentNode)s.unshift(r);r=t;while(r=r.parentNode)l.unshift(r);while(s[i]===l[i])i++;return i?ut(s[i],l[i]):s[i]===w?-1:l[i]===w?1:0},u=!1,[0,0].sort(v),T.detectDuplicates=u,p):p},st.matches=function(e,t){return st(e,null,null,t)},st.matchesSelector=function(e,t){if((e.ownerDocument||e)!==p&&c(e),t=t.replace(Z,"='$1']"),!(!T.matchesSelector||d||g&&g.test(t)||h.test(t)))try{var n=m.call(e,t);if(n||T.disconnectedMatch||e.document&&11!==e.document.nodeType)return n}catch(r){}return st(t,p,null,[e]).length>0},st.contains=function(e,t){return(e.ownerDocument||e)!==p&&c(e),y(e,t)},st.attr=function(e,t){var n;return(e.ownerDocument||e)!==p&&c(e),d||(t=t.toLowerCase()),(n=i.attrHandle[t])?n(e):d||T.attributes?e.getAttribute(t):((n=e.getAttributeNode(t))||e.getAttribute(t))&&e[t]===!0?t:n&&n.specified?n.value:null},st.error=function(e){throw Error("Syntax error, unrecognized expression: "+e)},st.uniqueSort=function(e){var t,n=[],r=1,i=0;if(u=!T.detectDuplicates,e.sort(v),u){for(;t=e[r];r++)t===e[r-1]&&(i=n.push(r));while(i--)e.splice(n[i],1)}return e};function ut(e,t){var n=t&&e,r=n&&(~t.sourceIndex||j)-(~e.sourceIndex||j);if(r)return r;if(n)while(n=n.nextSibling)if(n===t)return-1;return e?1:-1}function lt(e){return function(t){var n=t.nodeName.toLowerCase();return"input"===n&&t.type===e}}function ct(e){return function(t){var n=t.nodeName.toLowerCase();return("input"===n||"button"===n)&&t.type===e}}function pt(e){return ot(function(t){return t=+t,ot(function(n,r){var i,o=e([],n.length,t),a=o.length;while(a--)n[i=o[a]]&&(n[i]=!(r[i]=n[i]))})})}o=st.getText=function(e){var t,n="",r=0,i=e.nodeType;if(i){if(1===i||9===i||11===i){if("string"==typeof e.textContent)return e.textContent;for(e=e.firstChild;e;e=e.nextSibling)n+=o(e)}else if(3===i||4===i)return e.nodeValue}else for(;t=e[r];r++)n+=o(t);return n},i=st.selectors={cacheLength:50,createPseudo:ot,match:U,find:{},relative:{">":{dir:"parentNode",first:!0}," ":{dir:"parentNode"},"+":{dir:"previousSibling",first:!0},"~":{dir:"previousSibling"}},preFilter:{ATTR:function(e){return e[1]=e[1].replace(et,tt),e[3]=(e[4]||e[5]||"").replace(et,tt),"~="===e[2]&&(e[3]=" "+e[3]+" "),e.slice(0,4)},CHILD:function(e){return e[1]=e[1].toLowerCase(),"nth"===e[1].slice(0,3)?(e[3]||st.error(e[0]),e[4]=+(e[4]?e[5]+(e[6]||1):2*("even"===e[3]||"odd"===e[3])),e[5]=+(e[7]+e[8]||"odd"===e[3])):e[3]&&st.error(e[0]),e},PSEUDO:function(e){var t,n=!e[5]&&e[2];return U.CHILD.test(e[0])?null:(e[4]?e[2]=e[4]:n&&z.test(n)&&(t=ft(n,!0))&&(t=n.indexOf(")",n.length-t)-n.length)&&(e[0]=e[0].slice(0,t),e[2]=n.slice(0,t)),e.slice(0,3))}},filter:{TAG:function(e){return"*"===e?function(){return!0}:(e=e.replace(et,tt).toLowerCase(),function(t){return t.nodeName&&t.nodeName.toLowerCase()===e})},CLASS:function(e){var t=k[e+" "];return t||(t=RegExp("(^|"+_+")"+e+"("+_+"|$)"))&&k(e,function(e){return t.test(e.className||typeof e.getAttribute!==A&&e.getAttribute("class")||"")})},ATTR:function(e,t,n){return function(r){var i=st.attr(r,e);return null==i?"!="===t:t?(i+="","="===t?i===n:"!="===t?i!==n:"^="===t?n&&0===i.indexOf(n):"*="===t?n&&i.indexOf(n)>-1:"$="===t?n&&i.slice(-n.length)===n:"~="===t?(" "+i+" ").indexOf(n)>-1:"|="===t?i===n||i.slice(0,n.length+1)===n+"-":!1):!0}},CHILD:function(e,t,n,r,i){var o="nth"!==e.slice(0,3),a="last"!==e.slice(-4),s="of-type"===t;return 1===r&&0===i?function(e){return!!e.parentNode}:function(t,n,u){var l,c,p,f,d,h,g=o!==a?"nextSibling":"previousSibling",m=t.parentNode,y=s&&t.nodeName.toLowerCase(),v=!u&&!s;if(m){if(o){while(g){p=t;while(p=p[g])if(s?p.nodeName.toLowerCase()===y:1===p.nodeType)return!1;h=g="only"===e&&!h&&"nextSibling"}return!0}if(h=[a?m.firstChild:m.lastChild],a&&v){c=m[x]||(m[x]={}),l=c[e]||[],d=l[0]===N&&l[1],f=l[0]===N&&l[2],p=d&&m.childNodes[d];while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if(1===p.nodeType&&++f&&p===t){c[e]=[N,d,f];break}}else if(v&&(l=(t[x]||(t[x]={}))[e])&&l[0]===N)f=l[1];else while(p=++d&&p&&p[g]||(f=d=0)||h.pop())if((s?p.nodeName.toLowerCase()===y:1===p.nodeType)&&++f&&(v&&((p[x]||(p[x]={}))[e]=[N,f]),p===t))break;return f-=i,f===r||0===f%r&&f/r>=0}}},PSEUDO:function(e,t){var n,r=i.pseudos[e]||i.setFilters[e.toLowerCase()]||st.error("unsupported pseudo: "+e);return r[x]?r(t):r.length>1?(n=[e,e,"",t],i.setFilters.hasOwnProperty(e.toLowerCase())?ot(function(e,n){var i,o=r(e,t),a=o.length;while(a--)i=M.call(e,o[a]),e[i]=!(n[i]=o[a])}):function(e){return r(e,0,n)}):r}},pseudos:{not:ot(function(e){var t=[],n=[],r=s(e.replace(W,"$1"));return r[x]?ot(function(e,t,n,i){var o,a=r(e,null,i,[]),s=e.length;while(s--)(o=a[s])&&(e[s]=!(t[s]=o))}):function(e,i,o){return t[0]=e,r(t,null,o,n),!n.pop()}}),has:ot(function(e){return function(t){return st(e,t).length>0}}),contains:ot(function(e){return function(t){return(t.textContent||t.innerText||o(t)).indexOf(e)>-1}}),lang:ot(function(e){return X.test(e||"")||st.error("unsupported lang: "+e),e=e.replace(et,tt).toLowerCase(),function(t){var n;do if(n=d?t.getAttribute("xml:lang")||t.getAttribute("lang"):t.lang)return n=n.toLowerCase(),n===e||0===n.indexOf(e+"-");while((t=t.parentNode)&&1===t.nodeType);return!1}}),target:function(t){var n=e.location&&e.location.hash;return n&&n.slice(1)===t.id},root:function(e){return e===f},focus:function(e){return e===p.activeElement&&(!p.hasFocus||p.hasFocus())&&!!(e.type||e.href||~e.tabIndex)},enabled:function(e){return e.disabled===!1},disabled:function(e){return e.disabled===!0},checked:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&!!e.checked||"option"===t&&!!e.selected},selected:function(e){return e.parentNode&&e.parentNode.selectedIndex,e.selected===!0},empty:function(e){for(e=e.firstChild;e;e=e.nextSibling)if(e.nodeName>"@"||3===e.nodeType||4===e.nodeType)return!1;return!0},parent:function(e){return!i.pseudos.empty(e)},header:function(e){return Q.test(e.nodeName)},input:function(e){return G.test(e.nodeName)},button:function(e){var t=e.nodeName.toLowerCase();return"input"===t&&"button"===e.type||"button"===t},text:function(e){var t;return"input"===e.nodeName.toLowerCase()&&"text"===e.type&&(null==(t=e.getAttribute("type"))||t.toLowerCase()===e.type)},first:pt(function(){return[0]}),last:pt(function(e,t){return[t-1]}),eq:pt(function(e,t,n){return[0>n?n+t:n]}),even:pt(function(e,t){var n=0;for(;t>n;n+=2)e.push(n);return e}),odd:pt(function(e,t){var n=1;for(;t>n;n+=2)e.push(n);return e}),lt:pt(function(e,t,n){var r=0>n?n+t:n;for(;--r>=0;)e.push(r);return e}),gt:pt(function(e,t,n){var r=0>n?n+t:n;for(;t>++r;)e.push(r);return e})}};for(n in{radio:!0,checkbox:!0,file:!0,password:!0,image:!0})i.pseudos[n]=lt(n);for(n in{submit:!0,reset:!0})i.pseudos[n]=ct(n);function ft(e,t){var n,r,o,a,s,u,l,c=E[e+" "];if(c)return t?0:c.slice(0);s=e,u=[],l=i.preFilter;while(s){(!n||(r=$.exec(s)))&&(r&&(s=s.slice(r[0].length)||s),u.push(o=[])),n=!1,(r=I.exec(s))&&(n=r.shift(),o.push({value:n,type:r[0].replace(W," ")}),s=s.slice(n.length));for(a in i.filter)!(r=U[a].exec(s))||l[a]&&!(r=l[a](r))||(n=r.shift(),o.push({value:n,type:a,matches:r}),s=s.slice(n.length));if(!n)break}return t?s.length:s?st.error(e):E(e,u).slice(0)}function dt(e){var t=0,n=e.length,r="";for(;n>t;t++)r+=e[t].value;return r}function ht(e,t,n){var i=t.dir,o=n&&"parentNode"===i,a=C++;return t.first?function(t,n,r){while(t=t[i])if(1===t.nodeType||o)return e(t,n,r)}:function(t,n,s){var u,l,c,p=N+" "+a;if(s){while(t=t[i])if((1===t.nodeType||o)&&e(t,n,s))return!0}else while(t=t[i])if(1===t.nodeType||o)if(c=t[x]||(t[x]={}),(l=c[i])&&l[0]===p){if((u=l[1])===!0||u===r)return u===!0}else if(l=c[i]=[p],l[1]=e(t,n,s)||r,l[1]===!0)return!0}}function gt(e){return e.length>1?function(t,n,r){var i=e.length;while(i--)if(!e[i](t,n,r))return!1;return!0}:e[0]}function mt(e,t,n,r,i){var o,a=[],s=0,u=e.length,l=null!=t;for(;u>s;s++)(o=e[s])&&(!n||n(o,r,i))&&(a.push(o),l&&t.push(s));return a}function yt(e,t,n,r,i,o){return r&&!r[x]&&(r=yt(r)),i&&!i[x]&&(i=yt(i,o)),ot(function(o,a,s,u){var l,c,p,f=[],d=[],h=a.length,g=o||xt(t||"*",s.nodeType?[s]:s,[]),m=!e||!o&&t?g:mt(g,f,e,s,u),y=n?i||(o?e:h||r)?[]:a:m;if(n&&n(m,y,s,u),r){l=mt(y,d),r(l,[],s,u),c=l.length;while(c--)(p=l[c])&&(y[d[c]]=!(m[d[c]]=p))}if(o){if(i||e){if(i){l=[],c=y.length;while(c--)(p=y[c])&&l.push(m[c]=p);i(null,y=[],l,u)}c=y.length;while(c--)(p=y[c])&&(l=i?M.call(o,p):f[c])>-1&&(o[l]=!(a[l]=p))}}else y=mt(y===a?y.splice(h,y.length):y),i?i(null,a,y,u):H.apply(a,y)})}function vt(e){var t,n,r,o=e.length,a=i.relative[e[0].type],s=a||i.relative[" "],u=a?1:0,c=ht(function(e){return e===t},s,!0),p=ht(function(e){return M.call(t,e)>-1},s,!0),f=[function(e,n,r){return!a&&(r||n!==l)||((t=n).nodeType?c(e,n,r):p(e,n,r))}];for(;o>u;u++)if(n=i.relative[e[u].type])f=[ht(gt(f),n)];else{if(n=i.filter[e[u].type].apply(null,e[u].matches),n[x]){for(r=++u;o>r;r++)if(i.relative[e[r].type])break;return yt(u>1&&gt(f),u>1&&dt(e.slice(0,u-1)).replace(W,"$1"),n,r>u&&vt(e.slice(u,r)),o>r&&vt(e=e.slice(r)),o>r&&dt(e))}f.push(n)}return gt(f)}function bt(e,t){var n=0,o=t.length>0,a=e.length>0,s=function(s,u,c,f,d){var h,g,m,y=[],v=0,b="0",x=s&&[],w=null!=d,T=l,C=s||a&&i.find.TAG("*",d&&u.parentNode||u),k=N+=null==T?1:Math.random()||.1;for(w&&(l=u!==p&&u,r=n);null!=(h=C[b]);b++){if(a&&h){g=0;while(m=e[g++])if(m(h,u,c)){f.push(h);break}w&&(N=k,r=++n)}o&&((h=!m&&h)&&v--,s&&x.push(h))}if(v+=b,o&&b!==v){g=0;while(m=t[g++])m(x,y,u,c);if(s){if(v>0)while(b--)x[b]||y[b]||(y[b]=L.call(f));y=mt(y)}H.apply(f,y),w&&!s&&y.length>0&&v+t.length>1&&st.uniqueSort(f)}return w&&(N=k,l=T),x};return o?ot(s):s}s=st.compile=function(e,t){var n,r=[],i=[],o=S[e+" "];if(!o){t||(t=ft(e)),n=t.length;while(n--)o=vt(t[n]),o[x]?r.push(o):i.push(o);o=S(e,bt(i,r))}return o};function xt(e,t,n){var r=0,i=t.length;for(;i>r;r++)st(e,t[r],n);return n}function wt(e,t,n,r){var o,a,u,l,c,p=ft(e);if(!r&&1===p.length){if(a=p[0]=p[0].slice(0),a.length>2&&"ID"===(u=a[0]).type&&9===t.nodeType&&!d&&i.relative[a[1].type]){if(t=i.find.ID(u.matches[0].replace(et,tt),t)[0],!t)return n;e=e.slice(a.shift().value.length)}o=U.needsContext.test(e)?0:a.length;while(o--){if(u=a[o],i.relative[l=u.type])break;if((c=i.find[l])&&(r=c(u.matches[0].replace(et,tt),V.test(a[0].type)&&t.parentNode||t))){if(a.splice(o,1),e=r.length&&dt(a),!e)return H.apply(n,q.call(r,0)),n;break}}}return s(e,p)(r,t,d,n,V.test(e)),n}i.pseudos.nth=i.pseudos.eq;function Tt(){}i.filters=Tt.prototype=i.pseudos,i.setFilters=new Tt,c(),st.attr=b.attr,b.find=st,b.expr=st.selectors,b.expr[":"]=b.expr.pseudos,b.unique=st.uniqueSort,b.text=st.getText,b.isXMLDoc=st.isXML,b.contains=st.contains}(e);var at=/Until$/,st=/^(?:parents|prev(?:Until|All))/,ut=/^.[^:#\[\.,]*$/,lt=b.expr.match.needsContext,ct={children:!0,contents:!0,next:!0,prev:!0};b.fn.extend({find:function(e){var t,n,r,i=this.length;if("string"!=typeof e)return r=this,this.pushStack(b(e).filter(function(){for(t=0;i>t;t++)if(b.contains(r[t],this))return!0}));for(n=[],t=0;i>t;t++)b.find(e,this[t],n);return n=this.pushStack(i>1?b.unique(n):n),n.selector=(this.selector?this.selector+" ":"")+e,n},has:function(e){var t,n=b(e,this),r=n.length;return this.filter(function(){for(t=0;r>t;t++)if(b.contains(this,n[t]))return!0})},not:function(e){return this.pushStack(ft(this,e,!1))},filter:function(e){return this.pushStack(ft(this,e,!0))},is:function(e){return!!e&&("string"==typeof e?lt.test(e)?b(e,this.context).index(this[0])>=0:b.filter(e,this).length>0:this.filter(e).length>0)},closest:function(e,t){var n,r=0,i=this.length,o=[],a=lt.test(e)||"string"!=typeof e?b(e,t||this.context):0;for(;i>r;r++){n=this[r];while(n&&n.ownerDocument&&n!==t&&11!==n.nodeType){if(a?a.index(n)>-1:b.find.matchesSelector(n,e)){o.push(n);break}n=n.parentNode}}return this.pushStack(o.length>1?b.unique(o):o)},index:function(e){return e?"string"==typeof e?b.inArray(this[0],b(e)):b.inArray(e.jquery?e[0]:e,this):this[0]&&this[0].parentNode?this.first().prevAll().length:-1},add:function(e,t){var n="string"==typeof e?b(e,t):b.makeArray(e&&e.nodeType?[e]:e),r=b.merge(this.get(),n);return this.pushStack(b.unique(r))},addBack:function(e){return this.add(null==e?this.prevObject:this.prevObject.filter(e))}}),b.fn.andSelf=b.fn.addBack;function pt(e,t){do e=e[t];while(e&&1!==e.nodeType);return e}b.each({parent:function(e){var t=e.parentNode;return t&&11!==t.nodeType?t:null},parents:function(e){return b.dir(e,"parentNode")},parentsUntil:function(e,t,n){return b.dir(e,"parentNode",n)},next:function(e){return pt(e,"nextSibling")},prev:function(e){return pt(e,"previousSibling")},nextAll:function(e){return b.dir(e,"nextSibling")},prevAll:function(e){return b.dir(e,"previousSibling")},nextUntil:function(e,t,n){return b.dir(e,"nextSibling",n)},prevUntil:function(e,t,n){return b.dir(e,"previousSibling",n)},siblings:function(e){return b.sibling((e.parentNode||{}).firstChild,e)},children:function(e){return b.sibling(e.firstChild)},contents:function(e){return b.nodeName(e,"iframe")?e.contentDocument||e.contentWindow.document:b.merge([],e.childNodes)}},function(e,t){b.fn[e]=function(n,r){var i=b.map(this,t,n);return at.test(e)||(r=n),r&&"string"==typeof r&&(i=b.filter(r,i)),i=this.length>1&&!ct[e]?b.unique(i):i,this.length>1&&st.test(e)&&(i=i.reverse()),this.pushStack(i)}}),b.extend({filter:function(e,t,n){return n&&(e=":not("+e+")"),1===t.length?b.find.matchesSelector(t[0],e)?[t[0]]:[]:b.find.matches(e,t)},dir:function(e,n,r){var i=[],o=e[n];while(o&&9!==o.nodeType&&(r===t||1!==o.nodeType||!b(o).is(r)))1===o.nodeType&&i.push(o),o=o[n];return i},sibling:function(e,t){var n=[];for(;e;e=e.nextSibling)1===e.nodeType&&e!==t&&n.push(e);return n}});function ft(e,t,n){if(t=t||0,b.isFunction(t))return b.grep(e,function(e,r){var i=!!t.call(e,r,e);return i===n});if(t.nodeType)return b.grep(e,function(e){return e===t===n});if("string"==typeof t){var r=b.grep(e,function(e){return 1===e.nodeType});if(ut.test(t))return b.filter(t,r,!n);t=b.filter(t,r)}return b.grep(e,function(e){return b.inArray(e,t)>=0===n})}function dt(e){var t=ht.split("|"),n=e.createDocumentFragment();if(n.createElement)while(t.length)n.createElement(t.pop());return n}var ht="abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video",gt=/ jQuery\d+="(?:null|\d+)"/g,mt=RegExp("<(?:"+ht+")[\\s/>]","i"),yt=/^\s+/,vt=/<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi,bt=/<([\w:]+)/,xt=/<tbody/i,wt=/<|&#?\w+;/,Tt=/<(?:script|style|link)/i,Nt=/^(?:checkbox|radio)$/i,Ct=/checked\s*(?:[^=]|=\s*.checked.)/i,kt=/^$|\/(?:java|ecma)script/i,Et=/^true\/(.*)/,St=/^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g,At={option:[1,"<select multiple='multiple'>","</select>"],legend:[1,"<fieldset>","</fieldset>"],area:[1,"<map>","</map>"],param:[1,"<object>","</object>"],thead:[1,"<table>","</table>"],tr:[2,"<table><tbody>","</tbody></table>"],col:[2,"<table><tbody></tbody><colgroup>","</colgroup></table>"],td:[3,"<table><tbody><tr>","</tr></tbody></table>"],_default:b.support.htmlSerialize?[0,"",""]:[1,"X<div>","</div>"]},jt=dt(o),Dt=jt.appendChild(o.createElement("div"));At.optgroup=At.option,At.tbody=At.tfoot=At.colgroup=At.caption=At.thead,At.th=At.td,b.fn.extend({text:function(e){return b.access(this,function(e){return e===t?b.text(this):this.empty().append((this[0]&&this[0].ownerDocument||o).createTextNode(e))},null,e,arguments.length)},wrapAll:function(e){if(b.isFunction(e))return this.each(function(t){b(this).wrapAll(e.call(this,t))});if(this[0]){var t=b(e,this[0].ownerDocument).eq(0).clone(!0);this[0].parentNode&&t.insertBefore(this[0]),t.map(function(){var e=this;while(e.firstChild&&1===e.firstChild.nodeType)e=e.firstChild;return e}).append(this)}return this},wrapInner:function(e){return b.isFunction(e)?this.each(function(t){b(this).wrapInner(e.call(this,t))}):this.each(function(){var t=b(this),n=t.contents();n.length?n.wrapAll(e):t.append(e)})},wrap:function(e){var t=b.isFunction(e);return this.each(function(n){b(this).wrapAll(t?e.call(this,n):e)})},unwrap:function(){return this.parent().each(function(){b.nodeName(this,"body")||b(this).replaceWith(this.childNodes)}).end()},append:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.appendChild(e)})},prepend:function(){return this.domManip(arguments,!0,function(e){(1===this.nodeType||11===this.nodeType||9===this.nodeType)&&this.insertBefore(e,this.firstChild)})},before:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this)})},after:function(){return this.domManip(arguments,!1,function(e){this.parentNode&&this.parentNode.insertBefore(e,this.nextSibling)})},remove:function(e,t){var n,r=0;for(;null!=(n=this[r]);r++)(!e||b.filter(e,[n]).length>0)&&(t||1!==n.nodeType||b.cleanData(Ot(n)),n.parentNode&&(t&&b.contains(n.ownerDocument,n)&&Mt(Ot(n,"script")),n.parentNode.removeChild(n)));return this},empty:function(){var e,t=0;for(;null!=(e=this[t]);t++){1===e.nodeType&&b.cleanData(Ot(e,!1));while(e.firstChild)e.removeChild(e.firstChild);e.options&&b.nodeName(e,"select")&&(e.options.length=0)}return this},clone:function(e,t){return e=null==e?!1:e,t=null==t?e:t,this.map(function(){return b.clone(this,e,t)})},html:function(e){return b.access(this,function(e){var n=this[0]||{},r=0,i=this.length;if(e===t)return 1===n.nodeType?n.innerHTML.replace(gt,""):t;if(!("string"!=typeof e||Tt.test(e)||!b.support.htmlSerialize&&mt.test(e)||!b.support.leadingWhitespace&&yt.test(e)||At[(bt.exec(e)||["",""])[1].toLowerCase()])){e=e.replace(vt,"<$1></$2>");try{for(;i>r;r++)n=this[r]||{},1===n.nodeType&&(b.cleanData(Ot(n,!1)),n.innerHTML=e);n=0}catch(o){}}n&&this.empty().append(e)},null,e,arguments.length)},replaceWith:function(e){var t=b.isFunction(e);return t||"string"==typeof e||(e=b(e).not(this).detach()),this.domManip([e],!0,function(e){var t=this.nextSibling,n=this.parentNode;n&&(b(this).remove(),n.insertBefore(e,t))})},detach:function(e){return this.remove(e,!0)},domManip:function(e,n,r){e=f.apply([],e);var i,o,a,s,u,l,c=0,p=this.length,d=this,h=p-1,g=e[0],m=b.isFunction(g);if(m||!(1>=p||"string"!=typeof g||b.support.checkClone)&&Ct.test(g))return this.each(function(i){var o=d.eq(i);m&&(e[0]=g.call(this,i,n?o.html():t)),o.domManip(e,n,r)});if(p&&(l=b.buildFragment(e,this[0].ownerDocument,!1,this),i=l.firstChild,1===l.childNodes.length&&(l=i),i)){for(n=n&&b.nodeName(i,"tr"),s=b.map(Ot(l,"script"),Ht),a=s.length;p>c;c++)o=l,c!==h&&(o=b.clone(o,!0,!0),a&&b.merge(s,Ot(o,"script"))),r.call(n&&b.nodeName(this[c],"table")?Lt(this[c],"tbody"):this[c],o,c);if(a)for(u=s[s.length-1].ownerDocument,b.map(s,qt),c=0;a>c;c++)o=s[c],kt.test(o.type||"")&&!b._data(o,"globalEval")&&b.contains(u,o)&&(o.src?b.ajax({url:o.src,type:"GET",dataType:"script",async:!1,global:!1,"throws":!0}):b.globalEval((o.text||o.textContent||o.innerHTML||"").replace(St,"")));l=i=null}return this}});function Lt(e,t){return e.getElementsByTagName(t)[0]||e.appendChild(e.ownerDocument.createElement(t))}function Ht(e){var t=e.getAttributeNode("type");return e.type=(t&&t.specified)+"/"+e.type,e}function qt(e){var t=Et.exec(e.type);return t?e.type=t[1]:e.removeAttribute("type"),e}function Mt(e,t){var n,r=0;for(;null!=(n=e[r]);r++)b._data(n,"globalEval",!t||b._data(t[r],"globalEval"))}function _t(e,t){if(1===t.nodeType&&b.hasData(e)){var n,r,i,o=b._data(e),a=b._data(t,o),s=o.events;if(s){delete a.handle,a.events={};for(n in s)for(r=0,i=s[n].length;i>r;r++)b.event.add(t,n,s[n][r])}a.data&&(a.data=b.extend({},a.data))}}function Ft(e,t){var n,r,i;if(1===t.nodeType){if(n=t.nodeName.toLowerCase(),!b.support.noCloneEvent&&t[b.expando]){i=b._data(t);for(r in i.events)b.removeEvent(t,r,i.handle);t.removeAttribute(b.expando)}"script"===n&&t.text!==e.text?(Ht(t).text=e.text,qt(t)):"object"===n?(t.parentNode&&(t.outerHTML=e.outerHTML),b.support.html5Clone&&e.innerHTML&&!b.trim(t.innerHTML)&&(t.innerHTML=e.innerHTML)):"input"===n&&Nt.test(e.type)?(t.defaultChecked=t.checked=e.checked,t.value!==e.value&&(t.value=e.value)):"option"===n?t.defaultSelected=t.selected=e.defaultSelected:("input"===n||"textarea"===n)&&(t.defaultValue=e.defaultValue)}}b.each({appendTo:"append",prependTo:"prepend",insertBefore:"before",insertAfter:"after",replaceAll:"replaceWith"},function(e,t){b.fn[e]=function(e){var n,r=0,i=[],o=b(e),a=o.length-1;for(;a>=r;r++)n=r===a?this:this.clone(!0),b(o[r])[t](n),d.apply(i,n.get());return this.pushStack(i)}});function Ot(e,n){var r,o,a=0,s=typeof e.getElementsByTagName!==i?e.getElementsByTagName(n||"*"):typeof e.querySelectorAll!==i?e.querySelectorAll(n||"*"):t;if(!s)for(s=[],r=e.childNodes||e;null!=(o=r[a]);a++)!n||b.nodeName(o,n)?s.push(o):b.merge(s,Ot(o,n));return n===t||n&&b.nodeName(e,n)?b.merge([e],s):s}function Bt(e){Nt.test(e.type)&&(e.defaultChecked=e.checked)}b.extend({clone:function(e,t,n){var r,i,o,a,s,u=b.contains(e.ownerDocument,e);if(b.support.html5Clone||b.isXMLDoc(e)||!mt.test("<"+e.nodeName+">")?o=e.cloneNode(!0):(Dt.innerHTML=e.outerHTML,Dt.removeChild(o=Dt.firstChild)),!(b.support.noCloneEvent&&b.support.noCloneChecked||1!==e.nodeType&&11!==e.nodeType||b.isXMLDoc(e)))for(r=Ot(o),s=Ot(e),a=0;null!=(i=s[a]);++a)r[a]&&Ft(i,r[a]);if(t)if(n)for(s=s||Ot(e),r=r||Ot(o),a=0;null!=(i=s[a]);a++)_t(i,r[a]);else _t(e,o);return r=Ot(o,"script"),r.length>0&&Mt(r,!u&&Ot(e,"script")),r=s=i=null,o},buildFragment:function(e,t,n,r){var i,o,a,s,u,l,c,p=e.length,f=dt(t),d=[],h=0;for(;p>h;h++)if(o=e[h],o||0===o)if("object"===b.type(o))b.merge(d,o.nodeType?[o]:o);else if(wt.test(o)){s=s||f.appendChild(t.createElement("div")),u=(bt.exec(o)||["",""])[1].toLowerCase(),c=At[u]||At._default,s.innerHTML=c[1]+o.replace(vt,"<$1></$2>")+c[2],i=c[0];while(i--)s=s.lastChild;if(!b.support.leadingWhitespace&&yt.test(o)&&d.push(t.createTextNode(yt.exec(o)[0])),!b.support.tbody){o="table"!==u||xt.test(o)?"<table>"!==c[1]||xt.test(o)?0:s:s.firstChild,i=o&&o.childNodes.length;while(i--)b.nodeName(l=o.childNodes[i],"tbody")&&!l.childNodes.length&&o.removeChild(l)
-}b.merge(d,s.childNodes),s.textContent="";while(s.firstChild)s.removeChild(s.firstChild);s=f.lastChild}else d.push(t.createTextNode(o));s&&f.removeChild(s),b.support.appendChecked||b.grep(Ot(d,"input"),Bt),h=0;while(o=d[h++])if((!r||-1===b.inArray(o,r))&&(a=b.contains(o.ownerDocument,o),s=Ot(f.appendChild(o),"script"),a&&Mt(s),n)){i=0;while(o=s[i++])kt.test(o.type||"")&&n.push(o)}return s=null,f},cleanData:function(e,t){var n,r,o,a,s=0,u=b.expando,l=b.cache,p=b.support.deleteExpando,f=b.event.special;for(;null!=(n=e[s]);s++)if((t||b.acceptData(n))&&(o=n[u],a=o&&l[o])){if(a.events)for(r in a.events)f[r]?b.event.remove(n,r):b.removeEvent(n,r,a.handle);l[o]&&(delete l[o],p?delete n[u]:typeof n.removeAttribute!==i?n.removeAttribute(u):n[u]=null,c.push(o))}}});var Pt,Rt,Wt,$t=/alpha\([^)]*\)/i,It=/opacity\s*=\s*([^)]*)/,zt=/^(top|right|bottom|left)$/,Xt=/^(none|table(?!-c[ea]).+)/,Ut=/^margin/,Vt=RegExp("^("+x+")(.*)$","i"),Yt=RegExp("^("+x+")(?!px)[a-z%]+$","i"),Jt=RegExp("^([+-])=("+x+")","i"),Gt={BODY:"block"},Qt={position:"absolute",visibility:"hidden",display:"block"},Kt={letterSpacing:0,fontWeight:400},Zt=["Top","Right","Bottom","Left"],en=["Webkit","O","Moz","ms"];function tn(e,t){if(t in e)return t;var n=t.charAt(0).toUpperCase()+t.slice(1),r=t,i=en.length;while(i--)if(t=en[i]+n,t in e)return t;return r}function nn(e,t){return e=t||e,"none"===b.css(e,"display")||!b.contains(e.ownerDocument,e)}function rn(e,t){var n,r,i,o=[],a=0,s=e.length;for(;s>a;a++)r=e[a],r.style&&(o[a]=b._data(r,"olddisplay"),n=r.style.display,t?(o[a]||"none"!==n||(r.style.display=""),""===r.style.display&&nn(r)&&(o[a]=b._data(r,"olddisplay",un(r.nodeName)))):o[a]||(i=nn(r),(n&&"none"!==n||!i)&&b._data(r,"olddisplay",i?n:b.css(r,"display"))));for(a=0;s>a;a++)r=e[a],r.style&&(t&&"none"!==r.style.display&&""!==r.style.display||(r.style.display=t?o[a]||"":"none"));return e}b.fn.extend({css:function(e,n){return b.access(this,function(e,n,r){var i,o,a={},s=0;if(b.isArray(n)){for(o=Rt(e),i=n.length;i>s;s++)a[n[s]]=b.css(e,n[s],!1,o);return a}return r!==t?b.style(e,n,r):b.css(e,n)},e,n,arguments.length>1)},show:function(){return rn(this,!0)},hide:function(){return rn(this)},toggle:function(e){var t="boolean"==typeof e;return this.each(function(){(t?e:nn(this))?b(this).show():b(this).hide()})}}),b.extend({cssHooks:{opacity:{get:function(e,t){if(t){var n=Wt(e,"opacity");return""===n?"1":n}}}},cssNumber:{columnCount:!0,fillOpacity:!0,fontWeight:!0,lineHeight:!0,opacity:!0,orphans:!0,widows:!0,zIndex:!0,zoom:!0},cssProps:{"float":b.support.cssFloat?"cssFloat":"styleFloat"},style:function(e,n,r,i){if(e&&3!==e.nodeType&&8!==e.nodeType&&e.style){var o,a,s,u=b.camelCase(n),l=e.style;if(n=b.cssProps[u]||(b.cssProps[u]=tn(l,u)),s=b.cssHooks[n]||b.cssHooks[u],r===t)return s&&"get"in s&&(o=s.get(e,!1,i))!==t?o:l[n];if(a=typeof r,"string"===a&&(o=Jt.exec(r))&&(r=(o[1]+1)*o[2]+parseFloat(b.css(e,n)),a="number"),!(null==r||"number"===a&&isNaN(r)||("number"!==a||b.cssNumber[u]||(r+="px"),b.support.clearCloneStyle||""!==r||0!==n.indexOf("background")||(l[n]="inherit"),s&&"set"in s&&(r=s.set(e,r,i))===t)))try{l[n]=r}catch(c){}}},css:function(e,n,r,i){var o,a,s,u=b.camelCase(n);return n=b.cssProps[u]||(b.cssProps[u]=tn(e.style,u)),s=b.cssHooks[n]||b.cssHooks[u],s&&"get"in s&&(a=s.get(e,!0,r)),a===t&&(a=Wt(e,n,i)),"normal"===a&&n in Kt&&(a=Kt[n]),""===r||r?(o=parseFloat(a),r===!0||b.isNumeric(o)?o||0:a):a},swap:function(e,t,n,r){var i,o,a={};for(o in t)a[o]=e.style[o],e.style[o]=t[o];i=n.apply(e,r||[]);for(o in t)e.style[o]=a[o];return i}}),e.getComputedStyle?(Rt=function(t){return e.getComputedStyle(t,null)},Wt=function(e,n,r){var i,o,a,s=r||Rt(e),u=s?s.getPropertyValue(n)||s[n]:t,l=e.style;return s&&(""!==u||b.contains(e.ownerDocument,e)||(u=b.style(e,n)),Yt.test(u)&&Ut.test(n)&&(i=l.width,o=l.minWidth,a=l.maxWidth,l.minWidth=l.maxWidth=l.width=u,u=s.width,l.width=i,l.minWidth=o,l.maxWidth=a)),u}):o.documentElement.currentStyle&&(Rt=function(e){return e.currentStyle},Wt=function(e,n,r){var i,o,a,s=r||Rt(e),u=s?s[n]:t,l=e.style;return null==u&&l&&l[n]&&(u=l[n]),Yt.test(u)&&!zt.test(n)&&(i=l.left,o=e.runtimeStyle,a=o&&o.left,a&&(o.left=e.currentStyle.left),l.left="fontSize"===n?"1em":u,u=l.pixelLeft+"px",l.left=i,a&&(o.left=a)),""===u?"auto":u});function on(e,t,n){var r=Vt.exec(t);return r?Math.max(0,r[1]-(n||0))+(r[2]||"px"):t}function an(e,t,n,r,i){var o=n===(r?"border":"content")?4:"width"===t?1:0,a=0;for(;4>o;o+=2)"margin"===n&&(a+=b.css(e,n+Zt[o],!0,i)),r?("content"===n&&(a-=b.css(e,"padding"+Zt[o],!0,i)),"margin"!==n&&(a-=b.css(e,"border"+Zt[o]+"Width",!0,i))):(a+=b.css(e,"padding"+Zt[o],!0,i),"padding"!==n&&(a+=b.css(e,"border"+Zt[o]+"Width",!0,i)));return a}function sn(e,t,n){var r=!0,i="width"===t?e.offsetWidth:e.offsetHeight,o=Rt(e),a=b.support.boxSizing&&"border-box"===b.css(e,"boxSizing",!1,o);if(0>=i||null==i){if(i=Wt(e,t,o),(0>i||null==i)&&(i=e.style[t]),Yt.test(i))return i;r=a&&(b.support.boxSizingReliable||i===e.style[t]),i=parseFloat(i)||0}return i+an(e,t,n||(a?"border":"content"),r,o)+"px"}function un(e){var t=o,n=Gt[e];return n||(n=ln(e,t),"none"!==n&&n||(Pt=(Pt||b("<iframe frameborder='0' width='0' height='0'/>").css("cssText","display:block !important")).appendTo(t.documentElement),t=(Pt[0].contentWindow||Pt[0].contentDocument).document,t.write("<!doctype html><html><body>"),t.close(),n=ln(e,t),Pt.detach()),Gt[e]=n),n}function ln(e,t){var n=b(t.createElement(e)).appendTo(t.body),r=b.css(n[0],"display");return n.remove(),r}b.each(["height","width"],function(e,n){b.cssHooks[n]={get:function(e,r,i){return r?0===e.offsetWidth&&Xt.test(b.css(e,"display"))?b.swap(e,Qt,function(){return sn(e,n,i)}):sn(e,n,i):t},set:function(e,t,r){var i=r&&Rt(e);return on(e,t,r?an(e,n,r,b.support.boxSizing&&"border-box"===b.css(e,"boxSizing",!1,i),i):0)}}}),b.support.opacity||(b.cssHooks.opacity={get:function(e,t){return It.test((t&&e.currentStyle?e.currentStyle.filter:e.style.filter)||"")?.01*parseFloat(RegExp.$1)+"":t?"1":""},set:function(e,t){var n=e.style,r=e.currentStyle,i=b.isNumeric(t)?"alpha(opacity="+100*t+")":"",o=r&&r.filter||n.filter||"";n.zoom=1,(t>=1||""===t)&&""===b.trim(o.replace($t,""))&&n.removeAttribute&&(n.removeAttribute("filter"),""===t||r&&!r.filter)||(n.filter=$t.test(o)?o.replace($t,i):o+" "+i)}}),b(function(){b.support.reliableMarginRight||(b.cssHooks.marginRight={get:function(e,n){return n?b.swap(e,{display:"inline-block"},Wt,[e,"marginRight"]):t}}),!b.support.pixelPosition&&b.fn.position&&b.each(["top","left"],function(e,n){b.cssHooks[n]={get:function(e,r){return r?(r=Wt(e,n),Yt.test(r)?b(e).position()[n]+"px":r):t}}})}),b.expr&&b.expr.filters&&(b.expr.filters.hidden=function(e){return 0>=e.offsetWidth&&0>=e.offsetHeight||!b.support.reliableHiddenOffsets&&"none"===(e.style&&e.style.display||b.css(e,"display"))},b.expr.filters.visible=function(e){return!b.expr.filters.hidden(e)}),b.each({margin:"",padding:"",border:"Width"},function(e,t){b.cssHooks[e+t]={expand:function(n){var r=0,i={},o="string"==typeof n?n.split(" "):[n];for(;4>r;r++)i[e+Zt[r]+t]=o[r]||o[r-2]||o[0];return i}},Ut.test(e)||(b.cssHooks[e+t].set=on)});var cn=/%20/g,pn=/\[\]$/,fn=/\r?\n/g,dn=/^(?:submit|button|image|reset|file)$/i,hn=/^(?:input|select|textarea|keygen)/i;b.fn.extend({serialize:function(){return b.param(this.serializeArray())},serializeArray:function(){return this.map(function(){var e=b.prop(this,"elements");return e?b.makeArray(e):this}).filter(function(){var e=this.type;return this.name&&!b(this).is(":disabled")&&hn.test(this.nodeName)&&!dn.test(e)&&(this.checked||!Nt.test(e))}).map(function(e,t){var n=b(this).val();return null==n?null:b.isArray(n)?b.map(n,function(e){return{name:t.name,value:e.replace(fn,"\r\n")}}):{name:t.name,value:n.replace(fn,"\r\n")}}).get()}}),b.param=function(e,n){var r,i=[],o=function(e,t){t=b.isFunction(t)?t():null==t?"":t,i[i.length]=encodeURIComponent(e)+"="+encodeURIComponent(t)};if(n===t&&(n=b.ajaxSettings&&b.ajaxSettings.traditional),b.isArray(e)||e.jquery&&!b.isPlainObject(e))b.each(e,function(){o(this.name,this.value)});else for(r in e)gn(r,e[r],n,o);return i.join("&").replace(cn,"+")};function gn(e,t,n,r){var i;if(b.isArray(t))b.each(t,function(t,i){n||pn.test(e)?r(e,i):gn(e+"["+("object"==typeof i?t:"")+"]",i,n,r)});else if(n||"object"!==b.type(t))r(e,t);else for(i in t)gn(e+"["+i+"]",t[i],n,r)}b.each("blur focus focusin focusout load resize scroll unload click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave change select submit keydown keypress keyup error contextmenu".split(" "),function(e,t){b.fn[t]=function(e,n){return arguments.length>0?this.on(t,null,e,n):this.trigger(t)}}),b.fn.hover=function(e,t){return this.mouseenter(e).mouseleave(t||e)};var mn,yn,vn=b.now(),bn=/\?/,xn=/#.*$/,wn=/([?&])_=[^&]*/,Tn=/^(.*?):[ \t]*([^\r\n]*)\r?$/gm,Nn=/^(?:about|app|app-storage|.+-extension|file|res|widget):$/,Cn=/^(?:GET|HEAD)$/,kn=/^\/\//,En=/^([\w.+-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,Sn=b.fn.load,An={},jn={},Dn="*/".concat("*");try{yn=a.href}catch(Ln){yn=o.createElement("a"),yn.href="",yn=yn.href}mn=En.exec(yn.toLowerCase())||[];function Hn(e){return function(t,n){"string"!=typeof t&&(n=t,t="*");var r,i=0,o=t.toLowerCase().match(w)||[];if(b.isFunction(n))while(r=o[i++])"+"===r[0]?(r=r.slice(1)||"*",(e[r]=e[r]||[]).unshift(n)):(e[r]=e[r]||[]).push(n)}}function qn(e,n,r,i){var o={},a=e===jn;function s(u){var l;return o[u]=!0,b.each(e[u]||[],function(e,u){var c=u(n,r,i);return"string"!=typeof c||a||o[c]?a?!(l=c):t:(n.dataTypes.unshift(c),s(c),!1)}),l}return s(n.dataTypes[0])||!o["*"]&&s("*")}function Mn(e,n){var r,i,o=b.ajaxSettings.flatOptions||{};for(i in n)n[i]!==t&&((o[i]?e:r||(r={}))[i]=n[i]);return r&&b.extend(!0,e,r),e}b.fn.load=function(e,n,r){if("string"!=typeof e&&Sn)return Sn.apply(this,arguments);var i,o,a,s=this,u=e.indexOf(" ");return u>=0&&(i=e.slice(u,e.length),e=e.slice(0,u)),b.isFunction(n)?(r=n,n=t):n&&"object"==typeof n&&(a="POST"),s.length>0&&b.ajax({url:e,type:a,dataType:"html",data:n}).done(function(e){o=arguments,s.html(i?b("<div>").append(b.parseHTML(e)).find(i):e)}).complete(r&&function(e,t){s.each(r,o||[e.responseText,t,e])}),this},b.each(["ajaxStart","ajaxStop","ajaxComplete","ajaxError","ajaxSuccess","ajaxSend"],function(e,t){b.fn[t]=function(e){return this.on(t,e)}}),b.each(["get","post"],function(e,n){b[n]=function(e,r,i,o){return b.isFunction(r)&&(o=o||i,i=r,r=t),b.ajax({url:e,type:n,dataType:o,data:r,success:i})}}),b.extend({active:0,lastModified:{},etag:{},ajaxSettings:{url:yn,type:"GET",isLocal:Nn.test(mn[1]),global:!0,processData:!0,async:!0,contentType:"application/x-www-form-urlencoded; charset=UTF-8",accepts:{"*":Dn,text:"text/plain",html:"text/html",xml:"application/xml, text/xml",json:"application/json, text/javascript"},contents:{xml:/xml/,html:/html/,json:/json/},responseFields:{xml:"responseXML",text:"responseText"},converters:{"* text":e.String,"text html":!0,"text json":b.parseJSON,"text xml":b.parseXML},flatOptions:{url:!0,context:!0}},ajaxSetup:function(e,t){return t?Mn(Mn(e,b.ajaxSettings),t):Mn(b.ajaxSettings,e)},ajaxPrefilter:Hn(An),ajaxTransport:Hn(jn),ajax:function(e,n){"object"==typeof e&&(n=e,e=t),n=n||{};var r,i,o,a,s,u,l,c,p=b.ajaxSetup({},n),f=p.context||p,d=p.context&&(f.nodeType||f.jquery)?b(f):b.event,h=b.Deferred(),g=b.Callbacks("once memory"),m=p.statusCode||{},y={},v={},x=0,T="canceled",N={readyState:0,getResponseHeader:function(e){var t;if(2===x){if(!c){c={};while(t=Tn.exec(a))c[t[1].toLowerCase()]=t[2]}t=c[e.toLowerCase()]}return null==t?null:t},getAllResponseHeaders:function(){return 2===x?a:null},setRequestHeader:function(e,t){var n=e.toLowerCase();return x||(e=v[n]=v[n]||e,y[e]=t),this},overrideMimeType:function(e){return x||(p.mimeType=e),this},statusCode:function(e){var t;if(e)if(2>x)for(t in e)m[t]=[m[t],e[t]];else N.always(e[N.status]);return this},abort:function(e){var t=e||T;return l&&l.abort(t),k(0,t),this}};if(h.promise(N).complete=g.add,N.success=N.done,N.error=N.fail,p.url=((e||p.url||yn)+"").replace(xn,"").replace(kn,mn[1]+"//"),p.type=n.method||n.type||p.method||p.type,p.dataTypes=b.trim(p.dataType||"*").toLowerCase().match(w)||[""],null==p.crossDomain&&(r=En.exec(p.url.toLowerCase()),p.crossDomain=!(!r||r[1]===mn[1]&&r[2]===mn[2]&&(r[3]||("http:"===r[1]?80:443))==(mn[3]||("http:"===mn[1]?80:443)))),p.data&&p.processData&&"string"!=typeof p.data&&(p.data=b.param(p.data,p.traditional)),qn(An,p,n,N),2===x)return N;u=p.global,u&&0===b.active++&&b.event.trigger("ajaxStart"),p.type=p.type.toUpperCase(),p.hasContent=!Cn.test(p.type),o=p.url,p.hasContent||(p.data&&(o=p.url+=(bn.test(o)?"&":"?")+p.data,delete p.data),p.cache===!1&&(p.url=wn.test(o)?o.replace(wn,"$1_="+vn++):o+(bn.test(o)?"&":"?")+"_="+vn++)),p.ifModified&&(b.lastModified[o]&&N.setRequestHeader("If-Modified-Since",b.lastModified[o]),b.etag[o]&&N.setRequestHeader("If-None-Match",b.etag[o])),(p.data&&p.hasContent&&p.contentType!==!1||n.contentType)&&N.setRequestHeader("Content-Type",p.contentType),N.setRequestHeader("Accept",p.dataTypes[0]&&p.accepts[p.dataTypes[0]]?p.accepts[p.dataTypes[0]]+("*"!==p.dataTypes[0]?", "+Dn+"; q=0.01":""):p.accepts["*"]);for(i in p.headers)N.setRequestHeader(i,p.headers[i]);if(p.beforeSend&&(p.beforeSend.call(f,N,p)===!1||2===x))return N.abort();T="abort";for(i in{success:1,error:1,complete:1})N[i](p[i]);if(l=qn(jn,p,n,N)){N.readyState=1,u&&d.trigger("ajaxSend",[N,p]),p.async&&p.timeout>0&&(s=setTimeout(function(){N.abort("timeout")},p.timeout));try{x=1,l.send(y,k)}catch(C){if(!(2>x))throw C;k(-1,C)}}else k(-1,"No Transport");function k(e,n,r,i){var c,y,v,w,T,C=n;2!==x&&(x=2,s&&clearTimeout(s),l=t,a=i||"",N.readyState=e>0?4:0,r&&(w=_n(p,N,r)),e>=200&&300>e||304===e?(p.ifModified&&(T=N.getResponseHeader("Last-Modified"),T&&(b.lastModified[o]=T),T=N.getResponseHeader("etag"),T&&(b.etag[o]=T)),204===e?(c=!0,C="nocontent"):304===e?(c=!0,C="notmodified"):(c=Fn(p,w),C=c.state,y=c.data,v=c.error,c=!v)):(v=C,(e||!C)&&(C="error",0>e&&(e=0))),N.status=e,N.statusText=(n||C)+"",c?h.resolveWith(f,[y,C,N]):h.rejectWith(f,[N,C,v]),N.statusCode(m),m=t,u&&d.trigger(c?"ajaxSuccess":"ajaxError",[N,p,c?y:v]),g.fireWith(f,[N,C]),u&&(d.trigger("ajaxComplete",[N,p]),--b.active||b.event.trigger("ajaxStop")))}return N},getScript:function(e,n){return b.get(e,t,n,"script")},getJSON:function(e,t,n){return b.get(e,t,n,"json")}});function _n(e,n,r){var i,o,a,s,u=e.contents,l=e.dataTypes,c=e.responseFields;for(s in c)s in r&&(n[c[s]]=r[s]);while("*"===l[0])l.shift(),o===t&&(o=e.mimeType||n.getResponseHeader("Content-Type"));if(o)for(s in u)if(u[s]&&u[s].test(o)){l.unshift(s);break}if(l[0]in r)a=l[0];else{for(s in r){if(!l[0]||e.converters[s+" "+l[0]]){a=s;break}i||(i=s)}a=a||i}return a?(a!==l[0]&&l.unshift(a),r[a]):t}function Fn(e,t){var n,r,i,o,a={},s=0,u=e.dataTypes.slice(),l=u[0];if(e.dataFilter&&(t=e.dataFilter(t,e.dataType)),u[1])for(i in e.converters)a[i.toLowerCase()]=e.converters[i];for(;r=u[++s];)if("*"!==r){if("*"!==l&&l!==r){if(i=a[l+" "+r]||a["* "+r],!i)for(n in a)if(o=n.split(" "),o[1]===r&&(i=a[l+" "+o[0]]||a["* "+o[0]])){i===!0?i=a[n]:a[n]!==!0&&(r=o[0],u.splice(s--,0,r));break}if(i!==!0)if(i&&e["throws"])t=i(t);else try{t=i(t)}catch(c){return{state:"parsererror",error:i?c:"No conversion from "+l+" to "+r}}}l=r}return{state:"success",data:t}}b.ajaxSetup({accepts:{script:"text/javascript, application/javascript, application/ecmascript, application/x-ecmascript"},contents:{script:/(?:java|ecma)script/},converters:{"text script":function(e){return b.globalEval(e),e}}}),b.ajaxPrefilter("script",function(e){e.cache===t&&(e.cache=!1),e.crossDomain&&(e.type="GET",e.global=!1)}),b.ajaxTransport("script",function(e){if(e.crossDomain){var n,r=o.head||b("head")[0]||o.documentElement;return{send:function(t,i){n=o.createElement("script"),n.async=!0,e.scriptCharset&&(n.charset=e.scriptCharset),n.src=e.url,n.onload=n.onreadystatechange=function(e,t){(t||!n.readyState||/loaded|complete/.test(n.readyState))&&(n.onload=n.onreadystatechange=null,n.parentNode&&n.parentNode.removeChild(n),n=null,t||i(200,"success"))},r.insertBefore(n,r.firstChild)},abort:function(){n&&n.onload(t,!0)}}}});var On=[],Bn=/(=)\?(?=&|$)|\?\?/;b.ajaxSetup({jsonp:"callback",jsonpCallback:function(){var e=On.pop()||b.expando+"_"+vn++;return this[e]=!0,e}}),b.ajaxPrefilter("json jsonp",function(n,r,i){var o,a,s,u=n.jsonp!==!1&&(Bn.test(n.url)?"url":"string"==typeof n.data&&!(n.contentType||"").indexOf("application/x-www-form-urlencoded")&&Bn.test(n.data)&&"data");return u||"jsonp"===n.dataTypes[0]?(o=n.jsonpCallback=b.isFunction(n.jsonpCallback)?n.jsonpCallback():n.jsonpCallback,u?n[u]=n[u].replace(Bn,"$1"+o):n.jsonp!==!1&&(n.url+=(bn.test(n.url)?"&":"?")+n.jsonp+"="+o),n.converters["script json"]=function(){return s||b.error(o+" was not called"),s[0]},n.dataTypes[0]="json",a=e[o],e[o]=function(){s=arguments},i.always(function(){e[o]=a,n[o]&&(n.jsonpCallback=r.jsonpCallback,On.push(o)),s&&b.isFunction(a)&&a(s[0]),s=a=t}),"script"):t});var Pn,Rn,Wn=0,$n=e.ActiveXObject&&function(){var e;for(e in Pn)Pn[e](t,!0)};function In(){try{return new e.XMLHttpRequest}catch(t){}}function zn(){try{return new e.ActiveXObject("Microsoft.XMLHTTP")}catch(t){}}b.ajaxSettings.xhr=e.ActiveXObject?function(){return!this.isLocal&&In()||zn()}:In,Rn=b.ajaxSettings.xhr(),b.support.cors=!!Rn&&"withCredentials"in Rn,Rn=b.support.ajax=!!Rn,Rn&&b.ajaxTransport(function(n){if(!n.crossDomain||b.support.cors){var r;return{send:function(i,o){var a,s,u=n.xhr();if(n.username?u.open(n.type,n.url,n.async,n.username,n.password):u.open(n.type,n.url,n.async),n.xhrFields)for(s in n.xhrFields)u[s]=n.xhrFields[s];n.mimeType&&u.overrideMimeType&&u.overrideMimeType(n.mimeType),n.crossDomain||i["X-Requested-With"]||(i["X-Requested-With"]="XMLHttpRequest");try{for(s in i)u.setRequestHeader(s,i[s])}catch(l){}u.send(n.hasContent&&n.data||null),r=function(e,i){var s,l,c,p;try{if(r&&(i||4===u.readyState))if(r=t,a&&(u.onreadystatechange=b.noop,$n&&delete Pn[a]),i)4!==u.readyState&&u.abort();else{p={},s=u.status,l=u.getAllResponseHeaders(),"string"==typeof u.responseText&&(p.text=u.responseText);try{c=u.statusText}catch(f){c=""}s||!n.isLocal||n.crossDomain?1223===s&&(s=204):s=p.text?200:404}}catch(d){i||o(-1,d)}p&&o(s,c,p,l)},n.async?4===u.readyState?setTimeout(r):(a=++Wn,$n&&(Pn||(Pn={},b(e).unload($n)),Pn[a]=r),u.onreadystatechange=r):r()},abort:function(){r&&r(t,!0)}}}});var Xn,Un,Vn=/^(?:toggle|show|hide)$/,Yn=RegExp("^(?:([+-])=|)("+x+")([a-z%]*)$","i"),Jn=/queueHooks$/,Gn=[nr],Qn={"*":[function(e,t){var n,r,i=this.createTween(e,t),o=Yn.exec(t),a=i.cur(),s=+a||0,u=1,l=20;if(o){if(n=+o[2],r=o[3]||(b.cssNumber[e]?"":"px"),"px"!==r&&s){s=b.css(i.elem,e,!0)||n||1;do u=u||".5",s/=u,b.style(i.elem,e,s+r);while(u!==(u=i.cur()/a)&&1!==u&&--l)}i.unit=r,i.start=s,i.end=o[1]?s+(o[1]+1)*n:n}return i}]};function Kn(){return setTimeout(function(){Xn=t}),Xn=b.now()}function Zn(e,t){b.each(t,function(t,n){var r=(Qn[t]||[]).concat(Qn["*"]),i=0,o=r.length;for(;o>i;i++)if(r[i].call(e,t,n))return})}function er(e,t,n){var r,i,o=0,a=Gn.length,s=b.Deferred().always(function(){delete u.elem}),u=function(){if(i)return!1;var t=Xn||Kn(),n=Math.max(0,l.startTime+l.duration-t),r=n/l.duration||0,o=1-r,a=0,u=l.tweens.length;for(;u>a;a++)l.tweens[a].run(o);return s.notifyWith(e,[l,o,n]),1>o&&u?n:(s.resolveWith(e,[l]),!1)},l=s.promise({elem:e,props:b.extend({},t),opts:b.extend(!0,{specialEasing:{}},n),originalProperties:t,originalOptions:n,startTime:Xn||Kn(),duration:n.duration,tweens:[],createTween:function(t,n){var r=b.Tween(e,l.opts,t,n,l.opts.specialEasing[t]||l.opts.easing);return l.tweens.push(r),r},stop:function(t){var n=0,r=t?l.tweens.length:0;if(i)return this;for(i=!0;r>n;n++)l.tweens[n].run(1);return t?s.resolveWith(e,[l,t]):s.rejectWith(e,[l,t]),this}}),c=l.props;for(tr(c,l.opts.specialEasing);a>o;o++)if(r=Gn[o].call(l,e,c,l.opts))return r;return Zn(l,c),b.isFunction(l.opts.start)&&l.opts.start.call(e,l),b.fx.timer(b.extend(u,{elem:e,anim:l,queue:l.opts.queue})),l.progress(l.opts.progress).done(l.opts.done,l.opts.complete).fail(l.opts.fail).always(l.opts.always)}function tr(e,t){var n,r,i,o,a;for(i in e)if(r=b.camelCase(i),o=t[r],n=e[i],b.isArray(n)&&(o=n[1],n=e[i]=n[0]),i!==r&&(e[r]=n,delete e[i]),a=b.cssHooks[r],a&&"expand"in a){n=a.expand(n),delete e[r];for(i in n)i in e||(e[i]=n[i],t[i]=o)}else t[r]=o}b.Animation=b.extend(er,{tweener:function(e,t){b.isFunction(e)?(t=e,e=["*"]):e=e.split(" ");var n,r=0,i=e.length;for(;i>r;r++)n=e[r],Qn[n]=Qn[n]||[],Qn[n].unshift(t)},prefilter:function(e,t){t?Gn.unshift(e):Gn.push(e)}});function nr(e,t,n){var r,i,o,a,s,u,l,c,p,f=this,d=e.style,h={},g=[],m=e.nodeType&&nn(e);n.queue||(c=b._queueHooks(e,"fx"),null==c.unqueued&&(c.unqueued=0,p=c.empty.fire,c.empty.fire=function(){c.unqueued||p()}),c.unqueued++,f.always(function(){f.always(function(){c.unqueued--,b.queue(e,"fx").length||c.empty.fire()})})),1===e.nodeType&&("height"in t||"width"in t)&&(n.overflow=[d.overflow,d.overflowX,d.overflowY],"inline"===b.css(e,"display")&&"none"===b.css(e,"float")&&(b.support.inlineBlockNeedsLayout&&"inline"!==un(e.nodeName)?d.zoom=1:d.display="inline-block")),n.overflow&&(d.overflow="hidden",b.support.shrinkWrapBlocks||f.always(function(){d.overflow=n.overflow[0],d.overflowX=n.overflow[1],d.overflowY=n.overflow[2]}));for(i in t)if(a=t[i],Vn.exec(a)){if(delete t[i],u=u||"toggle"===a,a===(m?"hide":"show"))continue;g.push(i)}if(o=g.length){s=b._data(e,"fxshow")||b._data(e,"fxshow",{}),"hidden"in s&&(m=s.hidden),u&&(s.hidden=!m),m?b(e).show():f.done(function(){b(e).hide()}),f.done(function(){var t;b._removeData(e,"fxshow");for(t in h)b.style(e,t,h[t])});for(i=0;o>i;i++)r=g[i],l=f.createTween(r,m?s[r]:0),h[r]=s[r]||b.style(e,r),r in s||(s[r]=l.start,m&&(l.end=l.start,l.start="width"===r||"height"===r?1:0))}}function rr(e,t,n,r,i){return new rr.prototype.init(e,t,n,r,i)}b.Tween=rr,rr.prototype={constructor:rr,init:function(e,t,n,r,i,o){this.elem=e,this.prop=n,this.easing=i||"swing",this.options=t,this.start=this.now=this.cur(),this.end=r,this.unit=o||(b.cssNumber[n]?"":"px")},cur:function(){var e=rr.propHooks[this.prop];return e&&e.get?e.get(this):rr.propHooks._default.get(this)},run:function(e){var t,n=rr.propHooks[this.prop];return this.pos=t=this.options.duration?b.easing[this.easing](e,this.options.duration*e,0,1,this.options.duration):e,this.now=(this.end-this.start)*t+this.start,this.options.step&&this.options.step.call(this.elem,this.now,this),n&&n.set?n.set(this):rr.propHooks._default.set(this),this}},rr.prototype.init.prototype=rr.prototype,rr.propHooks={_default:{get:function(e){var t;return null==e.elem[e.prop]||e.elem.style&&null!=e.elem.style[e.prop]?(t=b.css(e.elem,e.prop,""),t&&"auto"!==t?t:0):e.elem[e.prop]},set:function(e){b.fx.step[e.prop]?b.fx.step[e.prop](e):e.elem.style&&(null!=e.elem.style[b.cssProps[e.prop]]||b.cssHooks[e.prop])?b.style(e.elem,e.prop,e.now+e.unit):e.elem[e.prop]=e.now}}},rr.propHooks.scrollTop=rr.propHooks.scrollLeft={set:function(e){e.elem.nodeType&&e.elem.parentNode&&(e.elem[e.prop]=e.now)}},b.each(["toggle","show","hide"],function(e,t){var n=b.fn[t];b.fn[t]=function(e,r,i){return null==e||"boolean"==typeof e?n.apply(this,arguments):this.animate(ir(t,!0),e,r,i)}}),b.fn.extend({fadeTo:function(e,t,n,r){return this.filter(nn).css("opacity",0).show().end().animate({opacity:t},e,n,r)},animate:function(e,t,n,r){var i=b.isEmptyObject(e),o=b.speed(t,n,r),a=function(){var t=er(this,b.extend({},e),o);a.finish=function(){t.stop(!0)},(i||b._data(this,"finish"))&&t.stop(!0)};return a.finish=a,i||o.queue===!1?this.each(a):this.queue(o.queue,a)},stop:function(e,n,r){var i=function(e){var t=e.stop;delete e.stop,t(r)};return"string"!=typeof e&&(r=n,n=e,e=t),n&&e!==!1&&this.queue(e||"fx",[]),this.each(function(){var t=!0,n=null!=e&&e+"queueHooks",o=b.timers,a=b._data(this);if(n)a[n]&&a[n].stop&&i(a[n]);else for(n in a)a[n]&&a[n].stop&&Jn.test(n)&&i(a[n]);for(n=o.length;n--;)o[n].elem!==this||null!=e&&o[n].queue!==e||(o[n].anim.stop(r),t=!1,o.splice(n,1));(t||!r)&&b.dequeue(this,e)})},finish:function(e){return e!==!1&&(e=e||"fx"),this.each(function(){var t,n=b._data(this),r=n[e+"queue"],i=n[e+"queueHooks"],o=b.timers,a=r?r.length:0;for(n.finish=!0,b.queue(this,e,[]),i&&i.cur&&i.cur.finish&&i.cur.finish.call(this),t=o.length;t--;)o[t].elem===this&&o[t].queue===e&&(o[t].anim.stop(!0),o.splice(t,1));for(t=0;a>t;t++)r[t]&&r[t].finish&&r[t].finish.call(this);delete n.finish})}});function ir(e,t){var n,r={height:e},i=0;for(t=t?1:0;4>i;i+=2-t)n=Zt[i],r["margin"+n]=r["padding"+n]=e;return t&&(r.opacity=r.width=e),r}b.each({slideDown:ir("show"),slideUp:ir("hide"),slideToggle:ir("toggle"),fadeIn:{opacity:"show"},fadeOut:{opacity:"hide"},fadeToggle:{opacity:"toggle"}},function(e,t){b.fn[e]=function(e,n,r){return this.animate(t,e,n,r)}}),b.speed=function(e,t,n){var r=e&&"object"==typeof e?b.extend({},e):{complete:n||!n&&t||b.isFunction(e)&&e,duration:e,easing:n&&t||t&&!b.isFunction(t)&&t};return r.duration=b.fx.off?0:"number"==typeof r.duration?r.duration:r.duration in b.fx.speeds?b.fx.speeds[r.duration]:b.fx.speeds._default,(null==r.queue||r.queue===!0)&&(r.queue="fx"),r.old=r.complete,r.complete=function(){b.isFunction(r.old)&&r.old.call(this),r.queue&&b.dequeue(this,r.queue)},r},b.easing={linear:function(e){return e},swing:function(e){return.5-Math.cos(e*Math.PI)/2}},b.timers=[],b.fx=rr.prototype.init,b.fx.tick=function(){var e,n=b.timers,r=0;for(Xn=b.now();n.length>r;r++)e=n[r],e()||n[r]!==e||n.splice(r--,1);n.length||b.fx.stop(),Xn=t},b.fx.timer=function(e){e()&&b.timers.push(e)&&b.fx.start()},b.fx.interval=13,b.fx.start=function(){Un||(Un=setInterval(b.fx.tick,b.fx.interval))},b.fx.stop=function(){clearInterval(Un),Un=null},b.fx.speeds={slow:600,fast:200,_default:400},b.fx.step={},b.expr&&b.expr.filters&&(b.expr.filters.animated=function(e){return b.grep(b.timers,function(t){return e===t.elem}).length}),b.fn.offset=function(e){if(arguments.length)return e===t?this:this.each(function(t){b.offset.setOffset(this,e,t)});var n,r,o={top:0,left:0},a=this[0],s=a&&a.ownerDocument;if(s)return n=s.documentElement,b.contains(n,a)?(typeof a.getBoundingClientRect!==i&&(o=a.getBoundingClientRect()),r=or(s),{top:o.top+(r.pageYOffset||n.scrollTop)-(n.clientTop||0),left:o.left+(r.pageXOffset||n.scrollLeft)-(n.clientLeft||0)}):o},b.offset={setOffset:function(e,t,n){var r=b.css(e,"position");"static"===r&&(e.style.position="relative");var i=b(e),o=i.offset(),a=b.css(e,"top"),s=b.css(e,"left"),u=("absolute"===r||"fixed"===r)&&b.inArray("auto",[a,s])>-1,l={},c={},p,f;u?(c=i.position(),p=c.top,f=c.left):(p=parseFloat(a)||0,f=parseFloat(s)||0),b.isFunction(t)&&(t=t.call(e,n,o)),null!=t.top&&(l.top=t.top-o.top+p),null!=t.left&&(l.left=t.left-o.left+f),"using"in t?t.using.call(e,l):i.css(l)}},b.fn.extend({position:function(){if(this[0]){var e,t,n={top:0,left:0},r=this[0];return"fixed"===b.css(r,"position")?t=r.getBoundingClientRect():(e=this.offsetParent(),t=this.offset(),b.nodeName(e[0],"html")||(n=e.offset()),n.top+=b.css(e[0],"borderTopWidth",!0),n.left+=b.css(e[0],"borderLeftWidth",!0)),{top:t.top-n.top-b.css(r,"marginTop",!0),left:t.left-n.left-b.css(r,"marginLeft",!0)}}},offsetParent:function(){return this.map(function(){var e=this.offsetParent||o.documentElement;while(e&&!b.nodeName(e,"html")&&"static"===b.css(e,"position"))e=e.offsetParent;return e||o.documentElement})}}),b.each({scrollLeft:"pageXOffset",scrollTop:"pageYOffset"},function(e,n){var r=/Y/.test(n);b.fn[e]=function(i){return b.access(this,function(e,i,o){var a=or(e);return o===t?a?n in a?a[n]:a.document.documentElement[i]:e[i]:(a?a.scrollTo(r?b(a).scrollLeft():o,r?o:b(a).scrollTop()):e[i]=o,t)},e,i,arguments.length,null)}});function or(e){return b.isWindow(e)?e:9===e.nodeType?e.defaultView||e.parentWindow:!1}b.each({Height:"height",Width:"width"},function(e,n){b.each({padding:"inner"+e,content:n,"":"outer"+e},function(r,i){b.fn[i]=function(i,o){var a=arguments.length&&(r||"boolean"!=typeof i),s=r||(i===!0||o===!0?"margin":"border");return b.access(this,function(n,r,i){var o;return b.isWindow(n)?n.document.documentElement["client"+e]:9===n.nodeType?(o=n.documentElement,Math.max(n.body["scroll"+e],o["scroll"+e],n.body["offset"+e],o["offset"+e],o["client"+e])):i===t?b.css(n,r,s):b.style(n,r,i,s)},n,a?i:t,a,null)}})}),e.jQuery=e.$=b,"function"==typeof define&&define.amd&&define.amd.jQuery&&define("jquery",[],function(){return b})})(window);
-/*!
- * QUnit 2.4.1
- * https://qunitjs.com/
- *
- * Copyright jQuery Foundation and other contributors
- * Released under the MIT license
- * https://jquery.org/license
- *
- * Date: 2017-10-22T05:12Z
- */
-(function (global$1) {
-  'use strict';
-
-  global$1 = 'default' in global$1 ? global$1['default'] : global$1;
-
-  var window = global$1.window;
-  var self$1 = global$1.self;
-  var console = global$1.console;
-  var setTimeout = global$1.setTimeout;
-  var clearTimeout = global$1.clearTimeout;
-
-  var document = window && window.document;
-  var navigator = window && window.navigator;
-
-  var localSessionStorage = function () {
-  	var x = "qunit-test-string";
-  	try {
-  		global$1.sessionStorage.setItem(x, x);
-  		global$1.sessionStorage.removeItem(x);
-  		return global$1.sessionStorage;
-  	} catch (e) {
-  		return undefined;
-  	}
-  }();
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  };
-
-
-
-
-
-
-
-
-
-
-
-  var classCallCheck = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  var createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  var toConsumableArray = function (arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-      return arr2;
-    } else {
-      return Array.from(arr);
-    }
-  };
-
-  var toString = Object.prototype.toString;
-  var hasOwn = Object.prototype.hasOwnProperty;
-  var now = Date.now || function () {
-  	return new Date().getTime();
-  };
-
-  var defined = {
-  	document: window && window.document !== undefined,
-  	setTimeout: setTimeout !== undefined
-  };
-
-  // Returns a new Array with the elements that are in a but not in b
-  function diff(a, b) {
-  	var i,
-  	    j,
-  	    result = a.slice();
-
-  	for (i = 0; i < result.length; i++) {
-  		for (j = 0; j < b.length; j++) {
-  			if (result[i] === b[j]) {
-  				result.splice(i, 1);
-  				i--;
-  				break;
-  			}
-  		}
-  	}
-  	return result;
-  }
-
-  /**
-   * Determines whether an element exists in a given array or not.
-   *
-   * @method inArray
-   * @param {Any} elem
-   * @param {Array} array
-   * @return {Boolean}
-   */
-  function inArray(elem, array) {
-  	return array.indexOf(elem) !== -1;
-  }
-
-  /**
-   * Makes a clone of an object using only Array or Object as base,
-   * and copies over the own enumerable properties.
-   *
-   * @param {Object} obj
-   * @return {Object} New object with only the own properties (recursively).
-   */
-  function objectValues(obj) {
-  	var key,
-  	    val,
-  	    vals = is("array", obj) ? [] : {};
-  	for (key in obj) {
-  		if (hasOwn.call(obj, key)) {
-  			val = obj[key];
-  			vals[key] = val === Object(val) ? objectValues(val) : val;
-  		}
-  	}
-  	return vals;
-  }
-
-  function extend(a, b, undefOnly) {
-  	for (var prop in b) {
-  		if (hasOwn.call(b, prop)) {
-  			if (b[prop] === undefined) {
-  				delete a[prop];
-  			} else if (!(undefOnly && typeof a[prop] !== "undefined")) {
-  				a[prop] = b[prop];
-  			}
-  		}
-  	}
-
-  	return a;
-  }
-
-  function objectType(obj) {
-  	if (typeof obj === "undefined") {
-  		return "undefined";
-  	}
-
-  	// Consider: typeof null === object
-  	if (obj === null) {
-  		return "null";
-  	}
-
-  	var match = toString.call(obj).match(/^\[object\s(.*)\]$/),
-  	    type = match && match[1];
-
-  	switch (type) {
-  		case "Number":
-  			if (isNaN(obj)) {
-  				return "nan";
-  			}
-  			return "number";
-  		case "String":
-  		case "Boolean":
-  		case "Array":
-  		case "Set":
-  		case "Map":
-  		case "Date":
-  		case "RegExp":
-  		case "Function":
-  		case "Symbol":
-  			return type.toLowerCase();
-  		default:
-  			return typeof obj === "undefined" ? "undefined" : _typeof(obj);
-  	}
-  }
-
-  // Safe object type checking
-  function is(type, obj) {
-  	return objectType(obj) === type;
-  }
-
-  // Based on Java's String.hashCode, a simple but not
-  // rigorously collision resistant hashing function
-  function generateHash(module, testName) {
-  	var str = module + "\x1C" + testName;
-  	var hash = 0;
-
-  	for (var i = 0; i < str.length; i++) {
-  		hash = (hash << 5) - hash + str.charCodeAt(i);
-  		hash |= 0;
-  	}
-
-  	// Convert the possibly negative integer hash code into an 8 character hex string, which isn't
-  	// strictly necessary but increases user understanding that the id is a SHA-like hash
-  	var hex = (0x100000000 + hash).toString(16);
-  	if (hex.length < 8) {
-  		hex = "0000000" + hex;
-  	}
-
-  	return hex.slice(-8);
-  }
-
-  // Test for equality any JavaScript type.
-  // Authors: Philippe Rathé <prathe@gmail.com>, David Chan <david@troi.org>
-  var equiv = (function () {
-
-  	// Value pairs queued for comparison. Used for breadth-first processing order, recursion
-  	// detection and avoiding repeated comparison (see below for details).
-  	// Elements are { a: val, b: val }.
-  	var pairs = [];
-
-  	var getProto = Object.getPrototypeOf || function (obj) {
-  		return obj.__proto__;
-  	};
-
-  	function useStrictEquality(a, b) {
-
-  		// This only gets called if a and b are not strict equal, and is used to compare on
-  		// the primitive values inside object wrappers. For example:
-  		// `var i = 1;`
-  		// `var j = new Number(1);`
-  		// Neither a nor b can be null, as a !== b and they have the same type.
-  		if ((typeof a === "undefined" ? "undefined" : _typeof(a)) === "object") {
-  			a = a.valueOf();
-  		}
-  		if ((typeof b === "undefined" ? "undefined" : _typeof(b)) === "object") {
-  			b = b.valueOf();
-  		}
-
-  		return a === b;
-  	}
-
-  	function compareConstructors(a, b) {
-  		var protoA = getProto(a);
-  		var protoB = getProto(b);
-
-  		// Comparing constructors is more strict than using `instanceof`
-  		if (a.constructor === b.constructor) {
-  			return true;
-  		}
-
-  		// Ref #851
-  		// If the obj prototype descends from a null constructor, treat it
-  		// as a null prototype.
-  		if (protoA && protoA.constructor === null) {
-  			protoA = null;
-  		}
-  		if (protoB && protoB.constructor === null) {
-  			protoB = null;
-  		}
-
-  		// Allow objects with no prototype to be equivalent to
-  		// objects with Object as their constructor.
-  		if (protoA === null && protoB === Object.prototype || protoB === null && protoA === Object.prototype) {
-  			return true;
-  		}
-
-  		return false;
-  	}
-
-  	function getRegExpFlags(regexp) {
-  		return "flags" in regexp ? regexp.flags : regexp.toString().match(/[gimuy]*$/)[0];
-  	}
-
-  	function isContainer(val) {
-  		return ["object", "array", "map", "set"].indexOf(objectType(val)) !== -1;
-  	}
-
-  	function breadthFirstCompareChild(a, b) {
-
-  		// If a is a container not reference-equal to b, postpone the comparison to the
-  		// end of the pairs queue -- unless (a, b) has been seen before, in which case skip
-  		// over the pair.
-  		if (a === b) {
-  			return true;
-  		}
-  		if (!isContainer(a)) {
-  			return typeEquiv(a, b);
-  		}
-  		if (pairs.every(function (pair) {
-  			return pair.a !== a || pair.b !== b;
-  		})) {
-
-  			// Not yet started comparing this pair
-  			pairs.push({ a: a, b: b });
-  		}
-  		return true;
-  	}
-
-  	var callbacks = {
-  		"string": useStrictEquality,
-  		"boolean": useStrictEquality,
-  		"number": useStrictEquality,
-  		"null": useStrictEquality,
-  		"undefined": useStrictEquality,
-  		"symbol": useStrictEquality,
-  		"date": useStrictEquality,
-
-  		"nan": function nan() {
-  			return true;
-  		},
-
-  		"regexp": function regexp(a, b) {
-  			return a.source === b.source &&
-
-  			// Include flags in the comparison
-  			getRegExpFlags(a) === getRegExpFlags(b);
-  		},
-
-  		// abort (identical references / instance methods were skipped earlier)
-  		"function": function _function() {
-  			return false;
-  		},
-
-  		"array": function array(a, b) {
-  			var i, len;
-
-  			len = a.length;
-  			if (len !== b.length) {
-
-  				// Safe and faster
-  				return false;
-  			}
-
-  			for (i = 0; i < len; i++) {
-
-  				// Compare non-containers; queue non-reference-equal containers
-  				if (!breadthFirstCompareChild(a[i], b[i])) {
-  					return false;
-  				}
-  			}
-  			return true;
-  		},
-
-  		// Define sets a and b to be equivalent if for each element aVal in a, there
-  		// is some element bVal in b such that aVal and bVal are equivalent. Element
-  		// repetitions are not counted, so these are equivalent:
-  		// a = new Set( [ {}, [], [] ] );
-  		// b = new Set( [ {}, {}, [] ] );
-  		"set": function set$$1(a, b) {
-  			var innerEq,
-  			    outerEq = true;
-
-  			if (a.size !== b.size) {
-
-  				// This optimization has certain quirks because of the lack of
-  				// repetition counting. For instance, adding the same
-  				// (reference-identical) element to two equivalent sets can
-  				// make them non-equivalent.
-  				return false;
-  			}
-
-  			a.forEach(function (aVal) {
-
-  				// Short-circuit if the result is already known. (Using for...of
-  				// with a break clause would be cleaner here, but it would cause
-  				// a syntax error on older Javascript implementations even if
-  				// Set is unused)
-  				if (!outerEq) {
-  					return;
-  				}
-
-  				innerEq = false;
-
-  				b.forEach(function (bVal) {
-  					var parentPairs;
-
-  					// Likewise, short-circuit if the result is already known
-  					if (innerEq) {
-  						return;
-  					}
-
-  					// Swap out the global pairs list, as the nested call to
-  					// innerEquiv will clobber its contents
-  					parentPairs = pairs;
-  					if (innerEquiv(bVal, aVal)) {
-  						innerEq = true;
-  					}
-
-  					// Replace the global pairs list
-  					pairs = parentPairs;
-  				});
-
-  				if (!innerEq) {
-  					outerEq = false;
-  				}
-  			});
-
-  			return outerEq;
-  		},
-
-  		// Define maps a and b to be equivalent if for each key-value pair (aKey, aVal)
-  		// in a, there is some key-value pair (bKey, bVal) in b such that
-  		// [ aKey, aVal ] and [ bKey, bVal ] are equivalent. Key repetitions are not
-  		// counted, so these are equivalent:
-  		// a = new Map( [ [ {}, 1 ], [ {}, 1 ], [ [], 1 ] ] );
-  		// b = new Map( [ [ {}, 1 ], [ [], 1 ], [ [], 1 ] ] );
-  		"map": function map(a, b) {
-  			var innerEq,
-  			    outerEq = true;
-
-  			if (a.size !== b.size) {
-
-  				// This optimization has certain quirks because of the lack of
-  				// repetition counting. For instance, adding the same
-  				// (reference-identical) key-value pair to two equivalent maps
-  				// can make them non-equivalent.
-  				return false;
-  			}
-
-  			a.forEach(function (aVal, aKey) {
-
-  				// Short-circuit if the result is already known. (Using for...of
-  				// with a break clause would be cleaner here, but it would cause
-  				// a syntax error on older Javascript implementations even if
-  				// Map is unused)
-  				if (!outerEq) {
-  					return;
-  				}
-
-  				innerEq = false;
-
-  				b.forEach(function (bVal, bKey) {
-  					var parentPairs;
-
-  					// Likewise, short-circuit if the result is already known
-  					if (innerEq) {
-  						return;
-  					}
-
-  					// Swap out the global pairs list, as the nested call to
-  					// innerEquiv will clobber its contents
-  					parentPairs = pairs;
-  					if (innerEquiv([bVal, bKey], [aVal, aKey])) {
-  						innerEq = true;
-  					}
-
-  					// Replace the global pairs list
-  					pairs = parentPairs;
-  				});
-
-  				if (!innerEq) {
-  					outerEq = false;
-  				}
-  			});
-
-  			return outerEq;
-  		},
-
-  		"object": function object(a, b) {
-  			var i,
-  			    aProperties = [],
-  			    bProperties = [];
-
-  			if (compareConstructors(a, b) === false) {
-  				return false;
-  			}
-
-  			// Be strict: don't ensure hasOwnProperty and go deep
-  			for (i in a) {
-
-  				// Collect a's properties
-  				aProperties.push(i);
-
-  				// Skip OOP methods that look the same
-  				if (a.constructor !== Object && typeof a.constructor !== "undefined" && typeof a[i] === "function" && typeof b[i] === "function" && a[i].toString() === b[i].toString()) {
-  					continue;
-  				}
-
-  				// Compare non-containers; queue non-reference-equal containers
-  				if (!breadthFirstCompareChild(a[i], b[i])) {
-  					return false;
-  				}
-  			}
-
-  			for (i in b) {
-
-  				// Collect b's properties
-  				bProperties.push(i);
-  			}
-
-  			// Ensures identical properties name
-  			return typeEquiv(aProperties.sort(), bProperties.sort());
-  		}
-  	};
-
-  	function typeEquiv(a, b) {
-  		var type = objectType(a);
-
-  		// Callbacks for containers will append to the pairs queue to achieve breadth-first
-  		// search order. The pairs queue is also used to avoid reprocessing any pair of
-  		// containers that are reference-equal to a previously visited pair (a special case
-  		// this being recursion detection).
-  		//
-  		// Because of this approach, once typeEquiv returns a false value, it should not be
-  		// called again without clearing the pair queue else it may wrongly report a visited
-  		// pair as being equivalent.
-  		return objectType(b) === type && callbacks[type](a, b);
-  	}
-
-  	function innerEquiv(a, b) {
-  		var i, pair;
-
-  		// We're done when there's nothing more to compare
-  		if (arguments.length < 2) {
-  			return true;
-  		}
-
-  		// Clear the global pair queue and add the top-level values being compared
-  		pairs = [{ a: a, b: b }];
-
-  		for (i = 0; i < pairs.length; i++) {
-  			pair = pairs[i];
-
-  			// Perform type-specific comparison on any pairs that are not strictly
-  			// equal. For container types, that comparison will postpone comparison
-  			// of any sub-container pair to the end of the pair queue. This gives
-  			// breadth-first search order. It also avoids the reprocessing of
-  			// reference-equal siblings, cousins etc, which can have a significant speed
-  			// impact when comparing a container of small objects each of which has a
-  			// reference to the same (singleton) large object.
-  			if (pair.a !== pair.b && !typeEquiv(pair.a, pair.b)) {
-  				return false;
-  			}
-  		}
-
-  		// ...across all consecutive argument pairs
-  		return arguments.length === 2 || innerEquiv.apply(this, [].slice.call(arguments, 1));
-  	}
-
-  	return function () {
-  		var result = innerEquiv.apply(undefined, arguments);
-
-  		// Release any retained objects
-  		pairs.length = 0;
-  		return result;
-  	};
-  })();
-
-  /**
-   * Config object: Maintain internal state
-   * Later exposed as QUnit.config
-   * `config` initialized at top of scope
-   */
-  var config = {
-
-  	// The queue of tests to run
-  	queue: [],
-
-  	// Block until document ready
-  	blocking: true,
-
-  	// By default, run previously failed tests first
-  	// very useful in combination with "Hide passed tests" checked
-  	reorder: true,
-
-  	// By default, modify document.title when suite is done
-  	altertitle: true,
-
-  	// HTML Reporter: collapse every test except the first failing test
-  	// If false, all failing tests will be expanded
-  	collapse: true,
-
-  	// By default, scroll to top of the page when suite is done
-  	scrolltop: true,
-
-  	// Depth up-to which object will be dumped
-  	maxDepth: 5,
-
-  	// When enabled, all tests must call expect()
-  	requireExpects: false,
-
-  	// Placeholder for user-configurable form-exposed URL parameters
-  	urlConfig: [],
-
-  	// Set of all modules.
-  	modules: [],
-
-  	// The first unnamed module
-  	currentModule: {
-  		name: "",
-  		tests: [],
-  		childModules: [],
-  		testsRun: 0,
-  		unskippedTestsRun: 0,
-  		hooks: {
-  			before: [],
-  			beforeEach: [],
-  			afterEach: [],
-  			after: []
-  		}
-  	},
-
-  	callbacks: {},
-
-  	// The storage module to use for reordering tests
-  	storage: localSessionStorage
-  };
-
-  // take a predefined QUnit.config and extend the defaults
-  var globalConfig = window && window.QUnit && window.QUnit.config;
-
-  // only extend the global config if there is no QUnit overload
-  if (window && window.QUnit && !window.QUnit.version) {
-  	extend(config, globalConfig);
-  }
-
-  // Push a loose unnamed module to the modules collection
-  config.modules.push(config.currentModule);
-
-  // Based on jsDump by Ariel Flesler
-  // http://flesler.blogspot.com/2008/05/jsdump-pretty-dump-of-any-javascript.html
-  var dump = (function () {
-  	function quote(str) {
-  		return "\"" + str.toString().replace(/\\/g, "\\\\").replace(/"/g, "\\\"") + "\"";
-  	}
-  	function literal(o) {
-  		return o + "";
-  	}
-  	function join(pre, arr, post) {
-  		var s = dump.separator(),
-  		    base = dump.indent(),
-  		    inner = dump.indent(1);
-  		if (arr.join) {
-  			arr = arr.join("," + s + inner);
-  		}
-  		if (!arr) {
-  			return pre + post;
-  		}
-  		return [pre, inner + arr, base + post].join(s);
-  	}
-  	function array(arr, stack) {
-  		var i = arr.length,
-  		    ret = new Array(i);
-
-  		if (dump.maxDepth && dump.depth > dump.maxDepth) {
-  			return "[object Array]";
-  		}
-
-  		this.up();
-  		while (i--) {
-  			ret[i] = this.parse(arr[i], undefined, stack);
-  		}
-  		this.down();
-  		return join("[", ret, "]");
-  	}
-
-  	function isArray(obj) {
-  		return (
-
-  			//Native Arrays
-  			toString.call(obj) === "[object Array]" ||
-
-  			// NodeList objects
-  			typeof obj.length === "number" && obj.item !== undefined && (obj.length ? obj.item(0) === obj[0] : obj.item(0) === null && obj[0] === undefined)
-  		);
-  	}
-
-  	var reName = /^function (\w+)/,
-  	    dump = {
-
-  		// The objType is used mostly internally, you can fix a (custom) type in advance
-  		parse: function parse(obj, objType, stack) {
-  			stack = stack || [];
-  			var res,
-  			    parser,
-  			    parserType,
-  			    objIndex = stack.indexOf(obj);
-
-  			if (objIndex !== -1) {
-  				return "recursion(" + (objIndex - stack.length) + ")";
-  			}
-
-  			objType = objType || this.typeOf(obj);
-  			parser = this.parsers[objType];
-  			parserType = typeof parser === "undefined" ? "undefined" : _typeof(parser);
-
-  			if (parserType === "function") {
-  				stack.push(obj);
-  				res = parser.call(this, obj, stack);
-  				stack.pop();
-  				return res;
-  			}
-  			return parserType === "string" ? parser : this.parsers.error;
-  		},
-  		typeOf: function typeOf(obj) {
-  			var type;
-
-  			if (obj === null) {
-  				type = "null";
-  			} else if (typeof obj === "undefined") {
-  				type = "undefined";
-  			} else if (is("regexp", obj)) {
-  				type = "regexp";
-  			} else if (is("date", obj)) {
-  				type = "date";
-  			} else if (is("function", obj)) {
-  				type = "function";
-  			} else if (obj.setInterval !== undefined && obj.document !== undefined && obj.nodeType === undefined) {
-  				type = "window";
-  			} else if (obj.nodeType === 9) {
-  				type = "document";
-  			} else if (obj.nodeType) {
-  				type = "node";
-  			} else if (isArray(obj)) {
-  				type = "array";
-  			} else if (obj.constructor === Error.prototype.constructor) {
-  				type = "error";
-  			} else {
-  				type = typeof obj === "undefined" ? "undefined" : _typeof(obj);
-  			}
-  			return type;
-  		},
-
-  		separator: function separator() {
-  			if (this.multiline) {
-  				return this.HTML ? "<br />" : "\n";
-  			} else {
-  				return this.HTML ? "&#160;" : " ";
-  			}
-  		},
-
-  		// Extra can be a number, shortcut for increasing-calling-decreasing
-  		indent: function indent(extra) {
-  			if (!this.multiline) {
-  				return "";
-  			}
-  			var chr = this.indentChar;
-  			if (this.HTML) {
-  				chr = chr.replace(/\t/g, "   ").replace(/ /g, "&#160;");
-  			}
-  			return new Array(this.depth + (extra || 0)).join(chr);
-  		},
-  		up: function up(a) {
-  			this.depth += a || 1;
-  		},
-  		down: function down(a) {
-  			this.depth -= a || 1;
-  		},
-  		setParser: function setParser(name, parser) {
-  			this.parsers[name] = parser;
-  		},
-
-  		// The next 3 are exposed so you can use them
-  		quote: quote,
-  		literal: literal,
-  		join: join,
-  		depth: 1,
-  		maxDepth: config.maxDepth,
-
-  		// This is the list of parsers, to modify them, use dump.setParser
-  		parsers: {
-  			window: "[Window]",
-  			document: "[Document]",
-  			error: function error(_error) {
-  				return "Error(\"" + _error.message + "\")";
-  			},
-  			unknown: "[Unknown]",
-  			"null": "null",
-  			"undefined": "undefined",
-  			"function": function _function(fn) {
-  				var ret = "function",
-
-
-  				// Functions never have name in IE
-  				name = "name" in fn ? fn.name : (reName.exec(fn) || [])[1];
-
-  				if (name) {
-  					ret += " " + name;
-  				}
-  				ret += "(";
-
-  				ret = [ret, dump.parse(fn, "functionArgs"), "){"].join("");
-  				return join(ret, dump.parse(fn, "functionCode"), "}");
-  			},
-  			array: array,
-  			nodelist: array,
-  			"arguments": array,
-  			object: function object(map, stack) {
-  				var keys,
-  				    key,
-  				    val,
-  				    i,
-  				    nonEnumerableProperties,
-  				    ret = [];
-
-  				if (dump.maxDepth && dump.depth > dump.maxDepth) {
-  					return "[object Object]";
-  				}
-
-  				dump.up();
-  				keys = [];
-  				for (key in map) {
-  					keys.push(key);
-  				}
-
-  				// Some properties are not always enumerable on Error objects.
-  				nonEnumerableProperties = ["message", "name"];
-  				for (i in nonEnumerableProperties) {
-  					key = nonEnumerableProperties[i];
-  					if (key in map && !inArray(key, keys)) {
-  						keys.push(key);
-  					}
-  				}
-  				keys.sort();
-  				for (i = 0; i < keys.length; i++) {
-  					key = keys[i];
-  					val = map[key];
-  					ret.push(dump.parse(key, "key") + ": " + dump.parse(val, undefined, stack));
-  				}
-  				dump.down();
-  				return join("{", ret, "}");
-  			},
-  			node: function node(_node) {
-  				var len,
-  				    i,
-  				    val,
-  				    open = dump.HTML ? "&lt;" : "<",
-  				    close = dump.HTML ? "&gt;" : ">",
-  				    tag = _node.nodeName.toLowerCase(),
-  				    ret = open + tag,
-  				    attrs = _node.attributes;
-
-  				if (attrs) {
-  					for (i = 0, len = attrs.length; i < len; i++) {
-  						val = attrs[i].nodeValue;
-
-  						// IE6 includes all attributes in .attributes, even ones not explicitly
-  						// set. Those have values like undefined, null, 0, false, "" or
-  						// "inherit".
-  						if (val && val !== "inherit") {
-  							ret += " " + attrs[i].nodeName + "=" + dump.parse(val, "attribute");
-  						}
-  					}
-  				}
-  				ret += close;
-
-  				// Show content of TextNode or CDATASection
-  				if (_node.nodeType === 3 || _node.nodeType === 4) {
-  					ret += _node.nodeValue;
-  				}
-
-  				return ret + open + "/" + tag + close;
-  			},
-
-  			// Function calls it internally, it's the arguments part of the function
-  			functionArgs: function functionArgs(fn) {
-  				var args,
-  				    l = fn.length;
-
-  				if (!l) {
-  					return "";
-  				}
-
-  				args = new Array(l);
-  				while (l--) {
-
-  					// 97 is 'a'
-  					args[l] = String.fromCharCode(97 + l);
-  				}
-  				return " " + args.join(", ") + " ";
-  			},
-
-  			// Object calls it internally, the key part of an item in a map
-  			key: quote,
-
-  			// Function calls it internally, it's the content of the function
-  			functionCode: "[code]",
-
-  			// Node calls it internally, it's a html attribute value
-  			attribute: quote,
-  			string: quote,
-  			date: quote,
-  			regexp: literal,
-  			number: literal,
-  			"boolean": literal,
-  			symbol: function symbol(sym) {
-  				return sym.toString();
-  			}
-  		},
-
-  		// If true, entities are escaped ( <, >, \t, space and \n )
-  		HTML: false,
-
-  		// Indentation unit
-  		indentChar: "  ",
-
-  		// If true, items in a collection, are separated by a \n, else just a space.
-  		multiline: true
-  	};
-
-  	return dump;
-  })();
-
-  var LISTENERS = Object.create(null);
-  var SUPPORTED_EVENTS = ["runStart", "suiteStart", "testStart", "assertion", "testEnd", "suiteEnd", "runEnd"];
-
-  /**
-   * Emits an event with the specified data to all currently registered listeners.
-   * Callbacks will fire in the order in which they are registered (FIFO). This
-   * function is not exposed publicly; it is used by QUnit internals to emit
-   * logging events.
-   *
-   * @private
-   * @method emit
-   * @param {String} eventName
-   * @param {Object} data
-   * @return {Void}
-   */
-  function emit(eventName, data) {
-  	if (objectType(eventName) !== "string") {
-  		throw new TypeError("eventName must be a string when emitting an event");
-  	}
-
-  	// Clone the callbacks in case one of them registers a new callback
-  	var originalCallbacks = LISTENERS[eventName];
-  	var callbacks = originalCallbacks ? [].concat(toConsumableArray(originalCallbacks)) : [];
-
-  	for (var i = 0; i < callbacks.length; i++) {
-  		callbacks[i](data);
-  	}
-  }
-
-  /**
-   * Registers a callback as a listener to the specified event.
-   *
-   * @public
-   * @method on
-   * @param {String} eventName
-   * @param {Function} callback
-   * @return {Void}
-   */
-  function on(eventName, callback) {
-  	if (objectType(eventName) !== "string") {
-  		throw new TypeError("eventName must be a string when registering a listener");
-  	} else if (!inArray(eventName, SUPPORTED_EVENTS)) {
-  		var events = SUPPORTED_EVENTS.join(", ");
-  		throw new Error("\"" + eventName + "\" is not a valid event; must be one of: " + events + ".");
-  	} else if (objectType(callback) !== "function") {
-  		throw new TypeError("callback must be a function when registering a listener");
-  	}
-
-  	if (!LISTENERS[eventName]) {
-  		LISTENERS[eventName] = [];
-  	}
-
-  	// Don't register the same callback more than once
-  	if (!inArray(callback, LISTENERS[eventName])) {
-  		LISTENERS[eventName].push(callback);
-  	}
-  }
-
-  // Register logging callbacks
-  function registerLoggingCallbacks(obj) {
-  	var i,
-  	    l,
-  	    key,
-  	    callbackNames = ["begin", "done", "log", "testStart", "testDone", "moduleStart", "moduleDone"];
-
-  	function registerLoggingCallback(key) {
-  		var loggingCallback = function loggingCallback(callback) {
-  			if (objectType(callback) !== "function") {
-  				throw new Error("QUnit logging methods require a callback function as their first parameters.");
-  			}
-
-  			config.callbacks[key].push(callback);
-  		};
-
-  		return loggingCallback;
-  	}
-
-  	for (i = 0, l = callbackNames.length; i < l; i++) {
-  		key = callbackNames[i];
-
-  		// Initialize key collection of logging callback
-  		if (objectType(config.callbacks[key]) === "undefined") {
-  			config.callbacks[key] = [];
-  		}
-
-  		obj[key] = registerLoggingCallback(key);
-  	}
-  }
-
-  function runLoggingCallbacks(key, args) {
-  	var i, l, callbacks;
-
-  	callbacks = config.callbacks[key];
-  	for (i = 0, l = callbacks.length; i < l; i++) {
-  		callbacks[i](args);
-  	}
-  }
-
-  // Doesn't support IE9, it will return undefined on these browsers
-  // See also https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error/Stack
-  var fileName = (sourceFromStacktrace(0) || "").replace(/(:\d+)+\)?/, "").replace(/.+\//, "");
-
-  function extractStacktrace(e, offset) {
-  	offset = offset === undefined ? 4 : offset;
-
-  	var stack, include, i;
-
-  	if (e && e.stack) {
-  		stack = e.stack.split("\n");
-  		if (/^error$/i.test(stack[0])) {
-  			stack.shift();
-  		}
-  		if (fileName) {
-  			include = [];
-  			for (i = offset; i < stack.length; i++) {
-  				if (stack[i].indexOf(fileName) !== -1) {
-  					break;
-  				}
-  				include.push(stack[i]);
-  			}
-  			if (include.length) {
-  				return include.join("\n");
-  			}
-  		}
-  		return stack[offset];
-  	}
-  }
-
-  function sourceFromStacktrace(offset) {
-  	var error = new Error();
-
-  	// Support: Safari <=7 only, IE <=10 - 11 only
-  	// Not all browsers generate the `stack` property for `new Error()`, see also #636
-  	if (!error.stack) {
-  		try {
-  			throw error;
-  		} catch (err) {
-  			error = err;
-  		}
-  	}
-
-  	return extractStacktrace(error, offset);
-  }
-
-  var priorityCount = 0;
-  var unitSampler = void 0;
-
-  /**
-   * Advances the ProcessingQueue to the next item if it is ready.
-   * @param {Boolean} last
-   */
-  function advance() {
-  	var start = now();
-  	config.depth = (config.depth || 0) + 1;
-
-  	while (config.queue.length && !config.blocking) {
-  		var elapsedTime = now() - start;
-
-  		if (!defined.setTimeout || config.updateRate <= 0 || elapsedTime < config.updateRate) {
-  			if (priorityCount > 0) {
-  				priorityCount--;
-  			}
-
-  			config.queue.shift()();
-  		} else {
-  			setTimeout(advance, 13);
-  			break;
-  		}
-  	}
-
-  	config.depth--;
-
-  	if (!config.blocking && !config.queue.length && config.depth === 0) {
-  		done();
-  	}
-  }
-
-  function addToQueueImmediate(callback) {
-  	if (objectType(callback) === "array") {
-  		while (callback.length) {
-  			addToQueueImmediate(callback.pop());
-  		}
-
-  		return;
-  	}
-
-  	config.queue.unshift(callback);
-  	priorityCount++;
-  }
-
-  /**
-   * Adds a function to the ProcessingQueue for execution.
-   * @param {Function|Array} callback
-   * @param {Boolean} priority
-   * @param {String} seed
-   */
-  function addToQueue(callback, prioritize, seed) {
-  	if (prioritize) {
-  		config.queue.splice(priorityCount++, 0, callback);
-  	} else if (seed) {
-  		if (!unitSampler) {
-  			unitSampler = unitSamplerGenerator(seed);
-  		}
-
-  		// Insert into a random position after all prioritized items
-  		var index = Math.floor(unitSampler() * (config.queue.length - priorityCount + 1));
-  		config.queue.splice(priorityCount + index, 0, callback);
-  	} else {
-  		config.queue.push(callback);
-  	}
-  }
-
-  /**
-   * Creates a seeded "sample" generator which is used for randomizing tests.
-   */
-  function unitSamplerGenerator(seed) {
-
-  	// 32-bit xorshift, requires only a nonzero seed
-  	// http://excamera.com/sphinx/article-xorshift.html
-  	var sample = parseInt(generateHash(seed), 16) || -1;
-  	return function () {
-  		sample ^= sample << 13;
-  		sample ^= sample >>> 17;
-  		sample ^= sample << 5;
-
-  		// ECMAScript has no unsigned number type
-  		if (sample < 0) {
-  			sample += 0x100000000;
-  		}
-
-  		return sample / 0x100000000;
-  	};
-  }
-
-  /**
-   * This function is called when the ProcessingQueue is done processing all
-   * items. It handles emitting the final run events.
-   */
-  function done() {
-  	var storage = config.storage;
-
-  	ProcessingQueue.finished = true;
-
-  	var runtime = now() - config.started;
-  	var passed = config.stats.all - config.stats.bad;
-
-  	emit("runEnd", globalSuite.end(true));
-  	runLoggingCallbacks("done", {
-  		passed: passed,
-  		failed: config.stats.bad,
-  		total: config.stats.all,
-  		runtime: runtime
-  	});
-
-  	// Clear own storage items if all tests passed
-  	if (storage && config.stats.bad === 0) {
-  		for (var i = storage.length - 1; i >= 0; i--) {
-  			var key = storage.key(i);
-
-  			if (key.indexOf("qunit-test-") === 0) {
-  				storage.removeItem(key);
-  			}
-  		}
-  	}
-  }
-
-  var ProcessingQueue = {
-  	finished: false,
-  	add: addToQueue,
-  	addImmediate: addToQueueImmediate,
-  	advance: advance
-  };
-
-  var TestReport = function () {
-  	function TestReport(name, suite, options) {
-  		classCallCheck(this, TestReport);
-
-  		this.name = name;
-  		this.suiteName = suite.name;
-  		this.fullName = suite.fullName.concat(name);
-  		this.runtime = 0;
-  		this.assertions = [];
-
-  		this.skipped = !!options.skip;
-  		this.todo = !!options.todo;
-
-  		this.valid = options.valid;
-
-  		this._startTime = 0;
-  		this._endTime = 0;
-
-  		suite.pushTest(this);
-  	}
-
-  	createClass(TestReport, [{
-  		key: "start",
-  		value: function start(recordTime) {
-  			if (recordTime) {
-  				this._startTime = Date.now();
-  			}
-
-  			return {
-  				name: this.name,
-  				suiteName: this.suiteName,
-  				fullName: this.fullName.slice()
-  			};
-  		}
-  	}, {
-  		key: "end",
-  		value: function end(recordTime) {
-  			if (recordTime) {
-  				this._endTime = Date.now();
-  			}
-
-  			return extend(this.start(), {
-  				runtime: this.getRuntime(),
-  				status: this.getStatus(),
-  				errors: this.getFailedAssertions(),
-  				assertions: this.getAssertions()
-  			});
-  		}
-  	}, {
-  		key: "pushAssertion",
-  		value: function pushAssertion(assertion) {
-  			this.assertions.push(assertion);
-  		}
-  	}, {
-  		key: "getRuntime",
-  		value: function getRuntime() {
-  			return this._endTime - this._startTime;
-  		}
-  	}, {
-  		key: "getStatus",
-  		value: function getStatus() {
-  			if (this.skipped) {
-  				return "skipped";
-  			}
-
-  			var testPassed = this.getFailedAssertions().length > 0 ? this.todo : !this.todo;
-
-  			if (!testPassed) {
-  				return "failed";
-  			} else if (this.todo) {
-  				return "todo";
-  			} else {
-  				return "passed";
-  			}
-  		}
-  	}, {
-  		key: "getFailedAssertions",
-  		value: function getFailedAssertions() {
-  			return this.assertions.filter(function (assertion) {
-  				return !assertion.passed;
-  			});
-  		}
-  	}, {
-  		key: "getAssertions",
-  		value: function getAssertions() {
-  			return this.assertions.slice();
-  		}
-
-  		// Remove actual and expected values from assertions. This is to prevent
-  		// leaking memory throughout a test suite.
-
-  	}, {
-  		key: "slimAssertions",
-  		value: function slimAssertions() {
-  			this.assertions = this.assertions.map(function (assertion) {
-  				delete assertion.actual;
-  				delete assertion.expected;
-  				return assertion;
-  			});
-  		}
-  	}]);
-  	return TestReport;
-  }();
-
-  var focused$1 = false;
-
-  function Test(settings) {
-  	var i, l;
-
-  	++Test.count;
-
-  	this.expected = null;
-  	this.assertions = [];
-  	this.semaphore = 0;
-  	this.module = config.currentModule;
-  	this.stack = sourceFromStacktrace(3);
-  	this.steps = [];
-  	this.timeout = undefined;
-
-  	// If a module is skipped, all its tests and the tests of the child suites
-  	// should be treated as skipped even if they are defined as `only` or `todo`.
-  	// As for `todo` module, all its tests will be treated as `todo` except for
-  	// tests defined as `skip` which will be left intact.
-  	//
-  	// So, if a test is defined as `todo` and is inside a skipped module, we should
-  	// then treat that test as if was defined as `skip`.
-  	if (this.module.skip) {
-  		settings.skip = true;
-  		settings.todo = false;
-
-  		// Skipped tests should be left intact
-  	} else if (this.module.todo && !settings.skip) {
-  		settings.todo = true;
-  	}
-
-  	extend(this, settings);
-
-  	this.testReport = new TestReport(settings.testName, this.module.suiteReport, {
-  		todo: settings.todo,
-  		skip: settings.skip,
-  		valid: this.valid()
-  	});
-
-  	// Register unique strings
-  	for (i = 0, l = this.module.tests; i < l.length; i++) {
-  		if (this.module.tests[i].name === this.testName) {
-  			this.testName += " ";
-  		}
-  	}
-
-  	this.testId = generateHash(this.module.name, this.testName);
-
-  	this.module.tests.push({
-  		name: this.testName,
-  		testId: this.testId,
-  		skip: !!settings.skip
-  	});
-
-  	if (settings.skip) {
-
-  		// Skipped tests will fully ignore any sent callback
-  		this.callback = function () {};
-  		this.async = false;
-  		this.expected = 0;
-  	} else {
-  		if (typeof this.callback !== "function") {
-  			var method = this.todo ? "todo" : "test";
-
-  			// eslint-disable-next-line max-len
-  			throw new TypeError("You must provide a function as a test callback to QUnit." + method + "(\"" + settings.testName + "\")");
-  		}
-
-  		this.assert = new Assert(this);
-  	}
-  }
-
-  Test.count = 0;
-
-  function getNotStartedModules(startModule) {
-  	var module = startModule,
-  	    modules = [];
-
-  	while (module && module.testsRun === 0) {
-  		modules.push(module);
-  		module = module.parentModule;
-  	}
-
-  	return modules;
-  }
-
-  Test.prototype = {
-  	before: function before() {
-  		var i,
-  		    startModule,
-  		    module = this.module,
-  		    notStartedModules = getNotStartedModules(module);
-
-  		for (i = notStartedModules.length - 1; i >= 0; i--) {
-  			startModule = notStartedModules[i];
-  			startModule.stats = { all: 0, bad: 0, started: now() };
-  			emit("suiteStart", startModule.suiteReport.start(true));
-  			runLoggingCallbacks("moduleStart", {
-  				name: startModule.name,
-  				tests: startModule.tests
-  			});
-  		}
-
-  		config.current = this;
-
-  		this.testEnvironment = extend({}, module.testEnvironment);
-
-  		this.started = now();
-  		emit("testStart", this.testReport.start(true));
-  		runLoggingCallbacks("testStart", {
-  			name: this.testName,
-  			module: module.name,
-  			testId: this.testId,
-  			previousFailure: this.previousFailure
-  		});
-
-  		if (!config.pollution) {
-  			saveGlobal();
-  		}
-  	},
-
-  	run: function run() {
-  		var promise;
-
-  		config.current = this;
-
-  		this.callbackStarted = now();
-
-  		if (config.notrycatch) {
-  			runTest(this);
-  			return;
-  		}
-
-  		try {
-  			runTest(this);
-  		} catch (e) {
-  			this.pushFailure("Died on test #" + (this.assertions.length + 1) + " " + this.stack + ": " + (e.message || e), extractStacktrace(e, 0));
-
-  			// Else next test will carry the responsibility
-  			saveGlobal();
-
-  			// Restart the tests if they're blocking
-  			if (config.blocking) {
-  				internalRecover(this);
-  			}
-  		}
-
-  		function runTest(test) {
-  			promise = test.callback.call(test.testEnvironment, test.assert);
-  			test.resolvePromise(promise);
-
-  			// If the test has a "lock" on it, but the timeout is 0, then we push a
-  			// failure as the test should be synchronous.
-  			if (test.timeout === 0 && test.semaphore !== 0) {
-  				pushFailure("Test did not finish synchronously even though assert.timeout( 0 ) was used.", sourceFromStacktrace(2));
-  			}
-  		}
-  	},
-
-  	after: function after() {
-  		checkPollution();
-  	},
-
-  	queueHook: function queueHook(hook, hookName, hookOwner) {
-  		var _this = this;
-
-  		var callHook = function callHook() {
-  			var promise = hook.call(_this.testEnvironment, _this.assert);
-  			_this.resolvePromise(promise, hookName);
-  		};
-
-  		var runHook = function runHook() {
-  			if (hookName === "before") {
-  				if (hookOwner.unskippedTestsRun !== 0) {
-  					return;
-  				}
-
-  				_this.preserveEnvironment = true;
-  			}
-
-  			if (hookName === "after" && hookOwner.unskippedTestsRun !== numberOfUnskippedTests(hookOwner) - 1 && config.queue.length > 2) {
-  				return;
-  			}
-
-  			config.current = _this;
-  			if (config.notrycatch) {
-  				callHook();
-  				return;
-  			}
-  			try {
-  				callHook();
-  			} catch (error) {
-  				_this.pushFailure(hookName + " failed on " + _this.testName + ": " + (error.message || error), extractStacktrace(error, 0));
-  			}
-  		};
-
-  		return runHook;
-  	},
-
-
-  	// Currently only used for module level hooks, can be used to add global level ones
-  	hooks: function hooks(handler) {
-  		var hooks = [];
-
-  		function processHooks(test, module) {
-  			if (module.parentModule) {
-  				processHooks(test, module.parentModule);
-  			}
-
-  			if (module.hooks[handler].length) {
-  				for (var i = 0; i < module.hooks[handler].length; i++) {
-  					hooks.push(test.queueHook(module.hooks[handler][i], handler, module));
-  				}
-  			}
-  		}
-
-  		// Hooks are ignored on skipped tests
-  		if (!this.skip) {
-  			processHooks(this, this.module);
-  		}
-
-  		return hooks;
-  	},
-
-
-  	finish: function finish() {
-  		config.current = this;
-  		if (config.requireExpects && this.expected === null) {
-  			this.pushFailure("Expected number of assertions to be defined, but expect() was " + "not called.", this.stack);
-  		} else if (this.expected !== null && this.expected !== this.assertions.length) {
-  			this.pushFailure("Expected " + this.expected + " assertions, but " + this.assertions.length + " were run", this.stack);
-  		} else if (this.expected === null && !this.assertions.length) {
-  			this.pushFailure("Expected at least one assertion, but none were run - call " + "expect(0) to accept zero assertions.", this.stack);
-  		}
-
-  		var i,
-  		    module = this.module,
-  		    moduleName = module.name,
-  		    testName = this.testName,
-  		    skipped = !!this.skip,
-  		    todo = !!this.todo,
-  		    bad = 0,
-  		    storage = config.storage;
-
-  		this.runtime = now() - this.started;
-
-  		config.stats.all += this.assertions.length;
-  		module.stats.all += this.assertions.length;
-
-  		for (i = 0; i < this.assertions.length; i++) {
-  			if (!this.assertions[i].result) {
-  				bad++;
-  				config.stats.bad++;
-  				module.stats.bad++;
-  			}
-  		}
-
-  		notifyTestsRan(module, skipped);
-
-  		// Store result when possible
-  		if (storage) {
-  			if (bad) {
-  				storage.setItem("qunit-test-" + moduleName + "-" + testName, bad);
-  			} else {
-  				storage.removeItem("qunit-test-" + moduleName + "-" + testName);
-  			}
-  		}
-
-  		// After emitting the js-reporters event we cleanup the assertion data to
-  		// avoid leaking it. It is not used by the legacy testDone callbacks.
-  		emit("testEnd", this.testReport.end(true));
-  		this.testReport.slimAssertions();
-
-  		runLoggingCallbacks("testDone", {
-  			name: testName,
-  			module: moduleName,
-  			skipped: skipped,
-  			todo: todo,
-  			failed: bad,
-  			passed: this.assertions.length - bad,
-  			total: this.assertions.length,
-  			runtime: skipped ? 0 : this.runtime,
-
-  			// HTML Reporter use
-  			assertions: this.assertions,
-  			testId: this.testId,
-
-  			// Source of Test
-  			source: this.stack
-  		});
-
-  		if (module.testsRun === numberOfTests(module)) {
-  			logSuiteEnd(module);
-
-  			// Check if the parent modules, iteratively, are done. If that the case,
-  			// we emit the `suiteEnd` event and trigger `moduleDone` callback.
-  			var parent = module.parentModule;
-  			while (parent && parent.testsRun === numberOfTests(parent)) {
-  				logSuiteEnd(parent);
-  				parent = parent.parentModule;
-  			}
-  		}
-
-  		config.current = undefined;
-
-  		function logSuiteEnd(module) {
-  			emit("suiteEnd", module.suiteReport.end(true));
-  			runLoggingCallbacks("moduleDone", {
-  				name: module.name,
-  				tests: module.tests,
-  				failed: module.stats.bad,
-  				passed: module.stats.all - module.stats.bad,
-  				total: module.stats.all,
-  				runtime: now() - module.stats.started
-  			});
-  		}
-  	},
-
-  	preserveTestEnvironment: function preserveTestEnvironment() {
-  		if (this.preserveEnvironment) {
-  			this.module.testEnvironment = this.testEnvironment;
-  			this.testEnvironment = extend({}, this.module.testEnvironment);
-  		}
-  	},
-
-  	queue: function queue() {
-  		var test = this;
-
-  		if (!this.valid()) {
-  			return;
-  		}
-
-  		function runTest() {
-
-  			// Each of these can by async
-  			ProcessingQueue.addImmediate([function () {
-  				test.before();
-  			}, test.hooks("before"), function () {
-  				test.preserveTestEnvironment();
-  			}, test.hooks("beforeEach"), function () {
-  				test.run();
-  			}, test.hooks("afterEach").reverse(), test.hooks("after").reverse(), function () {
-  				test.after();
-  			}, function () {
-  				test.finish();
-  			}]);
-  		}
-
-  		var previousFailCount = config.storage && +config.storage.getItem("qunit-test-" + this.module.name + "-" + this.testName);
-
-  		// Prioritize previously failed tests, detected from storage
-  		var prioritize = config.reorder && !!previousFailCount;
-
-  		this.previousFailure = !!previousFailCount;
-
-  		ProcessingQueue.add(runTest, prioritize, config.seed);
-
-  		// If the queue has already finished, we manually process the new test
-  		if (ProcessingQueue.finished) {
-  			ProcessingQueue.advance();
-  		}
-  	},
-
-
-  	pushResult: function pushResult(resultInfo) {
-  		if (this !== config.current) {
-  			throw new Error("Assertion occured after test had finished.");
-  		}
-
-  		// Destructure of resultInfo = { result, actual, expected, message, negative }
-  		var source,
-  		    details = {
-  			module: this.module.name,
-  			name: this.testName,
-  			result: resultInfo.result,
-  			message: resultInfo.message,
-  			actual: resultInfo.actual,
-  			testId: this.testId,
-  			negative: resultInfo.negative || false,
-  			runtime: now() - this.started,
-  			todo: !!this.todo
-  		};
-
-  		if (hasOwn.call(resultInfo, "expected")) {
-  			details.expected = resultInfo.expected;
-  		}
-
-  		if (!resultInfo.result) {
-  			source = resultInfo.source || sourceFromStacktrace();
-
-  			if (source) {
-  				details.source = source;
-  			}
-  		}
-
-  		this.logAssertion(details);
-
-  		this.assertions.push({
-  			result: !!resultInfo.result,
-  			message: resultInfo.message
-  		});
-  	},
-
-  	pushFailure: function pushFailure(message, source, actual) {
-  		if (!(this instanceof Test)) {
-  			throw new Error("pushFailure() assertion outside test context, was " + sourceFromStacktrace(2));
-  		}
-
-  		this.pushResult({
-  			result: false,
-  			message: message || "error",
-  			actual: actual || null,
-  			source: source
-  		});
-  	},
-
-  	/**
-    * Log assertion details using both the old QUnit.log interface and
-    * QUnit.on( "assertion" ) interface.
-    *
-    * @private
-    */
-  	logAssertion: function logAssertion(details) {
-  		runLoggingCallbacks("log", details);
-
-  		var assertion = {
-  			passed: details.result,
-  			actual: details.actual,
-  			expected: details.expected,
-  			message: details.message,
-  			stack: details.source,
-  			todo: details.todo
-  		};
-  		this.testReport.pushAssertion(assertion);
-  		emit("assertion", assertion);
-  	},
-
-
-  	resolvePromise: function resolvePromise(promise, phase) {
-  		var then,
-  		    resume,
-  		    message,
-  		    test = this;
-  		if (promise != null) {
-  			then = promise.then;
-  			if (objectType(then) === "function") {
-  				resume = internalStop(test);
-  				then.call(promise, function () {
-  					resume();
-  				}, function (error) {
-  					message = "Promise rejected " + (!phase ? "during" : phase.replace(/Each$/, "")) + " \"" + test.testName + "\": " + (error && error.message || error);
-  					test.pushFailure(message, extractStacktrace(error, 0));
-
-  					// Else next test will carry the responsibility
-  					saveGlobal();
-
-  					// Unblock
-  					resume();
-  				});
-  			}
-  		}
-  	},
-
-  	valid: function valid() {
-  		var filter = config.filter,
-  		    regexFilter = /^(!?)\/([\w\W]*)\/(i?$)/.exec(filter),
-  		    module = config.module && config.module.toLowerCase(),
-  		    fullName = this.module.name + ": " + this.testName;
-
-  		function moduleChainNameMatch(testModule) {
-  			var testModuleName = testModule.name ? testModule.name.toLowerCase() : null;
-  			if (testModuleName === module) {
-  				return true;
-  			} else if (testModule.parentModule) {
-  				return moduleChainNameMatch(testModule.parentModule);
-  			} else {
-  				return false;
-  			}
-  		}
-
-  		function moduleChainIdMatch(testModule) {
-  			return inArray(testModule.moduleId, config.moduleId) || testModule.parentModule && moduleChainIdMatch(testModule.parentModule);
-  		}
-
-  		// Internally-generated tests are always valid
-  		if (this.callback && this.callback.validTest) {
-  			return true;
-  		}
-
-  		if (config.moduleId && config.moduleId.length > 0 && !moduleChainIdMatch(this.module)) {
-
-  			return false;
-  		}
-
-  		if (config.testId && config.testId.length > 0 && !inArray(this.testId, config.testId)) {
-
-  			return false;
-  		}
-
-  		if (module && !moduleChainNameMatch(this.module)) {
-  			return false;
-  		}
-
-  		if (!filter) {
-  			return true;
-  		}
-
-  		return regexFilter ? this.regexFilter(!!regexFilter[1], regexFilter[2], regexFilter[3], fullName) : this.stringFilter(filter, fullName);
-  	},
-
-  	regexFilter: function regexFilter(exclude, pattern, flags, fullName) {
-  		var regex = new RegExp(pattern, flags);
-  		var match = regex.test(fullName);
-
-  		return match !== exclude;
-  	},
-
-  	stringFilter: function stringFilter(filter, fullName) {
-  		filter = filter.toLowerCase();
-  		fullName = fullName.toLowerCase();
-
-  		var include = filter.charAt(0) !== "!";
-  		if (!include) {
-  			filter = filter.slice(1);
-  		}
-
-  		// If the filter matches, we need to honour include
-  		if (fullName.indexOf(filter) !== -1) {
-  			return include;
-  		}
-
-  		// Otherwise, do the opposite
-  		return !include;
-  	}
-  };
-
-  function pushFailure() {
-  	if (!config.current) {
-  		throw new Error("pushFailure() assertion outside test context, in " + sourceFromStacktrace(2));
-  	}
-
-  	// Gets current test obj
-  	var currentTest = config.current;
-
-  	return currentTest.pushFailure.apply(currentTest, arguments);
-  }
-
-  function saveGlobal() {
-  	config.pollution = [];
-
-  	if (config.noglobals) {
-  		for (var key in global$1) {
-  			if (hasOwn.call(global$1, key)) {
-
-  				// In Opera sometimes DOM element ids show up here, ignore them
-  				if (/^qunit-test-output/.test(key)) {
-  					continue;
-  				}
-  				config.pollution.push(key);
-  			}
-  		}
-  	}
-  }
-
-  function checkPollution() {
-  	var newGlobals,
-  	    deletedGlobals,
-  	    old = config.pollution;
-
-  	saveGlobal();
-
-  	newGlobals = diff(config.pollution, old);
-  	if (newGlobals.length > 0) {
-  		pushFailure("Introduced global variable(s): " + newGlobals.join(", "));
-  	}
-
-  	deletedGlobals = diff(old, config.pollution);
-  	if (deletedGlobals.length > 0) {
-  		pushFailure("Deleted global variable(s): " + deletedGlobals.join(", "));
-  	}
-  }
-
-  // Will be exposed as QUnit.test
-  function test(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
-  	var newTest = new Test({
-  		testName: testName,
-  		callback: callback
-  	});
-
-  	newTest.queue();
-  }
-
-  function todo(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
-  	var newTest = new Test({
-  		testName: testName,
-  		callback: callback,
-  		todo: true
-  	});
-
-  	newTest.queue();
-  }
-
-  // Will be exposed as QUnit.skip
-  function skip(testName) {
-  	if (focused$1) {
-  		return;
-  	}
-
-  	var test = new Test({
-  		testName: testName,
-  		skip: true
-  	});
-
-  	test.queue();
-  }
-
-  // Will be exposed as QUnit.only
-  function only(testName, callback) {
-  	if (focused$1) {
-  		return;
-  	}
-
-  	config.queue.length = 0;
-  	focused$1 = true;
-
-  	var newTest = new Test({
-  		testName: testName,
-  		callback: callback
-  	});
-
-  	newTest.queue();
-  }
-
-  // Put a hold on processing and return a function that will release it.
-  function internalStop(test) {
-  	test.semaphore += 1;
-  	config.blocking = true;
-
-  	// Set a recovery timeout, if so configured.
-  	if (defined.setTimeout) {
-  		var timeoutDuration = void 0;
-
-  		if (typeof test.timeout === "number") {
-  			timeoutDuration = test.timeout;
-  		} else if (typeof config.testTimeout === "number") {
-  			timeoutDuration = config.testTimeout;
-  		}
-
-  		if (typeof timeoutDuration === "number" && timeoutDuration > 0) {
-  			clearTimeout(config.timeout);
-  			config.timeout = setTimeout(function () {
-  				pushFailure("Test took longer than " + timeoutDuration + "ms; test timed out.", sourceFromStacktrace(2));
-  				internalRecover(test);
-  			}, timeoutDuration);
-  		}
-  	}
-
-  	var released = false;
-  	return function resume() {
-  		if (released) {
-  			return;
-  		}
-
-  		released = true;
-  		test.semaphore -= 1;
-  		internalStart(test);
-  	};
-  }
-
-  // Forcefully release all processing holds.
-  function internalRecover(test) {
-  	test.semaphore = 0;
-  	internalStart(test);
-  }
-
-  // Release a processing hold, scheduling a resumption attempt if no holds remain.
-  function internalStart(test) {
-
-  	// If semaphore is non-numeric, throw error
-  	if (isNaN(test.semaphore)) {
-  		test.semaphore = 0;
-
-  		pushFailure("Invalid value on test.semaphore", sourceFromStacktrace(2));
-  		return;
-  	}
-
-  	// Don't start until equal number of stop-calls
-  	if (test.semaphore > 0) {
-  		return;
-  	}
-
-  	// Throw an Error if start is called more often than stop
-  	if (test.semaphore < 0) {
-  		test.semaphore = 0;
-
-  		pushFailure("Tried to restart test while already started (test's semaphore was 0 already)", sourceFromStacktrace(2));
-  		return;
-  	}
-
-  	// Add a slight delay to allow more assertions etc.
-  	if (defined.setTimeout) {
-  		if (config.timeout) {
-  			clearTimeout(config.timeout);
-  		}
-  		config.timeout = setTimeout(function () {
-  			if (test.semaphore > 0) {
-  				return;
-  			}
-
-  			if (config.timeout) {
-  				clearTimeout(config.timeout);
-  			}
-
-  			begin();
-  		}, 13);
-  	} else {
-  		begin();
-  	}
-  }
-
-  function collectTests(module) {
-  	var tests = [].concat(module.tests);
-  	var modules = [].concat(toConsumableArray(module.childModules));
-
-  	// Do a breadth-first traversal of the child modules
-  	while (modules.length) {
-  		var nextModule = modules.shift();
-  		tests.push.apply(tests, nextModule.tests);
-  		modules.push.apply(modules, toConsumableArray(nextModule.childModules));
-  	}
-
-  	return tests;
-  }
-
-  function numberOfTests(module) {
-  	return collectTests(module).length;
-  }
-
-  function numberOfUnskippedTests(module) {
-  	return collectTests(module).filter(function (test) {
-  		return !test.skip;
-  	}).length;
-  }
-
-  function notifyTestsRan(module, skipped) {
-  	module.testsRun++;
-  	if (!skipped) {
-  		module.unskippedTestsRun++;
-  	}
-  	while (module = module.parentModule) {
-  		module.testsRun++;
-  		if (!skipped) {
-  			module.unskippedTestsRun++;
-  		}
-  	}
-  }
-
-  /**
-   * Returns a function that proxies to the given method name on the globals
-   * console object. The proxy will also detect if the console doesn't exist and
-   * will appropriately no-op. This allows support for IE9, which doesn't have a
-   * console if the developer tools are not open.
-   */
-  function consoleProxy(method) {
-  	return function () {
-  		if (console) {
-  			console[method].apply(console, arguments);
-  		}
-  	};
-  }
-
-  var Logger = {
-  	warn: consoleProxy("warn")
-  };
-
-  var Assert = function () {
-  	function Assert(testContext) {
-  		classCallCheck(this, Assert);
-
-  		this.test = testContext;
-  	}
-
-  	// Assert helpers
-
-  	createClass(Assert, [{
-  		key: "timeout",
-  		value: function timeout(duration) {
-  			if (typeof duration !== "number") {
-  				throw new Error("You must pass a number as the duration to assert.timeout");
-  			}
-
-  			this.test.timeout = duration;
-  		}
-
-  		// Documents a "step", which is a string value, in a test as a passing assertion
-
-  	}, {
-  		key: "step",
-  		value: function step(message) {
-  			var result = !!message;
-
-  			this.test.steps.push(message);
-
-  			return this.pushResult({
-  				result: result,
-  				message: message || "You must provide a message to assert.step"
-  			});
-  		}
-
-  		// Verifies the steps in a test match a given array of string values
-
-  	}, {
-  		key: "verifySteps",
-  		value: function verifySteps(steps, message) {
-  			this.deepEqual(this.test.steps, steps, message);
-  		}
-
-  		// Specify the number of expected assertions to guarantee that failed test
-  		// (no assertions are run at all) don't slip through.
-
-  	}, {
-  		key: "expect",
-  		value: function expect(asserts) {
-  			if (arguments.length === 1) {
-  				this.test.expected = asserts;
-  			} else {
-  				return this.test.expected;
-  			}
-  		}
-
-  		// Put a hold on processing and return a function that will release it a maximum of once.
-
-  	}, {
-  		key: "async",
-  		value: function async(count) {
-  			var test$$1 = this.test;
-
-  			var popped = false,
-  			    acceptCallCount = count;
-
-  			if (typeof acceptCallCount === "undefined") {
-  				acceptCallCount = 1;
-  			}
-
-  			var resume = internalStop(test$$1);
-
-  			return function done() {
-  				if (config.current !== test$$1) {
-  					throw Error("assert.async callback called after test finished.");
-  				}
-
-  				if (popped) {
-  					test$$1.pushFailure("Too many calls to the `assert.async` callback", sourceFromStacktrace(2));
-  					return;
-  				}
-
-  				acceptCallCount -= 1;
-  				if (acceptCallCount > 0) {
-  					return;
-  				}
-
-  				popped = true;
-  				resume();
-  			};
-  		}
-
-  		// Exports test.push() to the user API
-  		// Alias of pushResult.
-
-  	}, {
-  		key: "push",
-  		value: function push(result, actual, expected, message, negative) {
-  			Logger.warn("assert.push is deprecated and will be removed in QUnit 3.0." + " Please use assert.pushResult instead (https://api.qunitjs.com/assert/pushResult).");
-
-  			var currentAssert = this instanceof Assert ? this : config.current.assert;
-  			return currentAssert.pushResult({
-  				result: result,
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: negative
-  			});
-  		}
-  	}, {
-  		key: "pushResult",
-  		value: function pushResult(resultInfo) {
-
-  			// Destructure of resultInfo = { result, actual, expected, message, negative }
-  			var assert = this;
-  			var currentTest = assert instanceof Assert && assert.test || config.current;
-
-  			// Backwards compatibility fix.
-  			// Allows the direct use of global exported assertions and QUnit.assert.*
-  			// Although, it's use is not recommended as it can leak assertions
-  			// to other tests from async tests, because we only get a reference to the current test,
-  			// not exactly the test where assertion were intended to be called.
-  			if (!currentTest) {
-  				throw new Error("assertion outside test context, in " + sourceFromStacktrace(2));
-  			}
-
-  			if (!(assert instanceof Assert)) {
-  				assert = currentTest.assert;
-  			}
-
-  			return assert.test.pushResult(resultInfo);
-  		}
-  	}, {
-  		key: "ok",
-  		value: function ok(result, message) {
-  			if (!message) {
-  				message = result ? "okay" : "failed, expected argument to be truthy, was: " + dump.parse(result);
-  			}
-
-  			this.pushResult({
-  				result: !!result,
-  				actual: result,
-  				expected: true,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notOk",
-  		value: function notOk(result, message) {
-  			if (!message) {
-  				message = !result ? "okay" : "failed, expected argument to be falsy, was: " + dump.parse(result);
-  			}
-
-  			this.pushResult({
-  				result: !result,
-  				actual: result,
-  				expected: false,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "equal",
-  		value: function equal(actual, expected, message) {
-
-  			// eslint-disable-next-line eqeqeq
-  			var result = expected == actual;
-
-  			this.pushResult({
-  				result: result,
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notEqual",
-  		value: function notEqual(actual, expected, message) {
-
-  			// eslint-disable-next-line eqeqeq
-  			var result = expected != actual;
-
-  			this.pushResult({
-  				result: result,
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
-  		key: "propEqual",
-  		value: function propEqual(actual, expected, message) {
-  			actual = objectValues(actual);
-  			expected = objectValues(expected);
-
-  			this.pushResult({
-  				result: equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notPropEqual",
-  		value: function notPropEqual(actual, expected, message) {
-  			actual = objectValues(actual);
-  			expected = objectValues(expected);
-
-  			this.pushResult({
-  				result: !equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
-  		key: "deepEqual",
-  		value: function deepEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notDeepEqual",
-  		value: function notDeepEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: !equiv(actual, expected),
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
-  		key: "strictEqual",
-  		value: function strictEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: expected === actual,
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}, {
-  		key: "notStrictEqual",
-  		value: function notStrictEqual(actual, expected, message) {
-  			this.pushResult({
-  				result: expected !== actual,
-  				actual: actual,
-  				expected: expected,
-  				message: message,
-  				negative: true
-  			});
-  		}
-  	}, {
-  		key: "throws",
-  		value: function throws(block, expected, message) {
-  			var actual = void 0,
-  			    result = false;
-
-  			var currentTest = this instanceof Assert && this.test || config.current;
-
-  			// 'expected' is optional unless doing string comparison
-  			if (objectType(expected) === "string") {
-  				if (message == null) {
-  					message = expected;
-  					expected = null;
-  				} else {
-  					throw new Error("throws/raises does not accept a string value for the expected argument.\n" + "Use a non-string object value (e.g. regExp) instead if it's necessary.");
-  				}
-  			}
-
-  			currentTest.ignoreGlobalErrors = true;
-  			try {
-  				block.call(currentTest.testEnvironment);
-  			} catch (e) {
-  				actual = e;
-  			}
-  			currentTest.ignoreGlobalErrors = false;
-
-  			if (actual) {
-  				var expectedType = objectType(expected);
-
-  				// We don't want to validate thrown error
-  				if (!expected) {
-  					result = true;
-  					expected = null;
-
-  					// Expected is a regexp
-  				} else if (expectedType === "regexp") {
-  					result = expected.test(errorString(actual));
-
-  					// Expected is a constructor, maybe an Error constructor
-  				} else if (expectedType === "function" && actual instanceof expected) {
-  					result = true;
-
-  					// Expected is an Error object
-  				} else if (expectedType === "object") {
-  					result = actual instanceof expected.constructor && actual.name === expected.name && actual.message === expected.message;
-
-  					// Expected is a validation function which returns true if validation passed
-  				} else if (expectedType === "function" && expected.call({}, actual) === true) {
-  					expected = null;
-  					result = true;
-  				}
-  			}
-
-  			currentTest.assert.pushResult({
-  				result: result,
-  				actual: actual,
-  				expected: expected,
-  				message: message
-  			});
-  		}
-  	}]);
-  	return Assert;
-  }();
-
-  // Provide an alternative to assert.throws(), for environments that consider throws a reserved word
-  // Known to us are: Closure Compiler, Narwhal
-  // eslint-disable-next-line dot-notation
-
-
-  Assert.prototype.raises = Assert.prototype["throws"];
-
-  /**
-   * Converts an error into a simple string for comparisons.
-   *
-   * @param {Error} error
-   * @return {String}
-   */
-  function errorString(error) {
-  	var resultErrorString = error.toString();
-
-  	if (resultErrorString.substring(0, 7) === "[object") {
-  		var name = error.name ? error.name.toString() : "Error";
-  		var message = error.message ? error.message.toString() : "";
-
-  		if (name && message) {
-  			return name + ": " + message;
-  		} else if (name) {
-  			return name;
-  		} else if (message) {
-  			return message;
-  		} else {
-  			return "Error";
-  		}
-  	} else {
-  		return resultErrorString;
-  	}
-  }
-
-  /* global module, exports, define */
-  function exportQUnit(QUnit) {
-
-  	if (defined.document) {
-
-  		// QUnit may be defined when it is preconfigured but then only QUnit and QUnit.config may be defined.
-  		if (window.QUnit && window.QUnit.version) {
-  			throw new Error("QUnit has already been defined.");
-  		}
-
-  		window.QUnit = QUnit;
-  	}
-
-  	// For nodejs
-  	if (typeof module !== "undefined" && module && module.exports) {
-  		module.exports = QUnit;
-
-  		// For consistency with CommonJS environments' exports
-  		module.exports.QUnit = QUnit;
-  	}
-
-  	// For CommonJS with exports, but without module.exports, like Rhino
-  	if (typeof exports !== "undefined" && exports) {
-  		exports.QUnit = QUnit;
-  	}
-
-  	if (typeof define === "function" && define.amd) {
-  		define(function () {
-  			return QUnit;
-  		});
-  		QUnit.config.autostart = false;
-  	}
-
-  	// For Web/Service Workers
-  	if (self$1 && self$1.WorkerGlobalScope && self$1 instanceof self$1.WorkerGlobalScope) {
-  		self$1.QUnit = QUnit;
-  	}
-  }
-
-  var SuiteReport = function () {
-  	function SuiteReport(name, parentSuite) {
-  		classCallCheck(this, SuiteReport);
-
-  		this.name = name;
-  		this.fullName = parentSuite ? parentSuite.fullName.concat(name) : [];
-
-  		this.tests = [];
-  		this.childSuites = [];
-
-  		if (parentSuite) {
-  			parentSuite.pushChildSuite(this);
-  		}
-  	}
-
-  	createClass(SuiteReport, [{
-  		key: "start",
-  		value: function start(recordTime) {
-  			if (recordTime) {
-  				this._startTime = Date.now();
-  			}
-
-  			return {
-  				name: this.name,
-  				fullName: this.fullName.slice(),
-  				tests: this.tests.map(function (test) {
-  					return test.start();
-  				}),
-  				childSuites: this.childSuites.map(function (suite) {
-  					return suite.start();
-  				}),
-  				testCounts: {
-  					total: this.getTestCounts().total
-  				}
-  			};
-  		}
-  	}, {
-  		key: "end",
-  		value: function end(recordTime) {
-  			if (recordTime) {
-  				this._endTime = Date.now();
-  			}
-
-  			return {
-  				name: this.name,
-  				fullName: this.fullName.slice(),
-  				tests: this.tests.map(function (test) {
-  					return test.end();
-  				}),
-  				childSuites: this.childSuites.map(function (suite) {
-  					return suite.end();
-  				}),
-  				testCounts: this.getTestCounts(),
-  				runtime: this.getRuntime(),
-  				status: this.getStatus()
-  			};
-  		}
-  	}, {
-  		key: "pushChildSuite",
-  		value: function pushChildSuite(suite) {
-  			this.childSuites.push(suite);
-  		}
-  	}, {
-  		key: "pushTest",
-  		value: function pushTest(test) {
-  			this.tests.push(test);
-  		}
-  	}, {
-  		key: "getRuntime",
-  		value: function getRuntime() {
-  			return this._endTime - this._startTime;
-  		}
-  	}, {
-  		key: "getTestCounts",
-  		value: function getTestCounts() {
-  			var counts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { passed: 0, failed: 0, skipped: 0, todo: 0, total: 0 };
-
-  			counts = this.tests.reduce(function (counts, test) {
-  				if (test.valid) {
-  					counts[test.getStatus()]++;
-  					counts.total++;
-  				}
-
-  				return counts;
-  			}, counts);
-
-  			return this.childSuites.reduce(function (counts, suite) {
-  				return suite.getTestCounts(counts);
-  			}, counts);
-  		}
-  	}, {
-  		key: "getStatus",
-  		value: function getStatus() {
-  			var _getTestCounts = this.getTestCounts(),
-  			    total = _getTestCounts.total,
-  			    failed = _getTestCounts.failed,
-  			    skipped = _getTestCounts.skipped,
-  			    todo = _getTestCounts.todo;
-
-  			if (failed) {
-  				return "failed";
-  			} else {
-  				if (skipped === total) {
-  					return "skipped";
-  				} else if (todo === total) {
-  					return "todo";
-  				} else {
-  					return "passed";
-  				}
-  			}
-  		}
-  	}]);
-  	return SuiteReport;
-  }();
-
-  // Handle an unhandled exception. By convention, returns true if further
-  // error handling should be suppressed and false otherwise.
-  // In this case, we will only suppress further error handling if the
-  // "ignoreGlobalErrors" configuration option is enabled.
-  function onError(error) {
-  	for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-  		args[_key - 1] = arguments[_key];
-  	}
-
-  	if (config.current) {
-  		if (config.current.ignoreGlobalErrors) {
-  			return true;
-  		}
-  		pushFailure.apply(undefined, [error.message, error.fileName + ":" + error.lineNumber].concat(args));
-  	} else {
-  		test("global failure", extend(function () {
-  			pushFailure.apply(undefined, [error.message, error.fileName + ":" + error.lineNumber].concat(args));
-  		}, { validTest: true }));
-  	}
-
-  	return false;
-  }
-
-  var focused = false;
-  var QUnit = {};
-  var globalSuite = new SuiteReport();
-
-  // The initial "currentModule" represents the global (or top-level) module that
-  // is not explicitly defined by the user, therefore we add the "globalSuite" to
-  // it since each module has a suiteReport associated with it.
-  config.currentModule.suiteReport = globalSuite;
-
-  var moduleStack = [];
-  var globalStartCalled = false;
-  var runStarted = false;
-
-  // Figure out if we're running the tests from a server or not
-  QUnit.isLocal = !(defined.document && window.location.protocol !== "file:");
-
-  // Expose the current QUnit version
-  QUnit.version = "2.4.1";
-
-  function createModule(name, testEnvironment, modifiers) {
-  	var parentModule = moduleStack.length ? moduleStack.slice(-1)[0] : null;
-  	var moduleName = parentModule !== null ? [parentModule.name, name].join(" > ") : name;
-  	var parentSuite = parentModule ? parentModule.suiteReport : globalSuite;
-
-  	var skip$$1 = parentModule !== null && parentModule.skip || modifiers.skip;
-  	var todo$$1 = parentModule !== null && parentModule.todo || modifiers.todo;
-
-  	var module = {
-  		name: moduleName,
-  		parentModule: parentModule,
-  		tests: [],
-  		moduleId: generateHash(moduleName),
-  		testsRun: 0,
-  		unskippedTestsRun: 0,
-  		childModules: [],
-  		suiteReport: new SuiteReport(name, parentSuite),
-
-  		// Pass along `skip` and `todo` properties from parent module, in case
-  		// there is one, to childs. And use own otherwise.
-  		// This property will be used to mark own tests and tests of child suites
-  		// as either `skipped` or `todo`.
-  		skip: skip$$1,
-  		todo: skip$$1 ? false : todo$$1
-  	};
-
-  	var env = {};
-  	if (parentModule) {
-  		parentModule.childModules.push(module);
-  		extend(env, parentModule.testEnvironment);
-  	}
-  	extend(env, testEnvironment);
-  	module.testEnvironment = env;
-
-  	config.modules.push(module);
-  	return module;
-  }
-
-  function processModule(name, options, executeNow) {
-  	var modifiers = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-  	var module = createModule(name, options, modifiers);
-
-  	// Move any hooks to a 'hooks' object
-  	var testEnvironment = module.testEnvironment;
-  	var hooks = module.hooks = {};
-
-  	setHookFromEnvironment(hooks, testEnvironment, "before");
-  	setHookFromEnvironment(hooks, testEnvironment, "beforeEach");
-  	setHookFromEnvironment(hooks, testEnvironment, "afterEach");
-  	setHookFromEnvironment(hooks, testEnvironment, "after");
-
-  	function setHookFromEnvironment(hooks, environment, name) {
-  		var potentialHook = environment[name];
-  		hooks[name] = typeof potentialHook === "function" ? [potentialHook] : [];
-  		delete environment[name];
-  	}
-
-  	var moduleFns = {
-  		before: setHookFunction(module, "before"),
-  		beforeEach: setHookFunction(module, "beforeEach"),
-  		afterEach: setHookFunction(module, "afterEach"),
-  		after: setHookFunction(module, "after")
-  	};
-
-  	var currentModule = config.currentModule;
-  	if (objectType(executeNow) === "function") {
-  		moduleStack.push(module);
-  		config.currentModule = module;
-  		executeNow.call(module.testEnvironment, moduleFns);
-  		moduleStack.pop();
-  		module = module.parentModule || currentModule;
-  	}
-
-  	config.currentModule = module;
-  }
-
-  // TODO: extract this to a new file alongside its related functions
-  function module$1(name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
-  	if (arguments.length === 2) {
-  		if (objectType(options) === "function") {
-  			executeNow = options;
-  			options = undefined;
-  		}
-  	}
-
-  	processModule(name, options, executeNow);
-  }
-
-  module$1.only = function () {
-  	if (focused) {
-  		return;
-  	}
-
-  	config.modules.length = 0;
-  	config.queue.length = 0;
-
-  	module$1.apply(undefined, arguments);
-
-  	focused = true;
-  };
-
-  module$1.skip = function (name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
-  	if (arguments.length === 2) {
-  		if (objectType(options) === "function") {
-  			executeNow = options;
-  			options = undefined;
-  		}
-  	}
-
-  	processModule(name, options, executeNow, { skip: true });
-  };
-
-  module$1.todo = function (name, options, executeNow) {
-  	if (focused) {
-  		return;
-  	}
-
-  	if (arguments.length === 2) {
-  		if (objectType(options) === "function") {
-  			executeNow = options;
-  			options = undefined;
-  		}
-  	}
-
-  	processModule(name, options, executeNow, { todo: true });
-  };
-
-  extend(QUnit, {
-  	on: on,
-
-  	module: module$1,
-
-  	test: test,
-
-  	todo: todo,
-
-  	skip: skip,
-
-  	only: only,
-
-  	start: function start(count) {
-  		var globalStartAlreadyCalled = globalStartCalled;
-
-  		if (!config.current) {
-  			globalStartCalled = true;
-
-  			if (runStarted) {
-  				throw new Error("Called start() while test already started running");
-  			} else if (globalStartAlreadyCalled || count > 1) {
-  				throw new Error("Called start() outside of a test context too many times");
-  			} else if (config.autostart) {
-  				throw new Error("Called start() outside of a test context when " + "QUnit.config.autostart was true");
-  			} else if (!config.pageLoaded) {
-
-  				// The page isn't completely loaded yet, so we set autostart and then
-  				// load if we're in Node or wait for the browser's load event.
-  				config.autostart = true;
-
-  				// Starts from Node even if .load was not previously called. We still return
-  				// early otherwise we'll wind up "beginning" twice.
-  				if (!defined.document) {
-  					QUnit.load();
-  				}
-
-  				return;
-  			}
-  		} else {
-  			throw new Error("QUnit.start cannot be called inside a test context.");
-  		}
-
-  		scheduleBegin();
-  	},
-
-  	config: config,
-
-  	is: is,
-
-  	objectType: objectType,
-
-  	extend: extend,
-
-  	load: function load() {
-  		config.pageLoaded = true;
-
-  		// Initialize the configuration options
-  		extend(config, {
-  			stats: { all: 0, bad: 0 },
-  			started: 0,
-  			updateRate: 1000,
-  			autostart: true,
-  			filter: ""
-  		}, true);
-
-  		if (!runStarted) {
-  			config.blocking = false;
-
-  			if (config.autostart) {
-  				scheduleBegin();
-  			}
-  		}
-  	},
-
-  	stack: function stack(offset) {
-  		offset = (offset || 0) + 2;
-  		return sourceFromStacktrace(offset);
-  	},
-
-  	onError: onError
-  });
-
-  QUnit.pushFailure = pushFailure;
-  QUnit.assert = Assert.prototype;
-  QUnit.equiv = equiv;
-  QUnit.dump = dump;
-
-  registerLoggingCallbacks(QUnit);
-
-  function scheduleBegin() {
-
-  	runStarted = true;
-
-  	// Add a slight delay to allow definition of more modules and tests.
-  	if (defined.setTimeout) {
-  		setTimeout(function () {
-  			begin();
-  		}, 13);
-  	} else {
-  		begin();
-  	}
-  }
-
-  function begin() {
-  	var i,
-  	    l,
-  	    modulesLog = [];
-
-  	// If the test run hasn't officially begun yet
-  	if (!config.started) {
-
-  		// Record the time of the test run's beginning
-  		config.started = now();
-
-  		// Delete the loose unnamed module if unused.
-  		if (config.modules[0].name === "" && config.modules[0].tests.length === 0) {
-  			config.modules.shift();
-  		}
-
-  		// Avoid unnecessary information by not logging modules' test environments
-  		for (i = 0, l = config.modules.length; i < l; i++) {
-  			modulesLog.push({
-  				name: config.modules[i].name,
-  				tests: config.modules[i].tests
-  			});
-  		}
-
-  		// The test run is officially beginning now
-  		emit("runStart", globalSuite.start(true));
-  		runLoggingCallbacks("begin", {
-  			totalTests: Test.count,
-  			modules: modulesLog
-  		});
-  	}
-
-  	config.blocking = false;
-  	ProcessingQueue.advance();
-  }
-
-  function setHookFunction(module, hookName) {
-  	return function setHook(callback) {
-  		module.hooks[hookName].push(callback);
-  	};
-  }
-
-  exportQUnit(QUnit);
-
-  (function () {
-
-  	if (typeof window === "undefined" || typeof document === "undefined") {
-  		return;
-  	}
-
-  	var config = QUnit.config,
-  	    hasOwn = Object.prototype.hasOwnProperty;
-
-  	// Stores fixture HTML for resetting later
-  	function storeFixture() {
-
-  		// Avoid overwriting user-defined values
-  		if (hasOwn.call(config, "fixture")) {
-  			return;
-  		}
-
-  		var fixture = document.getElementById("qunit-fixture");
-  		if (fixture) {
-  			config.fixture = fixture.innerHTML;
-  		}
-  	}
-
-  	QUnit.begin(storeFixture);
-
-  	// Resets the fixture DOM element if available.
-  	function resetFixture() {
-  		if (config.fixture == null) {
-  			return;
-  		}
-
-  		var fixture = document.getElementById("qunit-fixture");
-  		if (fixture) {
-  			fixture.innerHTML = config.fixture;
-  		}
-  	}
-
-  	QUnit.testStart(resetFixture);
-  })();
-
-  (function () {
-
-  	// Only interact with URLs via window.location
-  	var location = typeof window !== "undefined" && window.location;
-  	if (!location) {
-  		return;
-  	}
-
-  	var urlParams = getUrlParams();
-
-  	QUnit.urlParams = urlParams;
-
-  	// Match module/test by inclusion in an array
-  	QUnit.config.moduleId = [].concat(urlParams.moduleId || []);
-  	QUnit.config.testId = [].concat(urlParams.testId || []);
-
-  	// Exact case-insensitive match of the module name
-  	QUnit.config.module = urlParams.module;
-
-  	// Regular expression or case-insenstive substring match against "moduleName: testName"
-  	QUnit.config.filter = urlParams.filter;
-
-  	// Test order randomization
-  	if (urlParams.seed === true) {
-
-  		// Generate a random seed if the option is specified without a value
-  		QUnit.config.seed = Math.random().toString(36).slice(2);
-  	} else if (urlParams.seed) {
-  		QUnit.config.seed = urlParams.seed;
-  	}
-
-  	// Add URL-parameter-mapped config values with UI form rendering data
-  	QUnit.config.urlConfig.push({
-  		id: "hidepassed",
-  		label: "Hide passed tests",
-  		tooltip: "Only show tests and assertions that fail. Stored as query-strings."
-  	}, {
-  		id: "noglobals",
-  		label: "Check for Globals",
-  		tooltip: "Enabling this will test if any test introduces new properties on the " + "global object (`window` in Browsers). Stored as query-strings."
-  	}, {
-  		id: "notrycatch",
-  		label: "No try-catch",
-  		tooltip: "Enabling this will run tests outside of a try-catch block. Makes debugging " + "exceptions in IE reasonable. Stored as query-strings."
-  	});
-
-  	QUnit.begin(function () {
-  		var i,
-  		    option,
-  		    urlConfig = QUnit.config.urlConfig;
-
-  		for (i = 0; i < urlConfig.length; i++) {
-
-  			// Options can be either strings or objects with nonempty "id" properties
-  			option = QUnit.config.urlConfig[i];
-  			if (typeof option !== "string") {
-  				option = option.id;
-  			}
-
-  			if (QUnit.config[option] === undefined) {
-  				QUnit.config[option] = urlParams[option];
-  			}
-  		}
-  	});
-
-  	function getUrlParams() {
-  		var i, param, name, value;
-  		var urlParams = Object.create(null);
-  		var params = location.search.slice(1).split("&");
-  		var length = params.length;
-
-  		for (i = 0; i < length; i++) {
-  			if (params[i]) {
-  				param = params[i].split("=");
-  				name = decodeQueryParam(param[0]);
-
-  				// Allow just a key to turn on a flag, e.g., test.html?noglobals
-  				value = param.length === 1 || decodeQueryParam(param.slice(1).join("="));
-  				if (name in urlParams) {
-  					urlParams[name] = [].concat(urlParams[name], value);
-  				} else {
-  					urlParams[name] = value;
-  				}
-  			}
-  		}
-
-  		return urlParams;
-  	}
-
-  	function decodeQueryParam(param) {
-  		return decodeURIComponent(param.replace(/\+/g, "%20"));
-  	}
-  })();
-
-  var stats = {
-  	passedTests: 0,
-  	failedTests: 0,
-  	skippedTests: 0,
-  	todoTests: 0
-  };
-
-  // Escape text for attribute or text content.
-  function escapeText(s) {
-  	if (!s) {
-  		return "";
-  	}
-  	s = s + "";
-
-  	// Both single quotes and double quotes (for attributes)
-  	return s.replace(/['"<>&]/g, function (s) {
-  		switch (s) {
-  			case "'":
-  				return "&#039;";
-  			case "\"":
-  				return "&quot;";
-  			case "<":
-  				return "&lt;";
-  			case ">":
-  				return "&gt;";
-  			case "&":
-  				return "&amp;";
-  		}
-  	});
-  }
-
-  (function () {
-
-  	// Don't load the HTML Reporter on non-browser environments
-  	if (typeof window === "undefined" || !window.document) {
-  		return;
-  	}
-
-  	var config = QUnit.config,
-  	    document$$1 = window.document,
-  	    collapseNext = false,
-  	    hasOwn = Object.prototype.hasOwnProperty,
-  	    unfilteredUrl = setUrl({ filter: undefined, module: undefined,
-  		moduleId: undefined, testId: undefined }),
-  	    modulesList = [];
-
-  	function addEvent(elem, type, fn) {
-  		elem.addEventListener(type, fn, false);
-  	}
-
-  	function removeEvent(elem, type, fn) {
-  		elem.removeEventListener(type, fn, false);
-  	}
-
-  	function addEvents(elems, type, fn) {
-  		var i = elems.length;
-  		while (i--) {
-  			addEvent(elems[i], type, fn);
-  		}
-  	}
-
-  	function hasClass(elem, name) {
-  		return (" " + elem.className + " ").indexOf(" " + name + " ") >= 0;
-  	}
-
-  	function addClass(elem, name) {
-  		if (!hasClass(elem, name)) {
-  			elem.className += (elem.className ? " " : "") + name;
-  		}
-  	}
-
-  	function toggleClass(elem, name, force) {
-  		if (force || typeof force === "undefined" && !hasClass(elem, name)) {
-  			addClass(elem, name);
-  		} else {
-  			removeClass(elem, name);
-  		}
-  	}
-
-  	function removeClass(elem, name) {
-  		var set = " " + elem.className + " ";
-
-  		// Class name may appear multiple times
-  		while (set.indexOf(" " + name + " ") >= 0) {
-  			set = set.replace(" " + name + " ", " ");
-  		}
-
-  		// Trim for prettiness
-  		elem.className = typeof set.trim === "function" ? set.trim() : set.replace(/^\s+|\s+$/g, "");
-  	}
-
-  	function id(name) {
-  		return document$$1.getElementById && document$$1.getElementById(name);
-  	}
-
-  	function abortTests() {
-  		var abortButton = id("qunit-abort-tests-button");
-  		if (abortButton) {
-  			abortButton.disabled = true;
-  			abortButton.innerHTML = "Aborting...";
-  		}
-  		QUnit.config.queue.length = 0;
-  		return false;
-  	}
-
-  	function interceptNavigation(ev) {
-  		applyUrlParams();
-
-  		if (ev && ev.preventDefault) {
-  			ev.preventDefault();
-  		}
-
-  		return false;
-  	}
-
-  	function getUrlConfigHtml() {
-  		var i,
-  		    j,
-  		    val,
-  		    escaped,
-  		    escapedTooltip,
-  		    selection = false,
-  		    urlConfig = config.urlConfig,
-  		    urlConfigHtml = "";
-
-  		for (i = 0; i < urlConfig.length; i++) {
-
-  			// Options can be either strings or objects with nonempty "id" properties
-  			val = config.urlConfig[i];
-  			if (typeof val === "string") {
-  				val = {
-  					id: val,
-  					label: val
-  				};
-  			}
-
-  			escaped = escapeText(val.id);
-  			escapedTooltip = escapeText(val.tooltip);
-
-  			if (!val.value || typeof val.value === "string") {
-  				urlConfigHtml += "<label for='qunit-urlconfig-" + escaped + "' title='" + escapedTooltip + "'><input id='qunit-urlconfig-" + escaped + "' name='" + escaped + "' type='checkbox'" + (val.value ? " value='" + escapeText(val.value) + "'" : "") + (config[val.id] ? " checked='checked'" : "") + " title='" + escapedTooltip + "' />" + escapeText(val.label) + "</label>";
-  			} else {
-  				urlConfigHtml += "<label for='qunit-urlconfig-" + escaped + "' title='" + escapedTooltip + "'>" + val.label + ": </label><select id='qunit-urlconfig-" + escaped + "' name='" + escaped + "' title='" + escapedTooltip + "'><option></option>";
-
-  				if (QUnit.is("array", val.value)) {
-  					for (j = 0; j < val.value.length; j++) {
-  						escaped = escapeText(val.value[j]);
-  						urlConfigHtml += "<option value='" + escaped + "'" + (config[val.id] === val.value[j] ? (selection = true) && " selected='selected'" : "") + ">" + escaped + "</option>";
-  					}
-  				} else {
-  					for (j in val.value) {
-  						if (hasOwn.call(val.value, j)) {
-  							urlConfigHtml += "<option value='" + escapeText(j) + "'" + (config[val.id] === j ? (selection = true) && " selected='selected'" : "") + ">" + escapeText(val.value[j]) + "</option>";
-  						}
-  					}
-  				}
-  				if (config[val.id] && !selection) {
-  					escaped = escapeText(config[val.id]);
-  					urlConfigHtml += "<option value='" + escaped + "' selected='selected' disabled='disabled'>" + escaped + "</option>";
-  				}
-  				urlConfigHtml += "</select>";
-  			}
-  		}
-
-  		return urlConfigHtml;
-  	}
-
-  	// Handle "click" events on toolbar checkboxes and "change" for select menus.
-  	// Updates the URL with the new state of `config.urlConfig` values.
-  	function toolbarChanged() {
-  		var updatedUrl,
-  		    value,
-  		    tests,
-  		    field = this,
-  		    params = {};
-
-  		// Detect if field is a select menu or a checkbox
-  		if ("selectedIndex" in field) {
-  			value = field.options[field.selectedIndex].value || undefined;
-  		} else {
-  			value = field.checked ? field.defaultValue || true : undefined;
-  		}
-
-  		params[field.name] = value;
-  		updatedUrl = setUrl(params);
-
-  		// Check if we can apply the change without a page refresh
-  		if ("hidepassed" === field.name && "replaceState" in window.history) {
-  			QUnit.urlParams[field.name] = value;
-  			config[field.name] = value || false;
-  			tests = id("qunit-tests");
-  			if (tests) {
-  				toggleClass(tests, "hidepass", value || false);
-  			}
-  			window.history.replaceState(null, "", updatedUrl);
-  		} else {
-  			window.location = updatedUrl;
-  		}
-  	}
-
-  	function setUrl(params) {
-  		var key,
-  		    arrValue,
-  		    i,
-  		    querystring = "?",
-  		    location = window.location;
-
-  		params = QUnit.extend(QUnit.extend({}, QUnit.urlParams), params);
-
-  		for (key in params) {
-
-  			// Skip inherited or undefined properties
-  			if (hasOwn.call(params, key) && params[key] !== undefined) {
-
-  				// Output a parameter for each value of this key
-  				// (but usually just one)
-  				arrValue = [].concat(params[key]);
-  				for (i = 0; i < arrValue.length; i++) {
-  					querystring += encodeURIComponent(key);
-  					if (arrValue[i] !== true) {
-  						querystring += "=" + encodeURIComponent(arrValue[i]);
-  					}
-  					querystring += "&";
-  				}
-  			}
-  		}
-  		return location.protocol + "//" + location.host + location.pathname + querystring.slice(0, -1);
-  	}
-
-  	function applyUrlParams() {
-  		var i,
-  		    selectedModules = [],
-  		    modulesList = id("qunit-modulefilter-dropdown-list").getElementsByTagName("input"),
-  		    filter = id("qunit-filter-input").value;
-
-  		for (i = 0; i < modulesList.length; i++) {
-  			if (modulesList[i].checked) {
-  				selectedModules.push(modulesList[i].value);
-  			}
-  		}
-
-  		window.location = setUrl({
-  			filter: filter === "" ? undefined : filter,
-  			moduleId: selectedModules.length === 0 ? undefined : selectedModules,
-
-  			// Remove module and testId filter
-  			module: undefined,
-  			testId: undefined
-  		});
-  	}
-
-  	function toolbarUrlConfigContainer() {
-  		var urlConfigContainer = document$$1.createElement("span");
-
-  		urlConfigContainer.innerHTML = getUrlConfigHtml();
-  		addClass(urlConfigContainer, "qunit-url-config");
-
-  		addEvents(urlConfigContainer.getElementsByTagName("input"), "change", toolbarChanged);
-  		addEvents(urlConfigContainer.getElementsByTagName("select"), "change", toolbarChanged);
-
-  		return urlConfigContainer;
-  	}
-
-  	function abortTestsButton() {
-  		var button = document$$1.createElement("button");
-  		button.id = "qunit-abort-tests-button";
-  		button.innerHTML = "Abort";
-  		addEvent(button, "click", abortTests);
-  		return button;
-  	}
-
-  	function toolbarLooseFilter() {
-  		var filter = document$$1.createElement("form"),
-  		    label = document$$1.createElement("label"),
-  		    input = document$$1.createElement("input"),
-  		    button = document$$1.createElement("button");
-
-  		addClass(filter, "qunit-filter");
-
-  		label.innerHTML = "Filter: ";
-
-  		input.type = "text";
-  		input.value = config.filter || "";
-  		input.name = "filter";
-  		input.id = "qunit-filter-input";
-
-  		button.innerHTML = "Go";
-
-  		label.appendChild(input);
-
-  		filter.appendChild(label);
-  		filter.appendChild(document$$1.createTextNode(" "));
-  		filter.appendChild(button);
-  		addEvent(filter, "submit", interceptNavigation);
-
-  		return filter;
-  	}
-
-  	function moduleListHtml() {
-  		var i,
-  		    checked,
-  		    html = "";
-
-  		for (i = 0; i < config.modules.length; i++) {
-  			if (config.modules[i].name !== "") {
-  				checked = config.moduleId.indexOf(config.modules[i].moduleId) > -1;
-  				html += "<li><label class='clickable" + (checked ? " checked" : "") + "'><input type='checkbox' " + "value='" + config.modules[i].moduleId + "'" + (checked ? " checked='checked'" : "") + " />" + escapeText(config.modules[i].name) + "</label></li>";
-  			}
-  		}
-
-  		return html;
-  	}
-
-  	function toolbarModuleFilter() {
-  		var allCheckbox,
-  		    commit,
-  		    reset,
-  		    moduleFilter = document$$1.createElement("form"),
-  		    label = document$$1.createElement("label"),
-  		    moduleSearch = document$$1.createElement("input"),
-  		    dropDown = document$$1.createElement("div"),
-  		    actions = document$$1.createElement("span"),
-  		    dropDownList = document$$1.createElement("ul"),
-  		    dirty = false;
-
-  		moduleSearch.id = "qunit-modulefilter-search";
-  		addEvent(moduleSearch, "input", searchInput);
-  		addEvent(moduleSearch, "input", searchFocus);
-  		addEvent(moduleSearch, "focus", searchFocus);
-  		addEvent(moduleSearch, "click", searchFocus);
-
-  		label.id = "qunit-modulefilter-search-container";
-  		label.innerHTML = "Module: ";
-  		label.appendChild(moduleSearch);
-
-  		actions.id = "qunit-modulefilter-actions";
-  		actions.innerHTML = "<button style='display:none'>Apply</button>" + "<button type='reset' style='display:none'>Reset</button>" + "<label class='clickable" + (config.moduleId.length ? "" : " checked") + "'><input type='checkbox'" + (config.moduleId.length ? "" : " checked='checked'") + ">All modules</label>";
-  		allCheckbox = actions.lastChild.firstChild;
-  		commit = actions.firstChild;
-  		reset = commit.nextSibling;
-  		addEvent(commit, "click", applyUrlParams);
-
-  		dropDownList.id = "qunit-modulefilter-dropdown-list";
-  		dropDownList.innerHTML = moduleListHtml();
-
-  		dropDown.id = "qunit-modulefilter-dropdown";
-  		dropDown.style.display = "none";
-  		dropDown.appendChild(actions);
-  		dropDown.appendChild(dropDownList);
-  		addEvent(dropDown, "change", selectionChange);
-  		selectionChange();
-
-  		moduleFilter.id = "qunit-modulefilter";
-  		moduleFilter.appendChild(label);
-  		moduleFilter.appendChild(dropDown);
-  		addEvent(moduleFilter, "submit", interceptNavigation);
-  		addEvent(moduleFilter, "reset", function () {
-
-  			// Let the reset happen, then update styles
-  			window.setTimeout(selectionChange);
-  		});
-
-  		// Enables show/hide for the dropdown
-  		function searchFocus() {
-  			if (dropDown.style.display !== "none") {
-  				return;
-  			}
-
-  			dropDown.style.display = "block";
-  			addEvent(document$$1, "click", hideHandler);
-  			addEvent(document$$1, "keydown", hideHandler);
-
-  			// Hide on Escape keydown or outside-container click
-  			function hideHandler(e) {
-  				var inContainer = moduleFilter.contains(e.target);
-
-  				if (e.keyCode === 27 || !inContainer) {
-  					if (e.keyCode === 27 && inContainer) {
-  						moduleSearch.focus();
-  					}
-  					dropDown.style.display = "none";
-  					removeEvent(document$$1, "click", hideHandler);
-  					removeEvent(document$$1, "keydown", hideHandler);
-  					moduleSearch.value = "";
-  					searchInput();
-  				}
-  			}
-  		}
-
-  		// Processes module search box input
-  		function searchInput() {
-  			var i,
-  			    item,
-  			    searchText = moduleSearch.value.toLowerCase(),
-  			    listItems = dropDownList.children;
-
-  			for (i = 0; i < listItems.length; i++) {
-  				item = listItems[i];
-  				if (!searchText || item.textContent.toLowerCase().indexOf(searchText) > -1) {
-  					item.style.display = "";
-  				} else {
-  					item.style.display = "none";
-  				}
-  			}
-  		}
-
-  		// Processes selection changes
-  		function selectionChange(evt) {
-  			var i,
-  			    item,
-  			    checkbox = evt && evt.target || allCheckbox,
-  			    modulesList = dropDownList.getElementsByTagName("input"),
-  			    selectedNames = [];
-
-  			toggleClass(checkbox.parentNode, "checked", checkbox.checked);
-
-  			dirty = false;
-  			if (checkbox.checked && checkbox !== allCheckbox) {
-  				allCheckbox.checked = false;
-  				removeClass(allCheckbox.parentNode, "checked");
-  			}
-  			for (i = 0; i < modulesList.length; i++) {
-  				item = modulesList[i];
-  				if (!evt) {
-  					toggleClass(item.parentNode, "checked", item.checked);
-  				} else if (checkbox === allCheckbox && checkbox.checked) {
-  					item.checked = false;
-  					removeClass(item.parentNode, "checked");
-  				}
-  				dirty = dirty || item.checked !== item.defaultChecked;
-  				if (item.checked) {
-  					selectedNames.push(item.parentNode.textContent);
-  				}
-  			}
-
-  			commit.style.display = reset.style.display = dirty ? "" : "none";
-  			moduleSearch.placeholder = selectedNames.join(", ") || allCheckbox.parentNode.textContent;
-  			moduleSearch.title = "Type to filter list. Current selection:\n" + (selectedNames.join("\n") || allCheckbox.parentNode.textContent);
-  		}
-
-  		return moduleFilter;
-  	}
-
-  	function appendToolbar() {
-  		var toolbar = id("qunit-testrunner-toolbar");
-
-  		if (toolbar) {
-  			toolbar.appendChild(toolbarUrlConfigContainer());
-  			toolbar.appendChild(toolbarModuleFilter());
-  			toolbar.appendChild(toolbarLooseFilter());
-  			toolbar.appendChild(document$$1.createElement("div")).className = "clearfix";
-  		}
-  	}
-
-  	function appendHeader() {
-  		var header = id("qunit-header");
-
-  		if (header) {
-  			header.innerHTML = "<a href='" + escapeText(unfilteredUrl) + "'>" + header.innerHTML + "</a> ";
-  		}
-  	}
-
-  	function appendBanner() {
-  		var banner = id("qunit-banner");
-
-  		if (banner) {
-  			banner.className = "";
-  		}
-  	}
-
-  	function appendTestResults() {
-  		var tests = id("qunit-tests"),
-  		    result = id("qunit-testresult"),
-  		    controls;
-
-  		if (result) {
-  			result.parentNode.removeChild(result);
-  		}
-
-  		if (tests) {
-  			tests.innerHTML = "";
-  			result = document$$1.createElement("p");
-  			result.id = "qunit-testresult";
-  			result.className = "result";
-  			tests.parentNode.insertBefore(result, tests);
-  			result.innerHTML = "<div id=\"qunit-testresult-display\">Running...<br />&#160;</div>" + "<div id=\"qunit-testresult-controls\"></div>" + "<div class=\"clearfix\"></div>";
-  			controls = id("qunit-testresult-controls");
-  		}
-
-  		if (controls) {
-  			controls.appendChild(abortTestsButton());
-  		}
-  	}
-
-  	function appendFilteredTest() {
-  		var testId = QUnit.config.testId;
-  		if (!testId || testId.length <= 0) {
-  			return "";
-  		}
-  		return "<div id='qunit-filteredTest'>Rerunning selected tests: " + escapeText(testId.join(", ")) + " <a id='qunit-clearFilter' href='" + escapeText(unfilteredUrl) + "'>Run all tests</a></div>";
-  	}
-
-  	function appendUserAgent() {
-  		var userAgent = id("qunit-userAgent");
-
-  		if (userAgent) {
-  			userAgent.innerHTML = "";
-  			userAgent.appendChild(document$$1.createTextNode("QUnit " + QUnit.version + "; " + navigator.userAgent));
-  		}
-  	}
-
-  	function appendInterface() {
-  		var qunit = id("qunit");
-
-  		if (qunit) {
-  			qunit.innerHTML = "<h1 id='qunit-header'>" + escapeText(document$$1.title) + "</h1>" + "<h2 id='qunit-banner'></h2>" + "<div id='qunit-testrunner-toolbar'></div>" + appendFilteredTest() + "<h2 id='qunit-userAgent'></h2>" + "<ol id='qunit-tests'></ol>";
-  		}
-
-  		appendHeader();
-  		appendBanner();
-  		appendTestResults();
-  		appendUserAgent();
-  		appendToolbar();
-  	}
-
-  	function appendTestsList(modules) {
-  		var i, l, x, z, test, moduleObj;
-
-  		for (i = 0, l = modules.length; i < l; i++) {
-  			moduleObj = modules[i];
-
-  			for (x = 0, z = moduleObj.tests.length; x < z; x++) {
-  				test = moduleObj.tests[x];
-
-  				appendTest(test.name, test.testId, moduleObj.name);
-  			}
-  		}
-  	}
-
-  	function appendTest(name, testId, moduleName) {
-  		var title,
-  		    rerunTrigger,
-  		    testBlock,
-  		    assertList,
-  		    tests = id("qunit-tests");
-
-  		if (!tests) {
-  			return;
-  		}
-
-  		title = document$$1.createElement("strong");
-  		title.innerHTML = getNameHtml(name, moduleName);
-
-  		rerunTrigger = document$$1.createElement("a");
-  		rerunTrigger.innerHTML = "Rerun";
-  		rerunTrigger.href = setUrl({ testId: testId });
-
-  		testBlock = document$$1.createElement("li");
-  		testBlock.appendChild(title);
-  		testBlock.appendChild(rerunTrigger);
-  		testBlock.id = "qunit-test-output-" + testId;
-
-  		assertList = document$$1.createElement("ol");
-  		assertList.className = "qunit-assert-list";
-
-  		testBlock.appendChild(assertList);
-
-  		tests.appendChild(testBlock);
-  	}
-
-  	// HTML Reporter initialization and load
-  	QUnit.begin(function (details) {
-  		var i, moduleObj, tests;
-
-  		// Sort modules by name for the picker
-  		for (i = 0; i < details.modules.length; i++) {
-  			moduleObj = details.modules[i];
-  			if (moduleObj.name) {
-  				modulesList.push(moduleObj.name);
-  			}
-  		}
-  		modulesList.sort(function (a, b) {
-  			return a.localeCompare(b);
-  		});
-
-  		// Initialize QUnit elements
-  		appendInterface();
-  		appendTestsList(details.modules);
-  		tests = id("qunit-tests");
-  		if (tests && config.hidepassed) {
-  			addClass(tests, "hidepass");
-  		}
-  	});
-
-  	QUnit.done(function (details) {
-  		var banner = id("qunit-banner"),
-  		    tests = id("qunit-tests"),
-  		    abortButton = id("qunit-abort-tests-button"),
-  		    totalTests = stats.passedTests + stats.skippedTests + stats.todoTests + stats.failedTests,
-  		    html = [totalTests, " tests completed in ", details.runtime, " milliseconds, with ", stats.failedTests, " failed, ", stats.skippedTests, " skipped, and ", stats.todoTests, " todo.<br />", "<span class='passed'>", details.passed, "</span> assertions of <span class='total'>", details.total, "</span> passed, <span class='failed'>", details.failed, "</span> failed."].join(""),
-  		    test,
-  		    assertLi,
-  		    assertList;
-
-  		// Update remaing tests to aborted
-  		if (abortButton && abortButton.disabled) {
-  			html = "Tests aborted after " + details.runtime + " milliseconds.";
-
-  			for (var i = 0; i < tests.children.length; i++) {
-  				test = tests.children[i];
-  				if (test.className === "" || test.className === "running") {
-  					test.className = "aborted";
-  					assertList = test.getElementsByTagName("ol")[0];
-  					assertLi = document$$1.createElement("li");
-  					assertLi.className = "fail";
-  					assertLi.innerHTML = "Test aborted.";
-  					assertList.appendChild(assertLi);
-  				}
-  			}
-  		}
-
-  		if (banner && (!abortButton || abortButton.disabled === false)) {
-  			banner.className = stats.failedTests ? "qunit-fail" : "qunit-pass";
-  		}
-
-  		if (abortButton) {
-  			abortButton.parentNode.removeChild(abortButton);
-  		}
-
-  		if (tests) {
-  			id("qunit-testresult-display").innerHTML = html;
-  		}
-
-  		if (config.altertitle && document$$1.title) {
-
-  			// Show ✖ for good, ✔ for bad suite result in title
-  			// use escape sequences in case file gets loaded with non-utf-8
-  			// charset
-  			document$$1.title = [stats.failedTests ? "\u2716" : "\u2714", document$$1.title.replace(/^[\u2714\u2716] /i, "")].join(" ");
-  		}
-
-  		// Scroll back to top to show results
-  		if (config.scrolltop && window.scrollTo) {
-  			window.scrollTo(0, 0);
-  		}
-  	});
-
-  	function getNameHtml(name, module) {
-  		var nameHtml = "";
-
-  		if (module) {
-  			nameHtml = "<span class='module-name'>" + escapeText(module) + "</span>: ";
-  		}
-
-  		nameHtml += "<span class='test-name'>" + escapeText(name) + "</span>";
-
-  		return nameHtml;
-  	}
-
-  	QUnit.testStart(function (details) {
-  		var running, testBlock, bad;
-
-  		testBlock = id("qunit-test-output-" + details.testId);
-  		if (testBlock) {
-  			testBlock.className = "running";
-  		} else {
-
-  			// Report later registered tests
-  			appendTest(details.name, details.testId, details.module);
-  		}
-
-  		running = id("qunit-testresult-display");
-  		if (running) {
-  			bad = QUnit.config.reorder && details.previousFailure;
-
-  			running.innerHTML = [bad ? "Rerunning previously failed test: <br />" : "Running: <br />", getNameHtml(details.name, details.module)].join("");
-  		}
-  	});
-
-  	function stripHtml(string) {
-
-  		// Strip tags, html entity and whitespaces
-  		return string.replace(/<\/?[^>]+(>|$)/g, "").replace(/\&quot;/g, "").replace(/\s+/g, "");
-  	}
-
-  	QUnit.log(function (details) {
-  		var assertList,
-  		    assertLi,
-  		    message,
-  		    expected,
-  		    actual,
-  		    diff,
-  		    showDiff = false,
-  		    testItem = id("qunit-test-output-" + details.testId);
-
-  		if (!testItem) {
-  			return;
-  		}
-
-  		message = escapeText(details.message) || (details.result ? "okay" : "failed");
-  		message = "<span class='test-message'>" + message + "</span>";
-  		message += "<span class='runtime'>@ " + details.runtime + " ms</span>";
-
-  		// The pushFailure doesn't provide details.expected
-  		// when it calls, it's implicit to also not show expected and diff stuff
-  		// Also, we need to check details.expected existence, as it can exist and be undefined
-  		if (!details.result && hasOwn.call(details, "expected")) {
-  			if (details.negative) {
-  				expected = "NOT " + QUnit.dump.parse(details.expected);
-  			} else {
-  				expected = QUnit.dump.parse(details.expected);
-  			}
-
-  			actual = QUnit.dump.parse(details.actual);
-  			message += "<table><tr class='test-expected'><th>Expected: </th><td><pre>" + escapeText(expected) + "</pre></td></tr>";
-
-  			if (actual !== expected) {
-
-  				message += "<tr class='test-actual'><th>Result: </th><td><pre>" + escapeText(actual) + "</pre></td></tr>";
-
-  				if (typeof details.actual === "number" && typeof details.expected === "number") {
-  					if (!isNaN(details.actual) && !isNaN(details.expected)) {
-  						showDiff = true;
-  						diff = details.actual - details.expected;
-  						diff = (diff > 0 ? "+" : "") + diff;
-  					}
-  				} else if (typeof details.actual !== "boolean" && typeof details.expected !== "boolean") {
-  					diff = QUnit.diff(expected, actual);
-
-  					// don't show diff if there is zero overlap
-  					showDiff = stripHtml(diff).length !== stripHtml(expected).length + stripHtml(actual).length;
-  				}
-
-  				if (showDiff) {
-  					message += "<tr class='test-diff'><th>Diff: </th><td><pre>" + diff + "</pre></td></tr>";
-  				}
-  			} else if (expected.indexOf("[object Array]") !== -1 || expected.indexOf("[object Object]") !== -1) {
-  				message += "<tr class='test-message'><th>Message: </th><td>" + "Diff suppressed as the depth of object is more than current max depth (" + QUnit.config.maxDepth + ").<p>Hint: Use <code>QUnit.dump.maxDepth</code> to " + " run with a higher max depth or <a href='" + escapeText(setUrl({ maxDepth: -1 })) + "'>" + "Rerun</a> without max depth.</p></td></tr>";
-  			} else {
-  				message += "<tr class='test-message'><th>Message: </th><td>" + "Diff suppressed as the expected and actual results have an equivalent" + " serialization</td></tr>";
-  			}
-
-  			if (details.source) {
-  				message += "<tr class='test-source'><th>Source: </th><td><pre>" + escapeText(details.source) + "</pre></td></tr>";
-  			}
-
-  			message += "</table>";
-
-  			// This occurs when pushFailure is set and we have an extracted stack trace
-  		} else if (!details.result && details.source) {
-  			message += "<table>" + "<tr class='test-source'><th>Source: </th><td><pre>" + escapeText(details.source) + "</pre></td></tr>" + "</table>";
-  		}
-
-  		assertList = testItem.getElementsByTagName("ol")[0];
-
-  		assertLi = document$$1.createElement("li");
-  		assertLi.className = details.result ? "pass" : "fail";
-  		assertLi.innerHTML = message;
-  		assertList.appendChild(assertLi);
-  	});
-
-  	QUnit.testDone(function (details) {
-  		var testTitle,
-  		    time,
-  		    testItem,
-  		    assertList,
-  		    good,
-  		    bad,
-  		    testCounts,
-  		    skipped,
-  		    sourceName,
-  		    tests = id("qunit-tests");
-
-  		if (!tests) {
-  			return;
-  		}
-
-  		testItem = id("qunit-test-output-" + details.testId);
-
-  		assertList = testItem.getElementsByTagName("ol")[0];
-
-  		good = details.passed;
-  		bad = details.failed;
-
-  		// This test passed if it has no unexpected failed assertions
-  		var testPassed = details.failed > 0 ? details.todo : !details.todo;
-
-  		if (testPassed) {
-
-  			// Collapse the passing tests
-  			addClass(assertList, "qunit-collapsed");
-  		} else if (config.collapse) {
-  			if (!collapseNext) {
-
-  				// Skip collapsing the first failing test
-  				collapseNext = true;
-  			} else {
-
-  				// Collapse remaining tests
-  				addClass(assertList, "qunit-collapsed");
-  			}
-  		}
-
-  		// The testItem.firstChild is the test name
-  		testTitle = testItem.firstChild;
-
-  		testCounts = bad ? "<b class='failed'>" + bad + "</b>, " + "<b class='passed'>" + good + "</b>, " : "";
-
-  		testTitle.innerHTML += " <b class='counts'>(" + testCounts + details.assertions.length + ")</b>";
-
-  		if (details.skipped) {
-  			stats.skippedTests++;
-
-  			testItem.className = "skipped";
-  			skipped = document$$1.createElement("em");
-  			skipped.className = "qunit-skipped-label";
-  			skipped.innerHTML = "skipped";
-  			testItem.insertBefore(skipped, testTitle);
-  		} else {
-  			addEvent(testTitle, "click", function () {
-  				toggleClass(assertList, "qunit-collapsed");
-  			});
-
-  			testItem.className = testPassed ? "pass" : "fail";
-
-  			if (details.todo) {
-  				var todoLabel = document$$1.createElement("em");
-  				todoLabel.className = "qunit-todo-label";
-  				todoLabel.innerHTML = "todo";
-  				testItem.className += " todo";
-  				testItem.insertBefore(todoLabel, testTitle);
-  			}
-
-  			time = document$$1.createElement("span");
-  			time.className = "runtime";
-  			time.innerHTML = details.runtime + " ms";
-  			testItem.insertBefore(time, assertList);
-
-  			if (!testPassed) {
-  				stats.failedTests++;
-  			} else if (details.todo) {
-  				stats.todoTests++;
-  			} else {
-  				stats.passedTests++;
-  			}
-  		}
-
-  		// Show the source of the test when showing assertions
-  		if (details.source) {
-  			sourceName = document$$1.createElement("p");
-  			sourceName.innerHTML = "<strong>Source: </strong>" + details.source;
-  			addClass(sourceName, "qunit-source");
-  			if (testPassed) {
-  				addClass(sourceName, "qunit-collapsed");
-  			}
-  			addEvent(testTitle, "click", function () {
-  				toggleClass(sourceName, "qunit-collapsed");
-  			});
-  			testItem.appendChild(sourceName);
-  		}
-  	});
-
-  	// Avoid readyState issue with phantomjs
-  	// Ref: #818
-  	var notPhantom = function (p) {
-  		return !(p && p.version && p.version.major > 0);
-  	}(window.phantom);
-
-  	if (notPhantom && document$$1.readyState === "complete") {
-  		QUnit.load();
-  	} else {
-  		addEvent(window, "load", QUnit.load);
-  	}
-
-  	// Wrap window.onerror. We will call the original window.onerror to see if
-  	// the existing handler fully handles the error; if not, we will call the
-  	// QUnit.onError function.
-  	var originalWindowOnError = window.onerror;
-
-  	// Cover uncaught exceptions
-  	// Returning true will suppress the default browser handler,
-  	// returning false will let it run.
-  	window.onerror = function (message, fileName, lineNumber) {
-  		var ret = false;
-  		if (originalWindowOnError) {
-  			for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
-  				args[_key - 3] = arguments[_key];
-  			}
-
-  			ret = originalWindowOnError.call.apply(originalWindowOnError, [this, message, fileName, lineNumber].concat(args));
-  		}
-
-  		// Treat return value as window.onerror itself does,
-  		// Only do our handling if not suppressed.
-  		if (ret !== true) {
-  			var error = {
-  				message: message,
-  				fileName: fileName,
-  				lineNumber: lineNumber
-  			};
-
-  			ret = QUnit.onError(error);
-  		}
-
-  		return ret;
-  	};
-  })();
-
-  /*
-   * This file is a modified version of google-diff-match-patch's JavaScript implementation
-   * (https://code.google.com/p/google-diff-match-patch/source/browse/trunk/javascript/diff_match_patch_uncompressed.js),
-   * modifications are licensed as more fully set forth in LICENSE.txt.
-   *
-   * The original source of google-diff-match-patch is attributable and licensed as follows:
-   *
-   * Copyright 2006 Google Inc.
-   * https://code.google.com/p/google-diff-match-patch/
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   * https://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   *
-   * More Info:
-   *  https://code.google.com/p/google-diff-match-patch/
-   *
-   * Usage: QUnit.diff(expected, actual)
-   *
-   */
-  QUnit.diff = function () {
-  	function DiffMatchPatch() {}
-
-  	//  DIFF FUNCTIONS
-
-  	/**
-    * The data structure representing a diff is an array of tuples:
-    * [[DIFF_DELETE, 'Hello'], [DIFF_INSERT, 'Goodbye'], [DIFF_EQUAL, ' world.']]
-    * which means: delete 'Hello', add 'Goodbye' and keep ' world.'
-    */
-  	var DIFF_DELETE = -1,
-  	    DIFF_INSERT = 1,
-  	    DIFF_EQUAL = 0;
-
-  	/**
-    * Find the differences between two texts.  Simplifies the problem by stripping
-    * any common prefix or suffix off the texts before diffing.
-    * @param {string} text1 Old string to be diffed.
-    * @param {string} text2 New string to be diffed.
-    * @param {boolean=} optChecklines Optional speedup flag. If present and false,
-    *     then don't run a line-level diff first to identify the changed areas.
-    *     Defaults to true, which does a faster, slightly less optimal diff.
-    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
-    */
-  	DiffMatchPatch.prototype.DiffMain = function (text1, text2, optChecklines) {
-  		var deadline, checklines, commonlength, commonprefix, commonsuffix, diffs;
-
-  		// The diff must be complete in up to 1 second.
-  		deadline = new Date().getTime() + 1000;
-
-  		// Check for null inputs.
-  		if (text1 === null || text2 === null) {
-  			throw new Error("Null input. (DiffMain)");
-  		}
-
-  		// Check for equality (speedup).
-  		if (text1 === text2) {
-  			if (text1) {
-  				return [[DIFF_EQUAL, text1]];
-  			}
-  			return [];
-  		}
-
-  		if (typeof optChecklines === "undefined") {
-  			optChecklines = true;
-  		}
-
-  		checklines = optChecklines;
-
-  		// Trim off common prefix (speedup).
-  		commonlength = this.diffCommonPrefix(text1, text2);
-  		commonprefix = text1.substring(0, commonlength);
-  		text1 = text1.substring(commonlength);
-  		text2 = text2.substring(commonlength);
-
-  		// Trim off common suffix (speedup).
-  		commonlength = this.diffCommonSuffix(text1, text2);
-  		commonsuffix = text1.substring(text1.length - commonlength);
-  		text1 = text1.substring(0, text1.length - commonlength);
-  		text2 = text2.substring(0, text2.length - commonlength);
-
-  		// Compute the diff on the middle block.
-  		diffs = this.diffCompute(text1, text2, checklines, deadline);
-
-  		// Restore the prefix and suffix.
-  		if (commonprefix) {
-  			diffs.unshift([DIFF_EQUAL, commonprefix]);
-  		}
-  		if (commonsuffix) {
-  			diffs.push([DIFF_EQUAL, commonsuffix]);
-  		}
-  		this.diffCleanupMerge(diffs);
-  		return diffs;
-  	};
-
-  	/**
-    * Reduce the number of edits by eliminating operationally trivial equalities.
-    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
-    */
-  	DiffMatchPatch.prototype.diffCleanupEfficiency = function (diffs) {
-  		var changes, equalities, equalitiesLength, lastequality, pointer, preIns, preDel, postIns, postDel;
-  		changes = false;
-  		equalities = []; // Stack of indices where equalities are found.
-  		equalitiesLength = 0; // Keeping our own length var is faster in JS.
-  		/** @type {?string} */
-  		lastequality = null;
-
-  		// Always equal to diffs[equalities[equalitiesLength - 1]][1]
-  		pointer = 0; // Index of current position.
-
-  		// Is there an insertion operation before the last equality.
-  		preIns = false;
-
-  		// Is there a deletion operation before the last equality.
-  		preDel = false;
-
-  		// Is there an insertion operation after the last equality.
-  		postIns = false;
-
-  		// Is there a deletion operation after the last equality.
-  		postDel = false;
-  		while (pointer < diffs.length) {
-
-  			// Equality found.
-  			if (diffs[pointer][0] === DIFF_EQUAL) {
-  				if (diffs[pointer][1].length < 4 && (postIns || postDel)) {
-
-  					// Candidate found.
-  					equalities[equalitiesLength++] = pointer;
-  					preIns = postIns;
-  					preDel = postDel;
-  					lastequality = diffs[pointer][1];
-  				} else {
-
-  					// Not a candidate, and can never become one.
-  					equalitiesLength = 0;
-  					lastequality = null;
-  				}
-  				postIns = postDel = false;
-
-  				// An insertion or deletion.
-  			} else {
-
-  				if (diffs[pointer][0] === DIFF_DELETE) {
-  					postDel = true;
-  				} else {
-  					postIns = true;
-  				}
-
-  				/*
-       * Five types to be split:
-       * <ins>A</ins><del>B</del>XY<ins>C</ins><del>D</del>
-       * <ins>A</ins>X<ins>C</ins><del>D</del>
-       * <ins>A</ins><del>B</del>X<ins>C</ins>
-       * <ins>A</del>X<ins>C</ins><del>D</del>
-       * <ins>A</ins><del>B</del>X<del>C</del>
-       */
-  				if (lastequality && (preIns && preDel && postIns && postDel || lastequality.length < 2 && preIns + preDel + postIns + postDel === 3)) {
-
-  					// Duplicate record.
-  					diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]);
-
-  					// Change second copy to insert.
-  					diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
-  					equalitiesLength--; // Throw away the equality we just deleted;
-  					lastequality = null;
-  					if (preIns && preDel) {
-
-  						// No changes made which could affect previous entry, keep going.
-  						postIns = postDel = true;
-  						equalitiesLength = 0;
-  					} else {
-  						equalitiesLength--; // Throw away the previous equality.
-  						pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
-  						postIns = postDel = false;
-  					}
-  					changes = true;
-  				}
-  			}
-  			pointer++;
-  		}
-
-  		if (changes) {
-  			this.diffCleanupMerge(diffs);
-  		}
-  	};
-
-  	/**
-    * Convert a diff array into a pretty HTML report.
-    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
-    * @param {integer} string to be beautified.
-    * @return {string} HTML representation.
-    */
-  	DiffMatchPatch.prototype.diffPrettyHtml = function (diffs) {
-  		var op,
-  		    data,
-  		    x,
-  		    html = [];
-  		for (x = 0; x < diffs.length; x++) {
-  			op = diffs[x][0]; // Operation (insert, delete, equal)
-  			data = diffs[x][1]; // Text of change.
-  			switch (op) {
-  				case DIFF_INSERT:
-  					html[x] = "<ins>" + escapeText(data) + "</ins>";
-  					break;
-  				case DIFF_DELETE:
-  					html[x] = "<del>" + escapeText(data) + "</del>";
-  					break;
-  				case DIFF_EQUAL:
-  					html[x] = "<span>" + escapeText(data) + "</span>";
-  					break;
-  			}
-  		}
-  		return html.join("");
-  	};
-
-  	/**
-    * Determine the common prefix of two strings.
-    * @param {string} text1 First string.
-    * @param {string} text2 Second string.
-    * @return {number} The number of characters common to the start of each
-    *     string.
-    */
-  	DiffMatchPatch.prototype.diffCommonPrefix = function (text1, text2) {
-  		var pointermid, pointermax, pointermin, pointerstart;
-
-  		// Quick check for common null cases.
-  		if (!text1 || !text2 || text1.charAt(0) !== text2.charAt(0)) {
-  			return 0;
-  		}
-
-  		// Binary search.
-  		// Performance analysis: https://neil.fraser.name/news/2007/10/09/
-  		pointermin = 0;
-  		pointermax = Math.min(text1.length, text2.length);
-  		pointermid = pointermax;
-  		pointerstart = 0;
-  		while (pointermin < pointermid) {
-  			if (text1.substring(pointerstart, pointermid) === text2.substring(pointerstart, pointermid)) {
-  				pointermin = pointermid;
-  				pointerstart = pointermin;
-  			} else {
-  				pointermax = pointermid;
-  			}
-  			pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
-  		}
-  		return pointermid;
-  	};
-
-  	/**
-    * Determine the common suffix of two strings.
-    * @param {string} text1 First string.
-    * @param {string} text2 Second string.
-    * @return {number} The number of characters common to the end of each string.
-    */
-  	DiffMatchPatch.prototype.diffCommonSuffix = function (text1, text2) {
-  		var pointermid, pointermax, pointermin, pointerend;
-
-  		// Quick check for common null cases.
-  		if (!text1 || !text2 || text1.charAt(text1.length - 1) !== text2.charAt(text2.length - 1)) {
-  			return 0;
-  		}
-
-  		// Binary search.
-  		// Performance analysis: https://neil.fraser.name/news/2007/10/09/
-  		pointermin = 0;
-  		pointermax = Math.min(text1.length, text2.length);
-  		pointermid = pointermax;
-  		pointerend = 0;
-  		while (pointermin < pointermid) {
-  			if (text1.substring(text1.length - pointermid, text1.length - pointerend) === text2.substring(text2.length - pointermid, text2.length - pointerend)) {
-  				pointermin = pointermid;
-  				pointerend = pointermin;
-  			} else {
-  				pointermax = pointermid;
-  			}
-  			pointermid = Math.floor((pointermax - pointermin) / 2 + pointermin);
-  		}
-  		return pointermid;
-  	};
-
-  	/**
-    * Find the differences between two texts.  Assumes that the texts do not
-    * have any common prefix or suffix.
-    * @param {string} text1 Old string to be diffed.
-    * @param {string} text2 New string to be diffed.
-    * @param {boolean} checklines Speedup flag.  If false, then don't run a
-    *     line-level diff first to identify the changed areas.
-    *     If true, then run a faster, slightly less optimal diff.
-    * @param {number} deadline Time when the diff should be complete by.
-    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffCompute = function (text1, text2, checklines, deadline) {
-  		var diffs, longtext, shorttext, i, hm, text1A, text2A, text1B, text2B, midCommon, diffsA, diffsB;
-
-  		if (!text1) {
-
-  			// Just add some text (speedup).
-  			return [[DIFF_INSERT, text2]];
-  		}
-
-  		if (!text2) {
-
-  			// Just delete some text (speedup).
-  			return [[DIFF_DELETE, text1]];
-  		}
-
-  		longtext = text1.length > text2.length ? text1 : text2;
-  		shorttext = text1.length > text2.length ? text2 : text1;
-  		i = longtext.indexOf(shorttext);
-  		if (i !== -1) {
-
-  			// Shorter text is inside the longer text (speedup).
-  			diffs = [[DIFF_INSERT, longtext.substring(0, i)], [DIFF_EQUAL, shorttext], [DIFF_INSERT, longtext.substring(i + shorttext.length)]];
-
-  			// Swap insertions for deletions if diff is reversed.
-  			if (text1.length > text2.length) {
-  				diffs[0][0] = diffs[2][0] = DIFF_DELETE;
-  			}
-  			return diffs;
-  		}
-
-  		if (shorttext.length === 1) {
-
-  			// Single character string.
-  			// After the previous speedup, the character can't be an equality.
-  			return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
-  		}
-
-  		// Check to see if the problem can be split in two.
-  		hm = this.diffHalfMatch(text1, text2);
-  		if (hm) {
-
-  			// A half-match was found, sort out the return data.
-  			text1A = hm[0];
-  			text1B = hm[1];
-  			text2A = hm[2];
-  			text2B = hm[3];
-  			midCommon = hm[4];
-
-  			// Send both pairs off for separate processing.
-  			diffsA = this.DiffMain(text1A, text2A, checklines, deadline);
-  			diffsB = this.DiffMain(text1B, text2B, checklines, deadline);
-
-  			// Merge the results.
-  			return diffsA.concat([[DIFF_EQUAL, midCommon]], diffsB);
-  		}
-
-  		if (checklines && text1.length > 100 && text2.length > 100) {
-  			return this.diffLineMode(text1, text2, deadline);
-  		}
-
-  		return this.diffBisect(text1, text2, deadline);
-  	};
-
-  	/**
-    * Do the two texts share a substring which is at least half the length of the
-    * longer text?
-    * This speedup can produce non-minimal diffs.
-    * @param {string} text1 First string.
-    * @param {string} text2 Second string.
-    * @return {Array.<string>} Five element Array, containing the prefix of
-    *     text1, the suffix of text1, the prefix of text2, the suffix of
-    *     text2 and the common middle.  Or null if there was no match.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffHalfMatch = function (text1, text2) {
-  		var longtext, shorttext, dmp, text1A, text2B, text2A, text1B, midCommon, hm1, hm2, hm;
-
-  		longtext = text1.length > text2.length ? text1 : text2;
-  		shorttext = text1.length > text2.length ? text2 : text1;
-  		if (longtext.length < 4 || shorttext.length * 2 < longtext.length) {
-  			return null; // Pointless.
-  		}
-  		dmp = this; // 'this' becomes 'window' in a closure.
-
-  		/**
-     * Does a substring of shorttext exist within longtext such that the substring
-     * is at least half the length of longtext?
-     * Closure, but does not reference any external variables.
-     * @param {string} longtext Longer string.
-     * @param {string} shorttext Shorter string.
-     * @param {number} i Start index of quarter length substring within longtext.
-     * @return {Array.<string>} Five element Array, containing the prefix of
-     *     longtext, the suffix of longtext, the prefix of shorttext, the suffix
-     *     of shorttext and the common middle.  Or null if there was no match.
-     * @private
-     */
-  		function diffHalfMatchI(longtext, shorttext, i) {
-  			var seed, j, bestCommon, prefixLength, suffixLength, bestLongtextA, bestLongtextB, bestShorttextA, bestShorttextB;
-
-  			// Start with a 1/4 length substring at position i as a seed.
-  			seed = longtext.substring(i, i + Math.floor(longtext.length / 4));
-  			j = -1;
-  			bestCommon = "";
-  			while ((j = shorttext.indexOf(seed, j + 1)) !== -1) {
-  				prefixLength = dmp.diffCommonPrefix(longtext.substring(i), shorttext.substring(j));
-  				suffixLength = dmp.diffCommonSuffix(longtext.substring(0, i), shorttext.substring(0, j));
-  				if (bestCommon.length < suffixLength + prefixLength) {
-  					bestCommon = shorttext.substring(j - suffixLength, j) + shorttext.substring(j, j + prefixLength);
-  					bestLongtextA = longtext.substring(0, i - suffixLength);
-  					bestLongtextB = longtext.substring(i + prefixLength);
-  					bestShorttextA = shorttext.substring(0, j - suffixLength);
-  					bestShorttextB = shorttext.substring(j + prefixLength);
-  				}
-  			}
-  			if (bestCommon.length * 2 >= longtext.length) {
-  				return [bestLongtextA, bestLongtextB, bestShorttextA, bestShorttextB, bestCommon];
-  			} else {
-  				return null;
-  			}
-  		}
-
-  		// First check if the second quarter is the seed for a half-match.
-  		hm1 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 4));
-
-  		// Check again based on the third quarter.
-  		hm2 = diffHalfMatchI(longtext, shorttext, Math.ceil(longtext.length / 2));
-  		if (!hm1 && !hm2) {
-  			return null;
-  		} else if (!hm2) {
-  			hm = hm1;
-  		} else if (!hm1) {
-  			hm = hm2;
-  		} else {
-
-  			// Both matched.  Select the longest.
-  			hm = hm1[4].length > hm2[4].length ? hm1 : hm2;
-  		}
-
-  		// A half-match was found, sort out the return data.
-  		if (text1.length > text2.length) {
-  			text1A = hm[0];
-  			text1B = hm[1];
-  			text2A = hm[2];
-  			text2B = hm[3];
-  		} else {
-  			text2A = hm[0];
-  			text2B = hm[1];
-  			text1A = hm[2];
-  			text1B = hm[3];
-  		}
-  		midCommon = hm[4];
-  		return [text1A, text1B, text2A, text2B, midCommon];
-  	};
-
-  	/**
-    * Do a quick line-level diff on both strings, then rediff the parts for
-    * greater accuracy.
-    * This speedup can produce non-minimal diffs.
-    * @param {string} text1 Old string to be diffed.
-    * @param {string} text2 New string to be diffed.
-    * @param {number} deadline Time when the diff should be complete by.
-    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffLineMode = function (text1, text2, deadline) {
-  		var a, diffs, linearray, pointer, countInsert, countDelete, textInsert, textDelete, j;
-
-  		// Scan the text on a line-by-line basis first.
-  		a = this.diffLinesToChars(text1, text2);
-  		text1 = a.chars1;
-  		text2 = a.chars2;
-  		linearray = a.lineArray;
-
-  		diffs = this.DiffMain(text1, text2, false, deadline);
-
-  		// Convert the diff back to original text.
-  		this.diffCharsToLines(diffs, linearray);
-
-  		// Eliminate freak matches (e.g. blank lines)
-  		this.diffCleanupSemantic(diffs);
-
-  		// Rediff any replacement blocks, this time character-by-character.
-  		// Add a dummy entry at the end.
-  		diffs.push([DIFF_EQUAL, ""]);
-  		pointer = 0;
-  		countDelete = 0;
-  		countInsert = 0;
-  		textDelete = "";
-  		textInsert = "";
-  		while (pointer < diffs.length) {
-  			switch (diffs[pointer][0]) {
-  				case DIFF_INSERT:
-  					countInsert++;
-  					textInsert += diffs[pointer][1];
-  					break;
-  				case DIFF_DELETE:
-  					countDelete++;
-  					textDelete += diffs[pointer][1];
-  					break;
-  				case DIFF_EQUAL:
-
-  					// Upon reaching an equality, check for prior redundancies.
-  					if (countDelete >= 1 && countInsert >= 1) {
-
-  						// Delete the offending records and add the merged ones.
-  						diffs.splice(pointer - countDelete - countInsert, countDelete + countInsert);
-  						pointer = pointer - countDelete - countInsert;
-  						a = this.DiffMain(textDelete, textInsert, false, deadline);
-  						for (j = a.length - 1; j >= 0; j--) {
-  							diffs.splice(pointer, 0, a[j]);
-  						}
-  						pointer = pointer + a.length;
-  					}
-  					countInsert = 0;
-  					countDelete = 0;
-  					textDelete = "";
-  					textInsert = "";
-  					break;
-  			}
-  			pointer++;
-  		}
-  		diffs.pop(); // Remove the dummy entry at the end.
-
-  		return diffs;
-  	};
-
-  	/**
-    * Find the 'middle snake' of a diff, split the problem in two
-    * and return the recursively constructed diff.
-    * See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.
-    * @param {string} text1 Old string to be diffed.
-    * @param {string} text2 New string to be diffed.
-    * @param {number} deadline Time at which to bail if not yet complete.
-    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffBisect = function (text1, text2, deadline) {
-  		var text1Length, text2Length, maxD, vOffset, vLength, v1, v2, x, delta, front, k1start, k1end, k2start, k2end, k2Offset, k1Offset, x1, x2, y1, y2, d, k1, k2;
-
-  		// Cache the text lengths to prevent multiple calls.
-  		text1Length = text1.length;
-  		text2Length = text2.length;
-  		maxD = Math.ceil((text1Length + text2Length) / 2);
-  		vOffset = maxD;
-  		vLength = 2 * maxD;
-  		v1 = new Array(vLength);
-  		v2 = new Array(vLength);
-
-  		// Setting all elements to -1 is faster in Chrome & Firefox than mixing
-  		// integers and undefined.
-  		for (x = 0; x < vLength; x++) {
-  			v1[x] = -1;
-  			v2[x] = -1;
-  		}
-  		v1[vOffset + 1] = 0;
-  		v2[vOffset + 1] = 0;
-  		delta = text1Length - text2Length;
-
-  		// If the total number of characters is odd, then the front path will collide
-  		// with the reverse path.
-  		front = delta % 2 !== 0;
-
-  		// Offsets for start and end of k loop.
-  		// Prevents mapping of space beyond the grid.
-  		k1start = 0;
-  		k1end = 0;
-  		k2start = 0;
-  		k2end = 0;
-  		for (d = 0; d < maxD; d++) {
-
-  			// Bail out if deadline is reached.
-  			if (new Date().getTime() > deadline) {
-  				break;
-  			}
-
-  			// Walk the front path one step.
-  			for (k1 = -d + k1start; k1 <= d - k1end; k1 += 2) {
-  				k1Offset = vOffset + k1;
-  				if (k1 === -d || k1 !== d && v1[k1Offset - 1] < v1[k1Offset + 1]) {
-  					x1 = v1[k1Offset + 1];
-  				} else {
-  					x1 = v1[k1Offset - 1] + 1;
-  				}
-  				y1 = x1 - k1;
-  				while (x1 < text1Length && y1 < text2Length && text1.charAt(x1) === text2.charAt(y1)) {
-  					x1++;
-  					y1++;
-  				}
-  				v1[k1Offset] = x1;
-  				if (x1 > text1Length) {
-
-  					// Ran off the right of the graph.
-  					k1end += 2;
-  				} else if (y1 > text2Length) {
-
-  					// Ran off the bottom of the graph.
-  					k1start += 2;
-  				} else if (front) {
-  					k2Offset = vOffset + delta - k1;
-  					if (k2Offset >= 0 && k2Offset < vLength && v2[k2Offset] !== -1) {
-
-  						// Mirror x2 onto top-left coordinate system.
-  						x2 = text1Length - v2[k2Offset];
-  						if (x1 >= x2) {
-
-  							// Overlap detected.
-  							return this.diffBisectSplit(text1, text2, x1, y1, deadline);
-  						}
-  					}
-  				}
-  			}
-
-  			// Walk the reverse path one step.
-  			for (k2 = -d + k2start; k2 <= d - k2end; k2 += 2) {
-  				k2Offset = vOffset + k2;
-  				if (k2 === -d || k2 !== d && v2[k2Offset - 1] < v2[k2Offset + 1]) {
-  					x2 = v2[k2Offset + 1];
-  				} else {
-  					x2 = v2[k2Offset - 1] + 1;
-  				}
-  				y2 = x2 - k2;
-  				while (x2 < text1Length && y2 < text2Length && text1.charAt(text1Length - x2 - 1) === text2.charAt(text2Length - y2 - 1)) {
-  					x2++;
-  					y2++;
-  				}
-  				v2[k2Offset] = x2;
-  				if (x2 > text1Length) {
-
-  					// Ran off the left of the graph.
-  					k2end += 2;
-  				} else if (y2 > text2Length) {
-
-  					// Ran off the top of the graph.
-  					k2start += 2;
-  				} else if (!front) {
-  					k1Offset = vOffset + delta - k2;
-  					if (k1Offset >= 0 && k1Offset < vLength && v1[k1Offset] !== -1) {
-  						x1 = v1[k1Offset];
-  						y1 = vOffset + x1 - k1Offset;
-
-  						// Mirror x2 onto top-left coordinate system.
-  						x2 = text1Length - x2;
-  						if (x1 >= x2) {
-
-  							// Overlap detected.
-  							return this.diffBisectSplit(text1, text2, x1, y1, deadline);
-  						}
-  					}
-  				}
-  			}
-  		}
-
-  		// Diff took too long and hit the deadline or
-  		// number of diffs equals number of characters, no commonality at all.
-  		return [[DIFF_DELETE, text1], [DIFF_INSERT, text2]];
-  	};
-
-  	/**
-    * Given the location of the 'middle snake', split the diff in two parts
-    * and recurse.
-    * @param {string} text1 Old string to be diffed.
-    * @param {string} text2 New string to be diffed.
-    * @param {number} x Index of split point in text1.
-    * @param {number} y Index of split point in text2.
-    * @param {number} deadline Time at which to bail if not yet complete.
-    * @return {!Array.<!DiffMatchPatch.Diff>} Array of diff tuples.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffBisectSplit = function (text1, text2, x, y, deadline) {
-  		var text1a, text1b, text2a, text2b, diffs, diffsb;
-  		text1a = text1.substring(0, x);
-  		text2a = text2.substring(0, y);
-  		text1b = text1.substring(x);
-  		text2b = text2.substring(y);
-
-  		// Compute both diffs serially.
-  		diffs = this.DiffMain(text1a, text2a, false, deadline);
-  		diffsb = this.DiffMain(text1b, text2b, false, deadline);
-
-  		return diffs.concat(diffsb);
-  	};
-
-  	/**
-    * Reduce the number of edits by eliminating semantically trivial equalities.
-    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
-    */
-  	DiffMatchPatch.prototype.diffCleanupSemantic = function (diffs) {
-  		var changes, equalities, equalitiesLength, lastequality, pointer, lengthInsertions2, lengthDeletions2, lengthInsertions1, lengthDeletions1, deletion, insertion, overlapLength1, overlapLength2;
-  		changes = false;
-  		equalities = []; // Stack of indices where equalities are found.
-  		equalitiesLength = 0; // Keeping our own length var is faster in JS.
-  		/** @type {?string} */
-  		lastequality = null;
-
-  		// Always equal to diffs[equalities[equalitiesLength - 1]][1]
-  		pointer = 0; // Index of current position.
-
-  		// Number of characters that changed prior to the equality.
-  		lengthInsertions1 = 0;
-  		lengthDeletions1 = 0;
-
-  		// Number of characters that changed after the equality.
-  		lengthInsertions2 = 0;
-  		lengthDeletions2 = 0;
-  		while (pointer < diffs.length) {
-  			if (diffs[pointer][0] === DIFF_EQUAL) {
-  				// Equality found.
-  				equalities[equalitiesLength++] = pointer;
-  				lengthInsertions1 = lengthInsertions2;
-  				lengthDeletions1 = lengthDeletions2;
-  				lengthInsertions2 = 0;
-  				lengthDeletions2 = 0;
-  				lastequality = diffs[pointer][1];
-  			} else {
-  				// An insertion or deletion.
-  				if (diffs[pointer][0] === DIFF_INSERT) {
-  					lengthInsertions2 += diffs[pointer][1].length;
-  				} else {
-  					lengthDeletions2 += diffs[pointer][1].length;
-  				}
-
-  				// Eliminate an equality that is smaller or equal to the edits on both
-  				// sides of it.
-  				if (lastequality && lastequality.length <= Math.max(lengthInsertions1, lengthDeletions1) && lastequality.length <= Math.max(lengthInsertions2, lengthDeletions2)) {
-
-  					// Duplicate record.
-  					diffs.splice(equalities[equalitiesLength - 1], 0, [DIFF_DELETE, lastequality]);
-
-  					// Change second copy to insert.
-  					diffs[equalities[equalitiesLength - 1] + 1][0] = DIFF_INSERT;
-
-  					// Throw away the equality we just deleted.
-  					equalitiesLength--;
-
-  					// Throw away the previous equality (it needs to be reevaluated).
-  					equalitiesLength--;
-  					pointer = equalitiesLength > 0 ? equalities[equalitiesLength - 1] : -1;
-
-  					// Reset the counters.
-  					lengthInsertions1 = 0;
-  					lengthDeletions1 = 0;
-  					lengthInsertions2 = 0;
-  					lengthDeletions2 = 0;
-  					lastequality = null;
-  					changes = true;
-  				}
-  			}
-  			pointer++;
-  		}
-
-  		// Normalize the diff.
-  		if (changes) {
-  			this.diffCleanupMerge(diffs);
-  		}
-
-  		// Find any overlaps between deletions and insertions.
-  		// e.g: <del>abcxxx</del><ins>xxxdef</ins>
-  		//   -> <del>abc</del>xxx<ins>def</ins>
-  		// e.g: <del>xxxabc</del><ins>defxxx</ins>
-  		//   -> <ins>def</ins>xxx<del>abc</del>
-  		// Only extract an overlap if it is as big as the edit ahead or behind it.
-  		pointer = 1;
-  		while (pointer < diffs.length) {
-  			if (diffs[pointer - 1][0] === DIFF_DELETE && diffs[pointer][0] === DIFF_INSERT) {
-  				deletion = diffs[pointer - 1][1];
-  				insertion = diffs[pointer][1];
-  				overlapLength1 = this.diffCommonOverlap(deletion, insertion);
-  				overlapLength2 = this.diffCommonOverlap(insertion, deletion);
-  				if (overlapLength1 >= overlapLength2) {
-  					if (overlapLength1 >= deletion.length / 2 || overlapLength1 >= insertion.length / 2) {
-
-  						// Overlap found.  Insert an equality and trim the surrounding edits.
-  						diffs.splice(pointer, 0, [DIFF_EQUAL, insertion.substring(0, overlapLength1)]);
-  						diffs[pointer - 1][1] = deletion.substring(0, deletion.length - overlapLength1);
-  						diffs[pointer + 1][1] = insertion.substring(overlapLength1);
-  						pointer++;
-  					}
-  				} else {
-  					if (overlapLength2 >= deletion.length / 2 || overlapLength2 >= insertion.length / 2) {
-
-  						// Reverse overlap found.
-  						// Insert an equality and swap and trim the surrounding edits.
-  						diffs.splice(pointer, 0, [DIFF_EQUAL, deletion.substring(0, overlapLength2)]);
-
-  						diffs[pointer - 1][0] = DIFF_INSERT;
-  						diffs[pointer - 1][1] = insertion.substring(0, insertion.length - overlapLength2);
-  						diffs[pointer + 1][0] = DIFF_DELETE;
-  						diffs[pointer + 1][1] = deletion.substring(overlapLength2);
-  						pointer++;
-  					}
-  				}
-  				pointer++;
-  			}
-  			pointer++;
-  		}
-  	};
-
-  	/**
-    * Determine if the suffix of one string is the prefix of another.
-    * @param {string} text1 First string.
-    * @param {string} text2 Second string.
-    * @return {number} The number of characters common to the end of the first
-    *     string and the start of the second string.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffCommonOverlap = function (text1, text2) {
-  		var text1Length, text2Length, textLength, best, length, pattern, found;
-
-  		// Cache the text lengths to prevent multiple calls.
-  		text1Length = text1.length;
-  		text2Length = text2.length;
-
-  		// Eliminate the null case.
-  		if (text1Length === 0 || text2Length === 0) {
-  			return 0;
-  		}
-
-  		// Truncate the longer string.
-  		if (text1Length > text2Length) {
-  			text1 = text1.substring(text1Length - text2Length);
-  		} else if (text1Length < text2Length) {
-  			text2 = text2.substring(0, text1Length);
-  		}
-  		textLength = Math.min(text1Length, text2Length);
-
-  		// Quick check for the worst case.
-  		if (text1 === text2) {
-  			return textLength;
-  		}
-
-  		// Start by looking for a single character match
-  		// and increase length until no match is found.
-  		// Performance analysis: https://neil.fraser.name/news/2010/11/04/
-  		best = 0;
-  		length = 1;
-  		while (true) {
-  			pattern = text1.substring(textLength - length);
-  			found = text2.indexOf(pattern);
-  			if (found === -1) {
-  				return best;
-  			}
-  			length += found;
-  			if (found === 0 || text1.substring(textLength - length) === text2.substring(0, length)) {
-  				best = length;
-  				length++;
-  			}
-  		}
-  	};
-
-  	/**
-    * Split two texts into an array of strings.  Reduce the texts to a string of
-    * hashes where each Unicode character represents one line.
-    * @param {string} text1 First string.
-    * @param {string} text2 Second string.
-    * @return {{chars1: string, chars2: string, lineArray: !Array.<string>}}
-    *     An object containing the encoded text1, the encoded text2 and
-    *     the array of unique strings.
-    *     The zeroth element of the array of unique strings is intentionally blank.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffLinesToChars = function (text1, text2) {
-  		var lineArray, lineHash, chars1, chars2;
-  		lineArray = []; // E.g. lineArray[4] === 'Hello\n'
-  		lineHash = {}; // E.g. lineHash['Hello\n'] === 4
-
-  		// '\x00' is a valid character, but various debuggers don't like it.
-  		// So we'll insert a junk entry to avoid generating a null character.
-  		lineArray[0] = "";
-
-  		/**
-     * Split a text into an array of strings.  Reduce the texts to a string of
-     * hashes where each Unicode character represents one line.
-     * Modifies linearray and linehash through being a closure.
-     * @param {string} text String to encode.
-     * @return {string} Encoded string.
-     * @private
-     */
-  		function diffLinesToCharsMunge(text) {
-  			var chars, lineStart, lineEnd, lineArrayLength, line;
-  			chars = "";
-
-  			// Walk the text, pulling out a substring for each line.
-  			// text.split('\n') would would temporarily double our memory footprint.
-  			// Modifying text would create many large strings to garbage collect.
-  			lineStart = 0;
-  			lineEnd = -1;
-
-  			// Keeping our own length variable is faster than looking it up.
-  			lineArrayLength = lineArray.length;
-  			while (lineEnd < text.length - 1) {
-  				lineEnd = text.indexOf("\n", lineStart);
-  				if (lineEnd === -1) {
-  					lineEnd = text.length - 1;
-  				}
-  				line = text.substring(lineStart, lineEnd + 1);
-  				lineStart = lineEnd + 1;
-
-  				var lineHashExists = lineHash.hasOwnProperty ? lineHash.hasOwnProperty(line) : lineHash[line] !== undefined;
-
-  				if (lineHashExists) {
-  					chars += String.fromCharCode(lineHash[line]);
-  				} else {
-  					chars += String.fromCharCode(lineArrayLength);
-  					lineHash[line] = lineArrayLength;
-  					lineArray[lineArrayLength++] = line;
-  				}
-  			}
-  			return chars;
-  		}
-
-  		chars1 = diffLinesToCharsMunge(text1);
-  		chars2 = diffLinesToCharsMunge(text2);
-  		return {
-  			chars1: chars1,
-  			chars2: chars2,
-  			lineArray: lineArray
-  		};
-  	};
-
-  	/**
-    * Rehydrate the text in a diff from a string of line hashes to real lines of
-    * text.
-    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
-    * @param {!Array.<string>} lineArray Array of unique strings.
-    * @private
-    */
-  	DiffMatchPatch.prototype.diffCharsToLines = function (diffs, lineArray) {
-  		var x, chars, text, y;
-  		for (x = 0; x < diffs.length; x++) {
-  			chars = diffs[x][1];
-  			text = [];
-  			for (y = 0; y < chars.length; y++) {
-  				text[y] = lineArray[chars.charCodeAt(y)];
-  			}
-  			diffs[x][1] = text.join("");
-  		}
-  	};
-
-  	/**
-    * Reorder and merge like edit sections.  Merge equalities.
-    * Any edit section can move as long as it doesn't cross an equality.
-    * @param {!Array.<!DiffMatchPatch.Diff>} diffs Array of diff tuples.
-    */
-  	DiffMatchPatch.prototype.diffCleanupMerge = function (diffs) {
-  		var pointer, countDelete, countInsert, textInsert, textDelete, commonlength, changes, diffPointer, position;
-  		diffs.push([DIFF_EQUAL, ""]); // Add a dummy entry at the end.
-  		pointer = 0;
-  		countDelete = 0;
-  		countInsert = 0;
-  		textDelete = "";
-  		textInsert = "";
-
-  		while (pointer < diffs.length) {
-  			switch (diffs[pointer][0]) {
-  				case DIFF_INSERT:
-  					countInsert++;
-  					textInsert += diffs[pointer][1];
-  					pointer++;
-  					break;
-  				case DIFF_DELETE:
-  					countDelete++;
-  					textDelete += diffs[pointer][1];
-  					pointer++;
-  					break;
-  				case DIFF_EQUAL:
-
-  					// Upon reaching an equality, check for prior redundancies.
-  					if (countDelete + countInsert > 1) {
-  						if (countDelete !== 0 && countInsert !== 0) {
-
-  							// Factor out any common prefixes.
-  							commonlength = this.diffCommonPrefix(textInsert, textDelete);
-  							if (commonlength !== 0) {
-  								if (pointer - countDelete - countInsert > 0 && diffs[pointer - countDelete - countInsert - 1][0] === DIFF_EQUAL) {
-  									diffs[pointer - countDelete - countInsert - 1][1] += textInsert.substring(0, commonlength);
-  								} else {
-  									diffs.splice(0, 0, [DIFF_EQUAL, textInsert.substring(0, commonlength)]);
-  									pointer++;
-  								}
-  								textInsert = textInsert.substring(commonlength);
-  								textDelete = textDelete.substring(commonlength);
-  							}
-
-  							// Factor out any common suffixies.
-  							commonlength = this.diffCommonSuffix(textInsert, textDelete);
-  							if (commonlength !== 0) {
-  								diffs[pointer][1] = textInsert.substring(textInsert.length - commonlength) + diffs[pointer][1];
-  								textInsert = textInsert.substring(0, textInsert.length - commonlength);
-  								textDelete = textDelete.substring(0, textDelete.length - commonlength);
-  							}
-  						}
-
-  						// Delete the offending records and add the merged ones.
-  						if (countDelete === 0) {
-  							diffs.splice(pointer - countInsert, countDelete + countInsert, [DIFF_INSERT, textInsert]);
-  						} else if (countInsert === 0) {
-  							diffs.splice(pointer - countDelete, countDelete + countInsert, [DIFF_DELETE, textDelete]);
-  						} else {
-  							diffs.splice(pointer - countDelete - countInsert, countDelete + countInsert, [DIFF_DELETE, textDelete], [DIFF_INSERT, textInsert]);
-  						}
-  						pointer = pointer - countDelete - countInsert + (countDelete ? 1 : 0) + (countInsert ? 1 : 0) + 1;
-  					} else if (pointer !== 0 && diffs[pointer - 1][0] === DIFF_EQUAL) {
-
-  						// Merge this equality with the previous one.
-  						diffs[pointer - 1][1] += diffs[pointer][1];
-  						diffs.splice(pointer, 1);
-  					} else {
-  						pointer++;
-  					}
-  					countInsert = 0;
-  					countDelete = 0;
-  					textDelete = "";
-  					textInsert = "";
-  					break;
-  			}
-  		}
-  		if (diffs[diffs.length - 1][1] === "") {
-  			diffs.pop(); // Remove the dummy entry at the end.
-  		}
-
-  		// Second pass: look for single edits surrounded on both sides by equalities
-  		// which can be shifted sideways to eliminate an equality.
-  		// e.g: A<ins>BA</ins>C -> <ins>AB</ins>AC
-  		changes = false;
-  		pointer = 1;
-
-  		// Intentionally ignore the first and last element (don't need checking).
-  		while (pointer < diffs.length - 1) {
-  			if (diffs[pointer - 1][0] === DIFF_EQUAL && diffs[pointer + 1][0] === DIFF_EQUAL) {
-
-  				diffPointer = diffs[pointer][1];
-  				position = diffPointer.substring(diffPointer.length - diffs[pointer - 1][1].length);
-
-  				// This is a single edit surrounded by equalities.
-  				if (position === diffs[pointer - 1][1]) {
-
-  					// Shift the edit over the previous equality.
-  					diffs[pointer][1] = diffs[pointer - 1][1] + diffs[pointer][1].substring(0, diffs[pointer][1].length - diffs[pointer - 1][1].length);
-  					diffs[pointer + 1][1] = diffs[pointer - 1][1] + diffs[pointer + 1][1];
-  					diffs.splice(pointer - 1, 1);
-  					changes = true;
-  				} else if (diffPointer.substring(0, diffs[pointer + 1][1].length) === diffs[pointer + 1][1]) {
-
-  					// Shift the edit over the next equality.
-  					diffs[pointer - 1][1] += diffs[pointer + 1][1];
-  					diffs[pointer][1] = diffs[pointer][1].substring(diffs[pointer + 1][1].length) + diffs[pointer + 1][1];
-  					diffs.splice(pointer + 1, 1);
-  					changes = true;
-  				}
-  			}
-  			pointer++;
-  		}
-
-  		// If shifts were made, the diff needs reordering and another shift sweep.
-  		if (changes) {
-  			this.diffCleanupMerge(diffs);
-  		}
-  	};
-
-  	return function (o, n) {
-  		var diff, output, text;
-  		diff = new DiffMatchPatch();
-  		output = diff.DiffMain(o, n);
-  		diff.diffCleanupEfficiency(output);
-  		text = diff.diffPrettyHtml(output);
-
-  		return text;
-  	};
-  }();
-
-}((function() { return this; }())));
 
 /*!
  * Sizzle CSS Selector Engine v2.3.3

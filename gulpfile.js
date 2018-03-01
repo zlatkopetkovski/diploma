@@ -4,7 +4,8 @@ var mainBowerFiles = require('gulp-main-bower-files');
 var concat = require('gulp-concat');
 //var uglify = require('gulp-uglify-es').default;
 //var rename = require('gulp-rename');
-var sass = require('gulp-ruby-sass');
+//var sass = require('gulp-ruby-sass');
+//var copy = require('gulp-copy');
 //var strip = require('gulp-strip-comments');  vadi error
 //Concat JS & minify
 gulp.task('scripts', function() {
@@ -17,19 +18,20 @@ gulp.task('scripts', function() {
       .pipe(gulp.dest('build/js'))
 });
 
- gulp.task('sass', function() {
-    return sass('src/**/*.scss', {style: 'compressed'})
-        .pipe(concat('sass.css'))
-        .pipe(gulp.dest('src/css'));
-});
+
 gulp.task('css', function(){
-	return gulp.src('src/css/*.css')
+	return gulp.src('src/**/*.css')
 		.pipe(concat('main.css'))
         .pipe(gulp.dest('build/css'));
+});
+
+gulp.task('html', function() {
+    gulp.src('src/*.html')
+        .pipe(gulp.dest('build'));
 });
 /*gulp.task('main-bower-files', function(){
 	return fulp.src('./bower.json')
 	.pipe(mainBowerFiles())
 });*/
 
-gulp.task('default', ['scripts', 'sass', 'css']);
+gulp.task('default', ['scripts', 'css', 'html']);

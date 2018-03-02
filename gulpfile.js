@@ -40,8 +40,13 @@ gulp.task('server',  function(){
 		.pipe(webserver({
 			open: true,
 		}))
-		.pipe(wait())
+		.pipe(wait(10000))
 		.pipe(exit());
+});
+
+gulp.task('copyfonts', function() {
+   gulp.src('src/**/*.{ttf,woff,eof,svg}')
+   .pipe(gulp.dest('build/fonts'));
 });
 
 /*gulp.task('main-bower-files', function(){
@@ -49,4 +54,4 @@ gulp.task('server',  function(){
 	.pipe(mainBowerFiles())
 });*/
 
-gulp.task('default', ['scripts', 'css', 'html', 'server']);
+gulp.task('default', ['scripts', 'css', 'html', 'copyfonts', 'server']);

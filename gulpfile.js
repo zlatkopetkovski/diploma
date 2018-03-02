@@ -20,13 +20,15 @@ var wait = require('gulp-wait');
       .pipe(gulp.dest('src/js/'));
 });*/
 
-gulp.task('jquery', function() {
+gulp.task('copy', function() {
    gulp.src('src/bower_components/jquery/dist/jquery.js')
    .pipe(gulp.dest('build/js'));
+   gulp.src('src/images/*')
+   .pipe(gulp.dest('build/images'))
 });
 
 gulp.task('scripts', function() {
-    return gulp.src(['src/bower_components/jquery/dist/jquery.js', '**/popper.js', 'src/bower_components/bootstrap/dist/js/bootstrap.js', 'src/js/*.js',])
+    return gulp.src(['src/bower_components/popper.js/dist/umd/popper.js', 'src/bower_components/bootstrap/dist/js/bootstrap.js', /*'src/bower_components/bootstrap/js/dist/*.js',*/ 'src/js/*.js'])
       .pipe(concat('main.js'))
       //.pipe(rename('main.min.js'))
       //.pipe(strip().on('error', console.error.bind(console)))
@@ -37,7 +39,7 @@ gulp.task('scripts', function() {
 
 
 gulp.task('css', function(){
-	return gulp.src(['src/css/*.css', 'src/bower_components/bootstrap/dist/css/bootstrap.css'])
+	return gulp.src(['src/bower_components/bootstrap/dist/css/bootstrap-reboot.min.css', 'src/bower_components/bootstrap/dist/css/*min.css', 'src/css/*.css'])
 		.pipe(concat('main.css'))
         .pipe(gulp.dest('build/css'));
 });
@@ -66,5 +68,5 @@ gulp.task('copyfonts', function() {
 	.pipe(mainBowerFiles())
 });*/
 
-gulp.task('default', ['jquery', 'scripts', 'css', 'html', 'copyfonts']);
+gulp.task('default', ['copy', 'scripts', 'css', 'html', 'copyfonts']);
 gulp.task('startServer', ['server']);

@@ -1,4 +1,7 @@
 /* Make the image fully responsive */
+body { 
+    padding-top: 56px; 
+}
 .carousel-inner img {
 	object-fit: none;
 	width: 100%;
@@ -7,10 +10,6 @@
 }
 .carousel-caption {
 	background-color: rgba(0, 200, 180, 0.5);
-}
-
-.jumbotron-margin{
-	margin-top: 20px;
 }
 
 .paralsec {

@@ -31,20 +31,43 @@ body {
 	object-fit: cover;
 }
 .carousel-caption {
-	background-color: rgba(0, 200, 180, 0.5);
+	border-radius: 10px;
+	background-color: rgba(0, 200, 180, 0.6);
 }
 
 .paralsec {
-    background-image: url(https://img.webnots.com/2017/05/parallax.jpg);
+    background-image: url("../images/leto2018.jpg");
+    border-radius: 0;
 }
 
 .paral {
-	color:red;
     min-height: 600px;
     background-attachment: fixed;
     background-size: cover;
     background-position: 50% 50%;
 }
-.trans{
-	opacity: 0.5;
+.paral-text{
+	color: rgba(0, 200, 180,1);
+	background-color: rgba(255,255,255,0.9);
+	padding-bottom: 10px;
+	border-radius: 10px; 
+}
+.list-group-item.active{
+	background-color: rgba(0,200,180,1);
+	border-color: rgba(0,200,180,1);
+}
+.my-tabs{
+	padding-bottom: 20px;
+	opacity: 0.8;
+}
+.my-link-color a{
+	border-radius: 10px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 20px;
+	background-color: rgba(255,255,255,0.9);
+	color: rgba(0,200,180,1);
+}
+.my-margin-top{
+	margin-top: 40px;
 }

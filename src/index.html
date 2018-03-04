@@ -19,13 +19,24 @@
           <a class="nav-link" href="index.html">Дома<!--<span class="sr-only">(current)</span>--></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Промотивни понуди</a>
+          <a class="nav-link" href="promo-ponudi.html">Промотивни понуди</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">За нас</a>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Лето 2018
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="leto-grcija.html">Грција</a>
+            <a class="dropdown-item" href="leto-crnagora.html">Црна гора</a>
+            <a class="dropdown-item" href="lrto-albanija.html">Албанија</a>
+            <a class="dropdown-item" href="leto-bugarija.html">Бугарија</a>
+          </div>
+        </li>
+          <a class="nav-link" href="za-nas.html">За нас</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Контакт</a>
+          <a class="nav-link" href="kontakt.html">Контакт</a>
         </li>
       </ul>
      <!-- <form class="form-inline mt-2 mt-md-0">
@@ -88,31 +99,56 @@
 
 <!--leto 2018-->
 <div class="jumbotron paral paralsec text-center jumbotron-margin">
-  <h1>Летување 2018</h1>
-  <h3>Време е да се одлучите каде да летувате оваа година!</h3>      
-  <div class="row">
-    <div class="col-4 trans">
+  <div class="paral-text">
+    <h1>Летување 2018</h1>
+    <h3>Време е да се одлучите каде да летувате оваа година!</h3>   
+  </div>   
+  <div class="row my-margin-top">
+    <div class="col-md-3 my-tabs">
       <div class="list-group" id="list-tab" role="tablist">
         <a class="list-group-item list-group-item-action active" id="letuvanje-grcija-list" data-toggle="list" href="#letuvanje-grcija" role="tab" aria-controls="grcija">Грција</a>
         <a class="list-group-item list-group-item-action" id="letuvanje-crnagora-list" data-toggle="list" href="#letuvenje-crnagora" role="tab" aria-controls="crnagora">Црна гора</a>
-        <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
-        <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+        <a class="list-group-item list-group-item-action" id="letuvanje-albanija-list" data-toggle="list" href="#letuvanje-albanija" role="tab" aria-controls="messages">Албанија</a>
+        <a class="list-group-item list-group-item-action" id="letuvanje-bugarija-list" data-toggle="list" href="#letuvanje-bugarija" role="tab" aria-controls="settings">Settings</a>
       </div>
     </div>
-    <div class="col-8">
+    <div class="col-md-9 my-link-color">
       <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="letuvanje-grcija" role="tabpanel" aria-labelledby="letuvanje-grcija-list">
-            <p>napisi za grcija</p>
+       <div class="row">
+        <div class="col-12 tab-pane active fade show" id="letuvanje-grcija" role="tabpanel" aria-labelledby="letuvanje-grcija-list">
+          <div class="row">
+            <a class="col-sm-4 col-md-3" href="#">Паралиа</a>
+            <a class="col-sm-4 col-md-3" href="#">Неупори</a>
+            <a class="col-sm-4 col-md-3" href="#">Лептокарија</a>
+            <a class="col-sm-4 col-md-3" href="#">Халкидики</a>
+            <a class="col-sm-4 col-md-3" href="#">Ситониа</a>
+            <a class="col-sm-4 col-md-3" href="#">Тасос</a>
+            <a class="col-sm-4 col-md-3" href="#">Олимписка ривиера</a>
+          </div>
         </div>
         <div class="tab-pane fade" id="letuvenje-crnagora" role="tabpanel" aria-labelledby="letuvanje-crnagora-list">
-            <p>napisi za crna gora</p>
+            <div class="row">
+            <a class="col-sm-4 col-md-3" href="#">Будва</a>
+            <a class="col-sm-4 col-md-3" href="#">Бечичи</a>
+            <a class="col-sm-4 col-md-3" href="#">Петровац</a>
+            <a class="col-sm-4 col-md-3" href="#">Херцег Нови</a>
+          </div>
         </div>
-        <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
-
+        <div class="tab-pane fade" id="letuvanje-albanija" role="tabpanel" aria-labelledby="letuvanje-albanija-list">
+            <div class="row">
+            <a class="col-sm-4 col-md-3" href="#">Ксамил</a>
+            <a class="col-sm-4 col-md-3" href="#">Саранда</a>
+          </div>
         </div>
-        <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
-
+        <div class="tab-pane fade" id="letuvanje-bugarija" role="tabpanel" aria-labelledby="letuvanje-bugarija-list">
+          <div class="row">
+            <a class="col-sm-4 col-md-3" href="#">Сончев Брег</a>
+            <a class="col-sm-4 col-md-3" href="#">Албена</a>
+            <a class="col-sm-4 col-md-3" href="#">Несебар</a>
+            <a class="col-sm-4 col-md-3" href="#">Златни Песоци</a>
+          </div>
         </div>
+       </div>
       </div>
     </div>
   </div>

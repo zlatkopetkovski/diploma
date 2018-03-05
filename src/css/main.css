@@ -1,5 +1,6 @@
 /* Make the image fully responsive */
 body { 
+	position: relative;
     padding-top: 56px; 
 }
 .carousel-inner img {
@@ -37,6 +38,22 @@ body {
 .my-tabs{
 	padding-bottom: 20px;
 	opacity: 0.8;
+}
+.my-dark-dropdown{
+	background-color: #343a40!important;
+}
+.my-dark-dropdown a{
+    color: rgba(255,255,255,.5);
+}
+.my-dark-dropdown .dropdown-item.active, .dropdown-item:active {
+    color: #fff!important;
+    text-decoration: none;
+    background-color: transparent;
+}
+.my-dark-dropdown .dropdown-item.active, .dropdown-item:hover {
+    color: rgba(255,255,255,.8);
+    text-decoration: none;
+    background-color: transparent;
 }
 .my-link-color a{
 	border-radius: 10px;

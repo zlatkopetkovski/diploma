@@ -5,9 +5,9 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 	<title></title>
 </head>
-<body>
-<header>
-    <!--moeto meni-->
+<body data-spy="scroll">
+<header> 
+	<!--moeto meni-->
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="index.html">Лого</a>
     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -15,18 +15,18 @@
     </button>
     <div class="navbar-collapse collapse" id="navbarCollapse" style="">
       <ul class="navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item">
           <a class="nav-link" href="index.html">Дома<!--<span class="sr-only">(current)</span>--></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="promo-ponudi.html">Промотивни понуди</a>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown ">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Лето 2018
           </a>
           <div class="dropdown-menu my-dark-dropdown" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="leto-grcija.html">Грција</a>
+            <a class="dropdown-item  active" href="leto-grcija.html">Грција</a>
             <a class="dropdown-item" href="leto-crnagora.html">Црна гора</a>
             <a class="dropdown-item" href="lrto-albanija.html">Албанија</a>
             <a class="dropdown-item" href="leto-bugarija.html">Бугарија</a>
@@ -46,56 +46,7 @@
     </div>
 </nav>
 </header>
-	<!--slajder so promotivni ponudi-->
-<div id="slajderPromoPonudi" class="carousel slide" data-ride="carousel">
 
-  <!-- Indicators -->
-  <ul class="carousel-indicators">
-    <li data-target="#slajderPromoPonudi" data-slide-to="0" class="active"></li>
-    <li data-target="#slajderPromoPonudi" data-slide-to="1"></li>
-    <li data-target="#slajderPromoPonudi" data-slide-to="2"></li>
-  </ul>
-
-  <!-- The slideshow -->
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <a href="#">
-	    <img src="images/lutraki.jpg" alt="Лутраки">
-	    <div class="carousel-caption">
-	    	<h3>Лутраки</h3>
-	    	<p>Секоја недела за само 500 денари!</p>
-	  	</div>
-  	  </a>
-    </div>
-    <div class="carousel-item">
-      <a href="#">
-	    <img src="images/bansko.jpg" alt="Банско">
-	    <div class="carousel-caption">
-	    	<h3>Банско</h3>
-	    	<p>Неверојатни неделни понуди!</p>
-	  	</div>
-  	  </a>
-    </div>
-    <div class="carousel-item">
-      <a href="#">
-	    <img src="images/mavrovo.jpg" alt="Маврово">
-	    <div class="carousel-caption">
-	    	<h3>Маврово</h3>
-	    	<p>Неверојатни викенд понуди!</p>
-	  	</div>
-  	  </a>
-    </div>
-  </div>
-
-  <!-- Left and right controls -->
-  <a class="carousel-control-prev" href="#slajderPromoPonudi" data-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </a>
-  <a class="carousel-control-next" href="#slajderPromoPonudi" data-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </a>
-</div>
-  <!--END slajder so promotivni ponudi-->
 
 <!--leto 2018-->
 <div class="jumbotron paral paralsec text-center jumbotron-margin">
@@ -103,10 +54,10 @@
     <h1>Летување 2018</h1>
     <h3>Време е да се одлучите каде да летувате оваа година!</h3>   
   </div>   
-  <div class="row my-margin-top">
+  <div class="row my-margin-top" data-target:"#list-tab">
     <div class="col-md-3 my-tabs">
       <div class="list-group" id="list-tab" role="tablist">
-        <a class="list-group-item list-group-item-action active" id="letuvanje-grcija-list" data-toggle="list" href="#letuvanje-grcija" role="tab" aria-controls="Grcija">Грција</a>
+        <a class="list-group-item list-group-item-action" id="letuvanje-grcija-list" data-toggle="list" href="#letuvanje-grcija" role="tab" aria-controls="Grcija">Грција</a>
         <a class="list-group-item list-group-item-action" id="letuvanje-crnagora-list" data-toggle="list" href="#letuvanje-crnagora" role="tab" aria-controls="CrnaGora">Црна Гора</a>
         <a class="list-group-item list-group-item-action" id="letuvanje-albanija-list" data-toggle="list" href="#letuvanje-albanija" role="tab" aria-controls="Albanija">Албанија</a>
         <a class="list-group-item list-group-item-action" id="letuvanje-bugarija-list" data-toggle="list" href="#letuvanje-bugarija" role="tab" aria-controls="Bugarija">Бугарија</a>
@@ -114,7 +65,7 @@
     </div>
     <div class="col-md-9 my-link-color">
       <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="letuvanje-grcija" role="tabpanel" aria-labelledby="letuvanje-grcija-list">
+        <div class="tab-pane fade show" id="letuvanje-grcija" role="tabpanel" aria-labelledby="letuvanje-grcija-list">
           <div class="row">
             <a class="col-sm-4 col-md-3" href="#">Паралиа</a>
             <a class="col-sm-4 col-md-3" href="#">Неупори</a>
@@ -152,30 +103,6 @@
   </div>
 </div>
 <!--END leto 2018-->
-
-<div class="jumbotron text-center">
-  <h1>Промотивни понуди</h1>
-  <p>кои не смеете да ги пропуштите!</p> 
-  <div class="container">
-    <ul class="nav justify-content-center">
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
-      </li>
-    </ul>
-  </div>
-</div>
-
-
-
 
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/main.js"></script>

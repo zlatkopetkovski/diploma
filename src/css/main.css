@@ -49,3 +49,8 @@ body {
 .my-margin-top{
 	margin-top: 40px;
 }
+.container-za-nas{
+	padding-left: 100px;
+	padding-right: 100px;
+	text-align: justify;
+}

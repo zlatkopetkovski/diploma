@@ -54,7 +54,7 @@ gulp.task('server',  function(){
 		.pipe(webserver({
 			open: true,
 		}))
-		.pipe(wait(10000))
+		.pipe(wait(60000))
 		.pipe(exit());
 });
 

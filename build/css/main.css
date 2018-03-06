@@ -93,3 +93,37 @@ body {
 	padding-right: 100px;
 	text-align: justify;
 }
+.leto-country{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.leto-country .rounded{
+	height: 100px;
+	width: 150px;
+	border-radius: 50%!important;
+	opacity: .5;
+	display: block;
+	margin: 0 auto;
+}
+#hover-img:hover{
+	opacity: 1;
+}
+.leto-country-active .rounded{
+	opacity: 1;
+}
+.leto-place{
+	margin-top: 40px;
+	margin-bottom: 20px;
+}
+.leto-place .rounded{
+	height: 200px;
+	width: 200px;
+	border-radius: 50%!important;
+	display: block;
+	margin: 0 auto;
+}
+@media screen and (max-width: 600px) {
+  .leto-country {
+    display: none;
+  }
+}

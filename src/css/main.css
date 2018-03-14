@@ -11,9 +11,9 @@ body {
 }
 .carousel-caption {
 	border-radius: 10px;
-	background-color: rgba(0, 200, 180, 0.6);
+	/*background-color: rgba(0, 200, 180, 0.6);*/
+	background-color: rgba(52, 58, 64, .6);
 }
-
 .paralsec {
     background-image: url("../images/leto2018.jpg");
     border-radius: 0;

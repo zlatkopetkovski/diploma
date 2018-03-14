@@ -12,28 +12,31 @@ body {
 .carousel-caption {
 	border-radius: 10px;
 	/*background-color: rgba(0, 200, 180, 0.6);*/
-	background-color: rgba(52, 58, 64, .6);
+	background-color: rgba(52, 58, 64, .8);
 }
 .paralsec {
-    background-image: url("../images/leto2018.jpg");
+    background-image: url("../images/leto2018-1.jpg");
     border-radius: 0;
 }
 
 .paral {
+	margin-bottom: 0px;
     min-height: 600px;
     background-attachment: fixed;
     background-size: cover;
     background-position: 50% 50%;
 }
 .paral-text{
-	color: rgba(0, 200, 180,1);
-	background-color: rgba(255,255,255,0.9);
+	/*color: rgba(0, 200, 180,1);
+	background-color: rgba(255,255,255,0.9);*/
+	color: #fff;
+	background-color: rgba(52, 58, 64, .8);
 	padding-bottom: 10px;
 	border-radius: 10px; 
 }
 .list-group-item.active{
-	background-color: rgba(0,200,180,1);
-	border-color: rgba(0,200,180,1);
+	background-color: rgba(52, 58, 64, 1);
+	border-color: rgba(52, 58, 64, 1);
 }
 .my-tabs{
 	padding-bottom: 20px;
@@ -60,8 +63,8 @@ body {
 	margin-left: 20px;
 	margin-right: 20px;
 	margin-bottom: 20px;
-	background-color: rgba(255,255,255,0.9);
-	color: rgba(0,200,180,1);
+	background-color: rgba(52, 58, 64, .6);
+	color: #fff;
 }
 .my-margin-top{
 	margin-top: 40px;
@@ -77,7 +80,7 @@ body {
 }
 .leto-country .rounded{
 	height: 100px;
-	width: 150px;
+	width: 120px;
 	border-radius: 50%!important;
 	opacity: .5;
 	display: block;
@@ -99,6 +102,29 @@ body {
 	border-radius: 50%!important;
 	display: block;
 	margin: 0 auto;
+}
+.my-footer{
+	color: #fff;
+	padding-top: 25px;
+	padding-bottom: 5px;
+	background-image: url("../images/footer.png");
+	background-attachment: fixed;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+.footer-image-rounded{
+	height: 50px;
+	width: 50px;
+	border-radius: 50%!important;
+	margin-bottom: 20px;
+}
+.footer-black{
+	padding-top: 2;
+	padding-bottom: 2;
+	background-color: #000;
+}
+.footer-black p{
+	color: #fff;
 }
 @media screen and (max-width: 600px) {
   .leto-country {

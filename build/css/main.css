@@ -64,6 +64,9 @@ body {
 	padding-bottom: 20px;
 	opacity: 0.8;
 }
+.summer a{
+	color: rgba(52, 58, 64, 1);
+}
 .my-dark-dropdown{
 	background-color: #343a40!important;
 }

@@ -24,7 +24,9 @@
 body { 
 	position: relative;
     padding-top: 56px; 
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
 .carousel-inner img {
 	object-fit: none;
 	width: 100%;
@@ -94,6 +96,9 @@ body {
 .my-margin-top{
 	margin-top: 40px;
 }
+.my-margin-bottom{
+	margin-bottom: 40px;
+}
 .container-za-nas{
 	padding-left: 100px;
 	padding-right: 100px;
@@ -101,6 +106,14 @@ body {
 }
 .leto-country{
 	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.rounded{
+	height: 200px;
+	width: 200px;
+	border-radius: 50%!important;
+	display: block;
+	margin: 0 auto;
 	margin-bottom: 20px;
 }
 .leto-country .rounded{
@@ -127,6 +140,7 @@ body {
 	border-radius: 50%!important;
 	display: block;
 	margin: 0 auto;
+	margin-bottom: 20px;
 }
 .my-footer{
 	color: #fff;

@@ -27,6 +27,9 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+.logo{
+	width: 40px;
+}
 .carousel-inner img {
 	object-fit: none;
 	width: 100%;
@@ -98,11 +101,6 @@ body {
 }
 .my-margin-bottom{
 	margin-bottom: 40px;
-}
-.container-za-nas{
-	padding-left: 100px;
-	padding-right: 100px;
-	text-align: justify;
 }
 .leto-country{
 	margin-top: 20px;
